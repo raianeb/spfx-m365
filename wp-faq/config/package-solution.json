@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "wp-faq-client-side-solution",
+    "id": "96bc262a-e19e-44b6-99ea-f1d6956cb00f",
+    "version": "1.0.1.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "wp-faq: perguntas frequentes do Espaço PUC Carreiras"
+      },
+      "longDescription": {
+        "default": "wp-faq: perguntas frequentes do Espaço PUC Carreiras, com ordenação, cópia de link e sugestão de novas perguntas por fluxo do Power Automate"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "wp-faq Feature",
+        "description": "The feature that activates elements of the wp-faq solution.",
+        "id": "40e413e4-6bce-47c3-b977-340e1e198748",
+        "version": "1.0.1.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/wp-faq.sppkg"
+  }
+}

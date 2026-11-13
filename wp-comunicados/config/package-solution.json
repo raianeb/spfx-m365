@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "wp-comunicados-client-side-solution",
+    "id": "de5f0f14-fa79-4400-ba6d-430313d21f27",
+    "version": "1.0.4.1",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "wp-comunicados: comunicados do Espaço PUC Carreiras"
+      },
+      "longDescription": {
+        "default": "wp-comunicados: comunicados do Espaço PUC Carreiras, com categorias gerenciadas em lista auxiliar"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "wp-comunicados Feature",
+        "description": "The feature that activates elements of the wp-comunicados solution.",
+        "id": "478ba2df-5140-4851-97dc-3921967934a4",
+        "version": "1.0.4.1"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/wp-comunicados.sppkg"
+  }
+}

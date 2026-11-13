@@ -1,0 +1,449 @@
+.root {
+  --wp-primary: #0b5cad;
+  --wp-primary-alt: #084a8c;
+  --wp-text: #1f1f1f;
+  --wp-muted: #5f5f5f;
+  --wp-surface: #f5f5f5;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: var(--wp-text);
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 13px;
+  color: var(--wp-muted);
+
+  a {
+    color: var(--wp-primary);
+    text-decoration: underline;
+  }
+}
+
+.filters {
+  padding: 16px;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  background: var(--wp-surface);
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px 16px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.filterCell {
+  min-width: 0;
+}
+
+.range {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.rangeLegend {
+  padding: 5px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--wp-text);
+}
+
+.rangeInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* Modo de data + entradas. Quebra em linha quando a célula é estreita. */
+.dateRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.dateModeCell {
+  flex: 0 0 112px;
+  min-width: 0;
+}
+
+.dateInputs {
+  flex: 1 1 150px;
+  min-width: 0;
+}
+
+.dateStack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.fieldError {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #a4262c;
+}
+
+.filterActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.results {
+  margin-top: 16px;
+}
+
+.message,
+.empty {
+  padding: 16px;
+  color: var(--wp-muted);
+}
+
+.skeleton {
+  min-height: 200px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #ececec 25%, #f6f6f6 50%, #ececec 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    padding: 10px 12px;
+    border-bottom: 1px solid #edebe9;
+    background: #faf9f8;
+    color: var(--wp-muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f3f2f1;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: #faf9f8;
+  }
+
+  a {
+    color: var(--wp-primary);
+    text-decoration: underline;
+  }
+}
+
+.cellLong {
+  max-width: 360px;
+}
+
+.clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pagerInfo {
+  font-size: 13px;
+  color: var(--wp-muted);
+}
+
+.pagerButtons {
+  display: flex;
+  gap: 4px;
+}
+
+@media (max-width: 600px) {
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    padding: 8px 0;
+    border-bottom: 1px solid #edebe9;
+  }
+
+  .table td {
+    display: flex;
+    gap: 12px;
+    padding: 4px 12px;
+    border-bottom: none;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    flex: 0 0 40%;
+    color: var(--wp-muted);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .cellLong {
+    max-width: none;
+  }
+}
+
+/* Barra acima do grid: total do filtro e ações (exportar, gráficos). */
+.resultsBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.resultsCount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--wp-text);
+}
+
+.resultsActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Painel de gráficos (modal). */
+.chartsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.chartsTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.chartsHint {
+  margin: 4px 0 12px;
+  font-size: 13px;
+  color: var(--wp-muted);
+}
+
+.chartControls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  background: #faf9f8;
+}
+
+.kpiLabel {
+  font-size: 12px;
+  color: var(--wp-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Indicadores em fonte normal, sem tabular-nums: são números de destaque. */
+.kpiValue {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--wp-text);
+  overflow-wrap: anywhere;
+}
+
+.kpiSub {
+  font-size: 12px;
+  color: var(--wp-muted);
+}
+
+.chartArea {
+  margin-bottom: 16px;
+}
+
+/* Gráficos SVG sem altura fixa: crescem com a largura e incluem os rótulos do eixo. */
+.chartSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.donutWrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  margin-bottom: 16px;
+}
+
+.donutSvg {
+  width: 220px;
+  height: 220px;
+  flex: 0 0 auto;
+}
+
+.legend {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.swatch {
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legendLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.legendValue {
+  flex: 0 0 auto;
+  color: var(--wp-muted);
+  white-space: nowrap;
+}
+
+/* Primeira coluna da grade quando o link do item está configurado: abre a modal de detalhes. */
+.linkButton {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--wp-primary);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--wp-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Detalhes do item: pares rótulo/valor em grade; texto longo ocupa a largura toda. */
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.detailItem {
+  min-width: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #edebe9;
+}
+
+.detailWide {
+  grid-column: 1 / -1;
+}
+
+.detailLabel {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--wp-muted);
+}
+
+.detailValue {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--wp-text);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

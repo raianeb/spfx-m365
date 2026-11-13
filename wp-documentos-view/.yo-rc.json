@@ -1,0 +1,22 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "wp-documentos-view",
+    "environment": "spo",
+    "packageManager": "npm",
+    "skipFeatureDeployment": true,
+    "useGulp": false,
+    "componentType": "webpart",
+    "template": "react",
+    "componentName": "DocumentosView",
+    "componentDescription": "Documentos do Espaço PUC Carreiras",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.23.4",
+    "sdksVersions": {},
+    "version": "1.24.1",
+    "libraryName": "wp-documentos-view",
+    "libraryId": "b638b781-03b6-4f35-8ae6-a1a296913f16",
+    "solutionShortDescription": "wp-documentos-view description"
+  }
+}

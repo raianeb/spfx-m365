@@ -1,0 +1,33 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "05fb8f62-ef31-4942-8f6e-bdeaf2e9f4f4",
+  "alias": "CalendarioWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Advanced"
+      },
+      "title": {
+        "default": "Calendário Carreiras"
+      },
+      "description": {
+        "default": "Calendário de eventos do Espaço PUC Carreiras, com visualização de dia, semana e mês"
+      },
+      "officeFabricIconFontName": "Calendar",
+      "properties": {
+        "template": "completo",
+        "defaultView": "mes"
+      }
+    }
+  ]
+}

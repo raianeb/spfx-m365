@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "banner-principal-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/bannerPrincipal/BannerPrincipalWebPart.js",
+          "manifest": "./src/webparts/bannerPrincipal/BannerPrincipalWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "BannerPrincipalWebPartStrings": "lib/webparts/bannerPrincipal/loc/{locale}.js"
+  }
+}

@@ -1,0 +1,24 @@
+# Dependências e saídas de build (valem para qualquer projeto)
+node_modules/
+lib/
+lib-*/
+dist/
+temp/
+release/
+solution/
+*.sppkg
+
+# Logs e cobertura
+*.log
+coverage/
+
+# Sistema operacional e editores
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/
+.idea/
+
+# Ambiente local
+.env
+.env.*

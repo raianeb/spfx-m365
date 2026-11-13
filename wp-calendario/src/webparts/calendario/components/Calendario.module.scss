@@ -1,0 +1,346 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+}
+
+.periodTitle {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--cc-text, #1f1f1f);
+}
+
+.views {
+  display: flex;
+  gap: 4px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.empty {
+  padding: 16px;
+  color: var(--cc-muted, #5f5f5f);
+}
+
+.details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0 0 16px;
+  font-size: 14px;
+
+  dt {
+    font-weight: 600;
+    color: var(--cc-muted, #5f5f5f);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.description {
+  margin: 0 0 16px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
+.tag {
+  flex: 0 0 auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #d9f7f4;
+  color: #0b4f4a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Miniatura */
+.mini {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  max-width: 320px;
+}
+
+.miniWeekday {
+  padding: 4px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cc-muted, #5f5f5f);
+}
+
+.miniDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cc-text, #1f1f1f);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--cc-primary, #E45900);
+    outline: none;
+  }
+}
+
+.miniDots {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.miniDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--cc-primary, #E45900);
+}
+
+/* Mês */
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid #edebe9;
+  border-left: 1px solid #edebe9;
+}
+
+.weekday {
+  padding: 6px;
+  border-right: 1px solid #edebe9;
+  border-bottom: 1px solid #edebe9;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--cc-muted, #5f5f5f);
+  text-transform: capitalize;
+}
+
+.monthCell {
+  min-height: 104px;
+  padding: 4px;
+  border-right: 1px solid #edebe9;
+  border-bottom: 1px solid #edebe9;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.outside {
+  background: #faf9f8;
+  color: #a19f9d;
+}
+
+.today .dayNumber {
+  background: var(--cc-primary, #E45900);
+  color: #ffffff;
+}
+
+.dayNumber {
+  display: inline-block;
+  min-width: 26px;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  color: inherit;
+}
+
+.chip {
+  display: block;
+  width: 100%;
+  margin-top: 2px;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 4px;
+  background: #d9f7f4;
+  color: #0b4f4a;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.moreLink {
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--cc-primary, #E45900);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Semana */
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.weekColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 260px;
+  padding: 8px;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.weekHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--cc-muted, #5f5f5f);
+  text-transform: capitalize;
+}
+
+.weekEmpty {
+  margin: 0;
+  font-size: 12px;
+  color: #a19f9d;
+}
+
+.weekEvent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 6px 8px;
+  border: none;
+  border-left: 3px solid var(--cc-primary, #E45900);
+  border-radius: 4px;
+  background: #faf9f8;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.weekTime {
+  font-size: 12px;
+  color: var(--cc-muted, #5f5f5f);
+}
+
+.weekTitle {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Dia */
+.dayList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dayItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  background: #ffffff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dayTime {
+  flex: 0 0 140px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cc-muted, #5f5f5f);
+}
+
+.dayBody {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dayTitle {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.dayMeta {
+  font-size: 13px;
+  color: var(--cc-muted, #5f5f5f);
+}
+
+/* Modal de dia (miniatura) */
+.dayEvent {
+  padding: 12px 0;
+  border-bottom: 1px solid #edebe9;
+}
+
+.dayEventHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dayEventTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .monthCell {
+    min-height: 64px;
+  }
+
+  .chip {
+    display: none;
+  }
+
+  .dayTime {
+    flex-basis: 100px;
+  }
+}

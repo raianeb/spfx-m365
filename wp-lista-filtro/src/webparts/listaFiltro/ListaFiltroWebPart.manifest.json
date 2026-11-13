@@ -1,0 +1,30 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "ba221412-4ac4-469a-ba27-52980371c972",
+  "alias": "ListaFiltroWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Advanced"
+      },
+      "title": {
+        "default": "Lista com filtros"
+      },
+      "description": {
+        "default": "Filtra e exibe registros de uma lista, com filtros e colunas configuráveis e paginação para listas de alto volume"
+      },
+      "officeFabricIconFontName": "Filter",
+      "properties": {}
+    }
+  ]
+}

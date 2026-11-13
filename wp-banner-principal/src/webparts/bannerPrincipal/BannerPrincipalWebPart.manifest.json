@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "45fb6e5c-71af-4600-9b1b-de036b538f38",
+  "alias": "BannerPrincipalWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Advanced"
+      },
+      "title": {
+        "default": "Banner principal Carreiras"
+      },
+      "description": {
+        "default": "Carrossel de banners do Espaço PUC Carreiras, com imagens da biblioteca Banner"
+      },
+      "officeFabricIconFontName": "Photo2",
+      "properties": {
+        "top": 5,
+        "libraryName": "Banner",
+        "carouselInterval": 6,
+        "showArrows": true,
+        "showDots": true
+      }
+    }
+  ]
+}

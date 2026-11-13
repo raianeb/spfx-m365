@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "d6cc6101-b5dc-4e82-b6ab-2bac85cab1cc",
+  "alias": "ComunicadosWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Advanced"
+      },
+      "title": {
+        "default": "Comunicados Carreiras"
+      },
+      "description": {
+        "default": "Lista de comunicados do Espaço PUC Carreiras, com categorias gerenciadas em lista auxiliar"
+      },
+      "officeFabricIconFontName": "Megaphone",
+      "properties": {
+        "top": 5
+      }
+    }
+  ]
+}

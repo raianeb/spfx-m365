@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "wp-banner-principal-client-side-solution",
+    "id": "9a3f166d-1e72-4a85-8911-87a5225da0b4",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "wp-banner-principal: carrossel de banners do Espaço PUC Carreiras"
+      },
+      "longDescription": {
+        "default": "wp-banner-principal: carrossel de banners do Espaço PUC Carreiras"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "wp-banner-principal Feature",
+        "description": "The feature that activates elements of the wp-banner-principal solution.",
+        "id": "c188d05f-e6da-4536-854e-4a38dbbaf532",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/wp-banner-principal.sppkg"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "wp-calendario-client-side-solution",
+    "id": "185db7d4-dd45-4308-a023-8395dcb80811",
+    "version": "1.1.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "wp-calendario: calendario do Espaço PUC Carreiras"
+      },
+      "longDescription": {
+        "default": "wp-calendario: calendario central do Espaço PUC Carreiras, com eventos da lista replicados para o grupo ou equipe do Microsoft 365"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "wp-calendario Feature",
+        "description": "The feature that activates elements of the wp-calendario solution.",
+        "id": "c4a1d2e3-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+        "version": "1.1.0.0"
+      }
+    ],
+    "webApiPermissionRequests": [
+      {
+        "resource": "Microsoft Graph",
+        "scope": "Group.ReadWrite.All"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/wp-calendario.sppkg"
+  }
+}

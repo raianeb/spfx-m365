@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "wp-documentos-view-client-side-solution",
+    "id": "d6bf1445-e025-468b-8e06-19e973c31252",
+    "version": "1.0.2.1",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "wp-documentos-view: documentos do Espaço PUC Carreiras"
+      },
+      "longDescription": {
+        "default": "wp-documentos-view: pastas e arquivos de uma biblioteca do Espaço PUC Carreiras, com abertura direta e link de compartilhamento"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "wp-documentos-view Feature",
+        "description": "The feature that activates elements of the wp-documentos-view solution.",
+        "id": "573f0f51-bbbc-4b88-9f49-95ad611d2a5c",
+        "version": "1.0.2.1"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/wp-documentos-view.sppkg"
+  }
+}

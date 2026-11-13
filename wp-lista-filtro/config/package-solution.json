@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "wp-lista-filtro-client-side-solution",
+    "id": "b07db720-2077-489c-95b8-0c4de639f600",
+    "version": "1.0.9.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "wp-lista-filtro: consulta de listas com filtros configuráveis"
+      },
+      "longDescription": {
+        "default": "wp-lista-filtro: Web Part genérica para filtrar e exibir registros de uma lista do SharePoint, com paginação no servidor e suporte a listas de alto volume"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "wp-lista-filtro Feature",
+        "description": "The feature that activates elements of the wp-lista-filtro solution.",
+        "id": "e2cb8723-5d3e-4935-807e-f58d3c480ff7",
+        "version": "1.0.9.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/wp-lista-filtro.sppkg"
+  }
+}

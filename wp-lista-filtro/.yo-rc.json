@@ -1,0 +1,22 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "wp-lista-filtro",
+    "environment": "spo",
+    "packageManager": "npm",
+    "skipFeatureDeployment": true,
+    "useGulp": false,
+    "componentType": "webpart",
+    "template": "react",
+    "componentName": "ListaFiltro",
+    "componentDescription": "Consulta de listas com filtros configuráveis",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.23.4",
+    "sdksVersions": {},
+    "version": "1.24.1",
+    "libraryName": "wp-lista-filtro",
+    "libraryId": "d08122ef-4c72-4554-9c2b-1f50bba1bbc1",
+    "solutionShortDescription": "wp-lista-filtro description"
+  }
+}
