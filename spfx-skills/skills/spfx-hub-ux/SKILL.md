@@ -22,7 +22,7 @@ Use esta skill primeiro em qualquer tarefa de SPFx: web parts, extensions, layou
 | Modelagem de listas, índices e consultas SharePoint | sharepoint-dados-listas |
 | Provisionamento de listas por Console | sharepoint-provisionamento |
 | Painel de propriedades | spfx-property-pane-reatividade |
-| Application Customizer, Field Customizer, Command Set | spfx-extensoes-padroes |
+| Application Customizer, Field Customizer, Command Set | spfx-extensoes-padroes, sharepoint-dados-listas (se houver consulta a lista) |
 | Imagens e mídia | spfx-imagens-midia |
 | Versão, pacote e publicação | spfx-release-qualidade-pacote |
 | Build, Heft e webpack | spfx-heft-toolchain, spfx-heft-webpack |
