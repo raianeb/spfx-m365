@@ -18,7 +18,9 @@ Use esta skill primeiro em qualquer tarefa de SPFx: web parts, extensions, layou
 | Layout, estados, comandos da web part | spfx-design-base, spfx-acessibilidade-conteudo |
 | Cores, fontes, modo escuro e alto contraste | spfx-tema-marca, spfx-css-estilos |
 | Efeitos visuais de vidro (opcional) | spfx-glassmorphism |
-| Dados, serviços, tipos, performance | spfx-codigo-performance, spfx-implementacao-base |
+| Dados, serviços, tipos, performance | spfx-codigo-performance, spfx-implementacao-base, sharepoint-dados-listas |
+| Modelagem de listas, índices e consultas SharePoint | sharepoint-dados-listas |
+| Provisionamento de listas por Console | sharepoint-provisionamento |
 | Painel de propriedades | spfx-property-pane-reatividade |
 | Application Customizer, Field Customizer, Command Set | spfx-extensoes-padroes |
 | Imagens e mídia | spfx-imagens-midia |

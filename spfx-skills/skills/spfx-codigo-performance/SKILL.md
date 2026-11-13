@@ -10,8 +10,8 @@ Ao escrever lógica de dados, componentes React ou ao adicionar dependências.
 
 ## Regras-base
 - A classe da web part só inicializa e repassa props; a lógica fica em componentes e serviços.
-- Acesso a SharePoint por serviço, usando PnPjs; nada de URLs REST montadas inline.
-- Agrupe leituras (batch) e use cache quando o dado for estável.
+- Acesso a SharePoint sempre pelo serviço de dados da web part, com PnPjs. As regras de consulta (índices, filtros, paginação e limites) estão em `sharepoint-dados-listas`.
+- Cache e leituras em lote de SharePoint seguem `sharepoint-dados-listas`.
 - Carregue sob demanda e evite dependências pesadas sem necessidade.
 - Use memoização ou virtualização em listas grandes.
 - Não duplique React nem Fluent UI no bundle.

@@ -9,7 +9,8 @@ Construção incremental. Cada etapa adiciona uma camada e é validada antes da 
 | 2 | Padrões internos da equipe incorporados às skills SPFx | Aguardando orientações da equipe |
 | 3 | Processo de início de projeto (`/iniciar-projeto`) ligado às skills | Concluída (escopo na raiz do repositório) |
 | 4 | Provisionamento por Console (`sharepoint-provisionamento`, `/provisionar-estrutura`) | Skill e template criados; geração de projeto real pendente de teste em HML |
-| 4b | Skills de Power Automate, Microsoft Graph e dados SharePoint | Pendente |
+| 4b | Skill de dados de listas (`sharepoint-dados-listas`): modelagem, índices e consultas | Criada; integração com as skills de código e provisionamento em revisão |
+| 4c | Skills de Power Automate e Microsoft Graph | Pendente |
 | 5 | Checklist de entrega e critérios de qualidade | Pendente |
 
 ## Regras de uso das skills

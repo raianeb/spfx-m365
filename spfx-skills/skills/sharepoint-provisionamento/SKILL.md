@@ -8,6 +8,9 @@ description: "Provisiona listas e bibliotecas SharePoint por script para o Conso
 ## Quando usar
 Ao criar ou manter a estrutura de listas de um projeto (campos, índices e versionamento) em HML e PROD.
 
+## Regras de dados
+Modelagem, nomes internos, índices e limites vêm da skill `sharepoint-dados-listas`. Esta skill só gera os scripts a partir dessas regras.
+
 ## Regras
 1. **Script, não PowerShell.** O script roda no Console do navegador, com o site aberto e a sessão autenticada.
 2. **Mesmo site para HML e PROD.** A URL é perguntada uma vez. O que muda entre os ambientes é só o prefixo do nome da lista.
