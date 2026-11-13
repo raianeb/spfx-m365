@@ -1,6 +1,6 @@
 ---
-name: spfx-codigo-performance
-description: Código e desempenho em SPFx: classe de web part fina, acesso a dados por serviço, PnPjs, leituras em lote e cache, controle de bundle, carregamento preguiçoso e memoização.
+name: "spfx-codigo-performance"
+description: "Código e desempenho em SPFx: classe de web part fina, acesso a dados por serviço, PnPjs, leituras em lote e cache, controle de bundle, carregamento preguiçoso e memoização."
 ---
 
 # Código e performance

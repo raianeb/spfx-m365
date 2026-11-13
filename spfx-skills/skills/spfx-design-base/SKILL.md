@@ -1,6 +1,6 @@
 ---
-name: spfx-design-base
-description: Padrão base de UI para web parts SPFx: estrutura, layout responsivo, comandos e estados vazio, erro e primeiro uso.
+name: "spfx-design-base"
+description: "Padrão base de UI para web parts SPFx: estrutura, layout responsivo, comandos e estados vazio, erro e primeiro uso."
 ---
 
 # Design base de web parts

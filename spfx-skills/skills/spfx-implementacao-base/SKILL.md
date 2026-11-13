@@ -1,6 +1,6 @@
 ---
-name: spfx-implementacao-base
-description: Arquitetura de implementação em SPFx: limites entre serviços e componentes, contratos tipados para dados e props, e comportamento previsível de carregamento e erro.
+name: "spfx-implementacao-base"
+description: "Arquitetura de implementação em SPFx: limites entre serviços e componentes, contratos tipados para dados e props, e comportamento previsível de carregamento e erro."
 ---
 
 # Implementação base

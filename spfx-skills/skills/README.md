@@ -19,3 +19,6 @@ Cada skill fica em sua própria pasta, com um `SKILL.md` (frontmatter com `name`
 | `spfx-release-qualidade-pacote` | Release e qualidade do pacote |
 | `spfx-heft-toolchain` | Ferramental Heft |
 | `spfx-heft-webpack` | Customização do webpack |
+
+## Regra de frontmatter
+Os valores de `name` e `description` ficam entre aspas duplas. Sem aspas, um `:` dentro da descrição (por exemplo, "SPFx: tokens") quebra o YAML.

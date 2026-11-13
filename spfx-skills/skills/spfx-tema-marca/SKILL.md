@@ -1,6 +1,6 @@
 ---
-name: spfx-tema-marca
-description: Integração com o tema do SharePoint em SPFx: tokens de tema, cores semânticas, modos claro, escuro e alto contraste, e fontes do Brand Center.
+name: "spfx-tema-marca"
+description: "Integração com o tema do SharePoint em SPFx: tokens de tema, cores semânticas, modos claro, escuro e alto contraste, e fontes do Brand Center."
 ---
 
 # Tema e marca

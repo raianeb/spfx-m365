@@ -1,6 +1,6 @@
 ---
-name: spfx-extensoes-padroes
-description: Padrões para extensões SPFx (Application Customizer, Field Customizer e Command Set): diálogos seguros, descoberta de comandos e respeito ao contexto da página host.
+name: "spfx-extensoes-padroes"
+description: "Padrões para extensões SPFx (Application Customizer, Field Customizer e Command Set): diálogos seguros, descoberta de comandos e respeito ao contexto da página host."
 ---
 
 # Extensões

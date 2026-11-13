@@ -1,6 +1,6 @@
 ---
-name: spfx-css-estilos
-description: Governança de estilos em SPFx: SCSS com escopo de módulo, convenções de nomes e prevenção de vazamento de estilo global.
+name: "spfx-css-estilos"
+description: "Governança de estilos em SPFx: SCSS com escopo de módulo, convenções de nomes e prevenção de vazamento de estilo global."
 ---
 
 # CSS e estilos

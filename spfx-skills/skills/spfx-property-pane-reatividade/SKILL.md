@@ -1,6 +1,6 @@
 ---
-name: spfx-property-pane-reatividade
-description: Painel de propriedades em SPFx: quando usar atualização reativa ou não reativa, evitar trabalho caro a cada tecla e tornar explícito o comportamento do botão Aplicar.
+name: "spfx-property-pane-reatividade"
+description: "Painel de propriedades em SPFx: quando usar atualização reativa ou não reativa, evitar trabalho caro a cada tecla e tornar explícito o comportamento do botão Aplicar."
 ---
 
 # Painel de propriedades

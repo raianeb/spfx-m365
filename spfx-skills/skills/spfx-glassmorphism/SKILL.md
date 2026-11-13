@@ -1,6 +1,6 @@
 ---
-name: spfx-glassmorphism
-description: Padrão opcional de interface em vidro (fundo translúcido, blur, bordas e sombras) para cards e tabelas em SPFx.
+name: "spfx-glassmorphism"
+description: "Padrão opcional de interface em vidro (fundo translúcido, blur, bordas e sombras) para cards e tabelas em SPFx."
 ---
 
 # Glassmorphism (opcional)

@@ -1,6 +1,6 @@
 ---
-name: spfx-heft-webpack
-description: Customização mínima e pontual do webpack dentro do rig do SPFx, sem quebrar o padrão do ferramental.
+name: "spfx-heft-webpack"
+description: "Customização mínima e pontual do webpack dentro do rig do SPFx, sem quebrar o padrão do ferramental."
 ---
 
 # Customização do webpack

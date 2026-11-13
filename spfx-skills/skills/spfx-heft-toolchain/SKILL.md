@@ -1,6 +1,6 @@
 ---
-name: spfx-heft-toolchain
-description: Ferramental de build do SPFx com Heft: ciclo de vida, plugins incluídos e quando usar script plugins.
+name: "spfx-heft-toolchain"
+description: "Ferramental de build do SPFx com Heft: ciclo de vida, plugins incluídos e quando usar script plugins."
 ---
 
 # Heft e ferramental de build

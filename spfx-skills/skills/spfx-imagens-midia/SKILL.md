@@ -1,6 +1,6 @@
 ---
-name: spfx-imagens-midia
-description: Imagens e mídia em SPFx: imagens responsivas, carregamento preguiçoso, técnicas de percepção de desempenho e texto alternativo.
+name: "spfx-imagens-midia"
+description: "Imagens e mídia em SPFx: imagens responsivas, carregamento preguiçoso, técnicas de percepção de desempenho e texto alternativo."
 ---
 
 # Imagens e mídia

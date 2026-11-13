@@ -1,6 +1,6 @@
 ---
-name: spfx-acessibilidade-conteudo
-description: Acessibilidade e conteúdo de interface em SPFx: teclado, foco, leitores de tela, textos de ação e recuperação de erros.
+name: "spfx-acessibilidade-conteudo"
+description: "Acessibilidade e conteúdo de interface em SPFx: teclado, foco, leitores de tela, textos de ação e recuperação de erros."
 ---
 
 # Acessibilidade e qualidade de conteúdo

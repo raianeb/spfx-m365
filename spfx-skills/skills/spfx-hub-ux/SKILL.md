@@ -1,6 +1,6 @@
 ---
-name: spfx-hub-ux
-description: Ponto de entrada para qualquer trabalho com SPFx. Identifica o tipo de tarefa e carrega apenas as skills necessárias (design, tema, código, property pane, mídia, release).
+name: "spfx-hub-ux"
+description: "Ponto de entrada para qualquer trabalho com SPFx. Identifica o tipo de tarefa e carrega apenas as skills necessárias (design, tema, código, property pane, mídia, release)."
 ---
 
 # Hub SPFx

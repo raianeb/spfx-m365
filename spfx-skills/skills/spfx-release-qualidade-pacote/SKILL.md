@@ -1,6 +1,6 @@
 ---
-name: spfx-release-qualidade-pacote
-description: Empacotamento e release de soluções SPFx: configuração do package-solution, versionamento, registro de mudanças, prontidão no catálogo de aplicativos e prevenção de regressão.
+name: "spfx-release-qualidade-pacote"
+description: "Empacotamento e release de soluções SPFx: configuração do package-solution, versionamento, registro de mudanças, prontidão no catálogo de aplicativos e prevenção de regressão."
 ---
 
 # Release e qualidade do pacote
