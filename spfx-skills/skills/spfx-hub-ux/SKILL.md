@@ -16,6 +16,7 @@ Use esta skill primeiro em qualquer tarefa de SPFx: web parts, extensions, layou
 | Tipo de tarefa | Skills |
 |---|---|
 | Layout, estados, comandos da web part | spfx-design-base, spfx-acessibilidade-conteudo |
+| Configuração da web part (título, site, grupos, ambiente, tema, log) | spfx-configuracao-webpart |
 | Cores, fontes, modo escuro e alto contraste | spfx-tema-marca, spfx-css-estilos |
 | Efeitos visuais de vidro (opcional) | spfx-glassmorphism |
 | Dados, serviços, tipos, performance | spfx-codigo-performance, spfx-implementacao-base, sharepoint-dados-listas |
@@ -28,4 +29,4 @@ Use esta skill primeiro em qualquer tarefa de SPFx: web parts, extensions, layou
 | Build, Heft e webpack | spfx-heft-toolchain, spfx-heft-webpack |
 
 ## Padrões internos da equipe
-A definir nas próximas etapas.
+A definir nas próximas etapas. Os padrões de configuração de Web Parts estão em `spfx-configuracao-webpart`.

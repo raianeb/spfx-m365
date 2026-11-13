@@ -14,4 +14,9 @@ Ao criar ou alterar campos do painel de propriedades.
 - Deixe claro quando a alteração é aplicada.
 
 ## Padrões internos da equipe
-A definir.
+- Seletores de site e grupos carregam dados ao abrir o painel ou ao pesquisar. Nunca fazem chamada HTTP dentro de `getPropertyPaneConfiguration` a cada renderização.
+- Todo seletor tem estados de carregando, vazio, erro e nova tentativa.
+- A seleção atual é preservada mesmo quando não está na primeira página de resultados.
+- Respostas de uma consulta antiga são descartadas quando o site muda.
+- Alterar uma propriedade não refaz consultas que não dependem dela.
+- Origem: skill pessoal de configuração de Web Parts, seção de controles assíncronos.

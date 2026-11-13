@@ -12,6 +12,7 @@ Cada skill fica em sua própria pasta, com um `SKILL.md` (frontmatter com `name`
 | Skill | Conteúdo |
 |---|---|
 | `spfx-hub-ux` | Ponto de entrada e roteamento |
+| `spfx-configuracao-webpart` | Configurações obrigatórias: título, site, grupos, ambiente, tema e log |
 | `spfx-design-base` | Design base de web parts |
 | `spfx-acessibilidade-conteudo` | Acessibilidade e textos |
 | `spfx-tema-marca` | Tema e marca |
