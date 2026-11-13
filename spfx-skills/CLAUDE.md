@@ -18,6 +18,7 @@ Nenhum projeto recebe código, scaffold ou arquivos de implementação antes de 
 4. **Estrutura e execução:** definida em `docs/framework.md` (próxima etapa).
 
 ## Padrões técnicos mínimos
+- Em qualquer tarefa de SPFx, carregar primeiro `skills/spfx-hub-ux` e, a partir dele, só as skills necessárias.
 - Preferir SharePoint Online; quando houver SharePoint 2013/2019 on-premises, destacar diferenças de API, limites e recursos.
 - Sem valores fixos de site, tenant, grupo ou prefixo de lista em código: parametrizar e perguntar em tempo de execução quando for script de provisionamento.
 - Não vincular web parts ou soluções a um site específico; rotular como genéricas da equipe M365.
