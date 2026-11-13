@@ -2,6 +2,11 @@
 
 Cada skill fica em sua própria pasta, com um `SKILL.md` (frontmatter com `name` e `description`, depois o conteúdo).
 
+## Provisionamento SharePoint (etapa 4)
+| Skill | Conteúdo |
+|---|---|
+| `sharepoint-provisionamento` | Scripts de Console para HML e PROD a partir de `definicao.json` |
+
 ## SPFx (etapa 1)
 | Skill | Conteúdo |
 |---|---|

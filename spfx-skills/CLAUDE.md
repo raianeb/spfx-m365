@@ -15,7 +15,9 @@ Nenhum projeto recebe código, scaffold ou arquivos de implementação antes de 
 1. **Descoberta (brainstorming):** seguir `docs/01-brainstorming.md`. Perguntas objetivas, uma etapa por vez, com opções quando possível. Registrar respostas; não assumir o que não foi dito.
 2. **Escopo:** consolidar em `projetos/<nome>/escopo.md` usando `docs/02-escopo.md`. Marcar explicitamente o que é incerto e como validar.
 3. **Aprovação:** o usuário aprova ou ajusta o escopo. Só então a fase seguinte começa.
-4. **Estrutura e execução:** definida em `docs/framework.md` (próxima etapa).
+   O projeto fica na raiz do repositório, em `<nome>/escopo.md`.
+4. **Provisionamento:** `/provisionar-estrutura` gera `<nome>/definicao.json` (com aprovação) e, em cada `wp-*/provisionamento/`, os scripts de Console para HML e PROD, pela skill `sharepoint-provisionamento`.
+5. **Estrutura e execução:** definida em `docs/framework.md` (próxima etapa).
 
 ## Padrões técnicos mínimos
 - Em qualquer tarefa de SPFx, carregar primeiro `skills/spfx-hub-ux` e, a partir dele, só as skills necessárias.

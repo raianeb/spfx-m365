@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "projeto": "faq",
+  "listas": [
+    {
+      "base": "FAQ",
+      "modelo": 100,
+      "versionamento": true,
+      "campos": [
+        { "nome": "Title", "rotulo": "Pergunta", "tipo": "Text", "nativo": true },
+        { "nome": "Resposta", "rotulo": "Resposta", "tipo": "Note", "linhas": 6, "formatacao": true },
+        { "nome": "Ordem", "rotulo": "Ordem", "tipo": "Number", "indexado": true }
+      ]
+    }
+  ]
+}
