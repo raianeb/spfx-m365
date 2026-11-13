@@ -21,6 +21,7 @@ Nenhum projeto recebe código, scaffold ou arquivos de implementação antes de 
 - Em qualquer tarefa de SPFx, carregar primeiro `skills/spfx-hub-ux` e, a partir dele, só as skills necessárias.
 - Preferir SharePoint Online; quando houver SharePoint 2013/2019 on-premises, destacar diferenças de API, limites e recursos.
 - Sem valores fixos de site, tenant, grupo ou prefixo de lista em código: parametrizar e perguntar em tempo de execução quando for script de provisionamento.
+- Prefixos de listas (PROD e HML) são configuráveis por instância da Web Part e perguntados pelo script; nunca fixar `HML_` ou outro prefixo no código.
 - Não vincular web parts ou soluções a um site específico; rotular como genéricas da equipe M365.
 - Segurança: nenhum segredo, token ou credencial em arquivo versionado; `.env` fica fora do Git.
 - Clean Code, SOLID, testabilidade e desempenho em código gerado.

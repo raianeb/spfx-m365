@@ -3,13 +3,13 @@
 Esta WP não cria listas nem bibliotecas. Ela lê uma biblioteca de documentos que já exista.
 
 ## Antes de usar
-1. Confirme que a biblioteca existe em PROD (ex.: `Documentos`) e, se usar o ambiente HML, em `HML_Documentos`.
+1. Confirme que a biblioteca existe em PROD (ex.: `Documentos`) e, se usar o ambiente HML, em `[prefixo HML]Documentos`.
 2. Abra o Console com o site aberto (F12 > Console), cole `validar-estrutura.console.js` e confira a tabela. Ela não altera nada.
 3. Os usuários precisam de permissão de leitura na biblioteca. A WP não concede acesso.
 
 ## Configurar a WP
 1. Em **Dados e ambiente**, escolha o site de dados e o ambiente (HML ou Produção).
-2. Em **Biblioteca de documentos**, escolha a biblioteca. A lista mostra somente bibliotecas do site, sem as cópias HML_.
+2. Em **Biblioteca de documentos**, escolha a biblioteca. A lista mostra somente bibliotecas do site, sem as cópias de HML.
 3. Em **Visualização inicial**, escolha Grade de ícones ou Lista.
 
 ## Uso pelo usuário

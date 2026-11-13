@@ -1,3 +1,4 @@
+import { nomeFisico, prefixosDe } from './prefixos';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import { Root, createRoot } from 'react-dom/client';
@@ -14,17 +15,7 @@ import {
   PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
 import { ListQueryService } from '../services/ListQueryService';
-import {
-  EMPTY_ADMIN_GROUPS,
-  ENVIRONMENT_OPTIONS,
-  Environment,
-  IAdminGroups,
-  IBaseWebPartProps,
-  ICommonProps,
-  IGroupRef,
-  getAdminGroupIds,
-  resolveListTitle
-} from './config';
+import {EMPTY_ADMIN_GROUPS, ENVIRONMENT_OPTIONS, Environment, IAdminGroups, IBaseWebPartProps, ICommonProps, IGroupRef, getAdminGroupIds} from './config';
 import { DiagnosticsLogger } from './diagnostics';
 import { GroupPickerField, ListPickerField, SitePickerField } from './PropertyFields';
 import { ISiteRef, SiteDirectoryService } from './siteDirectory';
@@ -82,7 +73,7 @@ export abstract class BaseWebPart<TProps extends IBaseWebPartProps> extends Base
 
   /** Nome físico da lista no ambiente ativo. Vazio enquanto não houver lista escolhida. */
   protected get resolvedListTitle(): string {
-    return resolveListTitle(this.properties.listName, this.properties.environment ?? 'PROD');
+    return nomeFisico(this.properties.listName, this.properties.environment ?? 'PROD', prefixosDe(this.properties));
   }
 
   protected get siteDirectory(): SiteDirectoryService {
@@ -124,6 +115,7 @@ export abstract class BaseWebPart<TProps extends IBaseWebPartProps> extends Base
       service,
       logger: this._logger,
       environment,
+      prefixos: prefixosDe(this.properties),
       adminGroupIds: getAdminGroupIds(this.properties.adminGroups, environment),
       title: this.properties.title,
       themeStyle: this.properties.inheritSiteTheme ? themeToCssVars(this._theme) : {}
@@ -175,6 +167,16 @@ export abstract class BaseWebPart<TProps extends IBaseWebPartProps> extends Base
                   label: 'Ambiente',
                   options: ENVIRONMENT_OPTIONS.map((option) => ({ key: option.key, text: option.text })),
                   selectedKey: this.properties.environment ?? 'PROD'
+                }),
+                PropertyPaneTextField('prefixoProd', {
+                  label: 'Prefixo das listas de PROD',
+                  description: 'Vazio se as listas de PROD não têm prefixo. Use o mesmo valor do script de provisionamento.',
+                  value: this.properties.prefixoProd ?? ''
+                }),
+                PropertyPaneTextField('prefixoHml', {
+                  label: 'Prefixo das listas de HML',
+                  description: 'Obrigatório no ambiente HML. Deve ser diferente do prefixo de PROD e igual ao do script de provisionamento.',
+                  value: this.properties.prefixoHml ?? ''
                 }),
                 this.reactField(LIST_FIELD, (notify: NotifyChange) => this._listElement(notify)),
                 ...this.getSourceFields()
@@ -284,6 +286,7 @@ export abstract class BaseWebPart<TProps extends IBaseWebPartProps> extends Base
     return React.createElement(ListPickerField, {
       key: siteUrl,
       label: 'Lista',
+      prefixos: prefixosDe(this.properties),
       siteUrl,
       service: this.siteDirectory,
       value: this.properties.listName ?? '',

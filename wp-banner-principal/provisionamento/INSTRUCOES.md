@@ -31,8 +31,8 @@ O script é idempotente: rodar de novo não duplica lista, biblioteca ou campo. 
 
 ## Depois da criação
 - A coluna `Ordem` é nova. Se a lista HML já existia, a execução em `apply` a cria com padrão 0 e a indexa. Em PROD, ela só é criada se o gate permitir (ver passo 6).
-- A biblioteca `HML_Banner` deve receber permissão de Colaborar para quem envia imagens. Este script não altera permissões.
+- A biblioteca `[prefixo HML]Banner` deve receber permissão de Colaborar para quem envia imagens. Este script não altera permissões.
 - Os grupos de Administradores HML precisam ser definidos nas propriedades da web part, no ambiente HML.
-- Na web part, mantenha o campo "Biblioteca de imagens dos banners" igual ao nome base (`Banner`). O prefixo é o informado ao executar o script (padrão `HML_` para HML).
-- **Atenção:** as Web Parts usam `HML_` fixo para localizar as listas de HML (`resolveListTitle`, em `src/core/config.ts`). Se o prefixo informado for outro, ajuste essa função antes de publicar.
+- Na web part, mantenha o campo "Biblioteca de imagens dos banners" igual ao nome base (`Banner`). O prefixo é o informado ao executar o script e deve ser o mesmo configurado na Web Part.
+- Os prefixos de PROD e HML são propriedades da Web Part (grupo "Dados e ambiente"). Use os mesmos valores informados no script.
 - Não há fluxos Power Automate nesta etapa.

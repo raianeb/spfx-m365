@@ -9,7 +9,7 @@ Nenhuma lista ou biblioteca é criada. A WP usa a biblioteca escolhida nas propr
 
 | Escolha na WP | PROD | HML |
 |---|---|---|
-| Biblioteca de documentos (ex.: `Documentos`) | `Documentos` | `HML_Documentos` |
+| Biblioteca de documentos (ex.: `Documentos`) | `Documentos` | `[prefixo HML]Documentos` |
 
 A biblioteca precisa existir nos dois ambientes com o mesmo nome base. A WP nunca usa PROD como alternativa quando HML estiver ausente.
 

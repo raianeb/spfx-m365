@@ -7,8 +7,8 @@ Status: **proposta para validação.** Os scripts desta pasta só devem ser exec
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| Comunicados | HML_Comunicados | Lista (modelo 100, versionamento ativo) | Comunicados publicados |
-| Categorias Comunicados | HML_Categorias Comunicados | Lista (modelo 100, versionamento ativo) | Lista auxiliar de categorias, mantida pela própria WP |
+| Comunicados | [prefixo HML]Comunicados | Lista (modelo 100, versionamento ativo) | Comunicados publicados |
+| Categorias Comunicados | [prefixo HML]Categorias Comunicados | Lista (modelo 100, versionamento ativo) | Lista auxiliar de categorias, mantida pela própria WP |
 
 Não há bibliotecas nesta versão: o comunicado não tem anexos previstos no print.
 

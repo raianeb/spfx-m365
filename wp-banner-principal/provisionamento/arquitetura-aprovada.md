@@ -7,8 +7,8 @@ Status: **proposta para validação.** Os scripts desta pasta só devem ser exec
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| Banner | HML_Banner | Lista (modelo 100, versionamento ativo) | Registro dos banners do carrossel |
-| Banner | HML_Banner | Biblioteca de documentos (modelo 101, versionamento ativo) | Imagens dos banners, enviadas pelo usuário ou pelo upload da WP |
+| Banner | [prefixo HML]Banner | Lista (modelo 100, versionamento ativo) | Registro dos banners do carrossel |
+| Banner | [prefixo HML]Banner | Biblioteca de documentos (modelo 101, versionamento ativo) | Imagens dos banners, enviadas pelo usuário ou pelo upload da WP |
 
 O nome da biblioteca é configurável na WP (propriedade `libraryName`, padrão `Banner`). O script cria a biblioteca padrão; se a WP apontar para outra, o recurso deve ser criado com o mesmo padrão de nomes.
 

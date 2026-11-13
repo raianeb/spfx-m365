@@ -4,7 +4,8 @@ import { DefaultButton } from '@fluentui/react/lib/Button';
 import { Icon } from '@fluentui/react/lib/Icon';
 import styles from './ListaFiltro.module.scss';
 import coreStyles from '../../../core/core.module.scss';
-import { ICommonProps, resolveListTitle } from '../../../core/config';
+import { ICommonProps } from '../../../core/config';
+import { nomeFisico } from '../../../core/prefixos';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
 import {
   FilterValues,
@@ -37,7 +38,7 @@ interface ICountState {
 const IDLE_COUNT: ICountState = { status: 'idle', scanned: 0, total: 0 };
 
 export interface IListaFiltroProps extends ICommonProps {
-  /** Nome base da lista (sem HML_). Vazio = ainda não configurada. */
+  /** Nome base da lista (sem prefixo). Vazio = ainda não configurada. */
   listName: string;
   filterFields: string[];
   displayFields: string[];
@@ -67,6 +68,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
   service,
   logger,
   environment,
+  prefixos,
   adminGroupIds,
   title,
   themeStyle,
@@ -79,7 +81,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
   linkToItem,
   newestFirst
 }) => {
-  const listTitle: string = resolveListTitle(listName, environment);
+  const listTitle: string = nomeFisico(listName, environment, prefixos);
   const configured: boolean = listTitle !== '';
   const contextLabel: string = title || 'Consulta';
   const filterKey: string = toKey(filterFields);

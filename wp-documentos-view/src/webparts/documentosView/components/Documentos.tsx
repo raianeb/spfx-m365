@@ -6,7 +6,7 @@ import styles from './Documentos.module.scss';
 import coreStyles from '../../../core/core.module.scss';
 import sharedStyles from './shared.module.scss';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
-import { resolveListTitle } from '../../../core/config';
+import { nomeFisico } from '../../../core/prefixos';
 import { IFileEntry, IFolderContent, IFolderEntry, ISearchFileEntry, ISearchResult } from '../../../services/SpListService';
 import { categoryOf, DocumentosLayout, FileCategory, formatBytes, ICON_BY_CATEGORY, IDocumentosProps, isOfficeCategory } from './IDocumentosProps';
 
@@ -78,9 +78,9 @@ const buildSearchEntries = (results: ISearchFileEntry[]): IEntry[] =>
  * Arquivos abrem em nova aba (Office no visualizador do SharePoint) e podem ser compartilhados por link.
  * Bibliotecas grandes: a pasta carrega por páginas (botão "Carregar mais") e a busca percorre as subpastas uma a uma.
  */
-const Documentos: React.FC<IDocumentosProps> = ({ service, logger, environment, title, themeStyle, libraryName, layout: initialLayout, adminGroupIds }) => {
+const Documentos: React.FC<IDocumentosProps> = ({ service, logger, environment, prefixos, title, themeStyle, libraryName, layout: initialLayout, adminGroupIds }) => {
   const base: string = libraryName.trim();
-  const libraryTitle: string = base === '' || base.indexOf('HML_') === 0 ? '' : resolveListTitle(base, environment);
+  const libraryTitle: string = nomeFisico(base, environment, prefixos);
   const configured: boolean = libraryTitle !== '';
   const displayName: string = base || 'Documentos';
   const contextLabel: string = title || 'Documentos';

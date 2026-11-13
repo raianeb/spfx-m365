@@ -4,7 +4,8 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { TextField } from '@fluentui/react/lib/TextField';
 import styles from './Faq.module.scss';
 import coreStyles from '../../../core/core.module.scss';
-import { IWebPartCommonProps, resolveListTitle } from '../../../core/config';
+import { IWebPartCommonProps } from '../../../core/config';
+import { nomeFisico } from '../../../core/prefixos';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
 import { ICrudList, useCrudList } from '../../../crud/useCrudList';
 import { secondaryButtonStyles } from '../../../crud/modalStyles';
@@ -37,7 +38,7 @@ const FAQ_LIMIT: number = 500;
 const NOTICE_MS: number = 3000;
 
 export interface IFaqProps extends IWebPartCommonProps {
-  /** Nome base da lista de perguntas (sem HML_). Vazio = ainda não configurada. */
+  /** Nome base da lista de perguntas (sem prefixo). Vazio = ainda não configurada. */
   listName: string;
   openMode: FaqOpenMode;
   sortMode: FaqSortMode;
@@ -55,6 +56,7 @@ const Faq: React.FC<IFaqProps> = ({
   service,
   logger,
   environment,
+  prefixos,
   adminGroupIds,
   title,
   themeStyle,
@@ -73,9 +75,9 @@ const Faq: React.FC<IFaqProps> = ({
   const nextOrderRef: React.MutableRefObject<number> = React.useRef<number>(1);
   const contextLabel: string = title || 'Perguntas Frequentes';
 
-  /** Nome físico da lista no ambiente. Vazio enquanto não houver lista escolhida (ou se for uma cópia HML_). */
+  /** Nome físico da lista no ambiente. Vazio enquanto não houver lista escolhida (ou se for uma cópia de HML). */
   const base: string = listName.trim();
-  const listTitle: string = base === '' || base.indexOf('HML_') === 0 ? '' : resolveListTitle(base, environment);
+  const listTitle: string = nomeFisico(base, environment, prefixos);
   const configured: boolean = listTitle !== '';
   const suggestionReady: boolean = configured && allowSuggestions && isSafeFlowUrl(suggestionFlowUrl);
 

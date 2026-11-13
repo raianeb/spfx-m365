@@ -1,3 +1,4 @@
+import { IPrefixosListas, nomesBase } from './prefixos';
 import { ISPHttpClientOptions, SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { IGroupRef } from './config';
 
@@ -90,8 +91,8 @@ export class SiteDirectoryService {
     return body.value.map((group: { Id: number; Title: string }) => ({ id: group.Id, title: group.Title }));
   }
 
-  /** Listas de itens do site de dados (modelo genérico), sem as cópias HML_. Retorna somente os nomes, em ordem. */
-  public async getSiteLists(webUrl: string): Promise<string[]> {
+  /** Listas de itens do site de dados (modelo genérico), sem as cópias de HML. Retorna somente os nomes, em ordem. */
+  public async getSiteLists(webUrl: string, prefixos: IPrefixosListas): Promise<string[]> {
     const response: SPHttpClientResponse = await this._client.get(
       `${normalizeUrl(webUrl)}/_api/web/lists?$select=Title&$filter=Hidden%20eq%20false%20and%20BaseTemplate%20eq%20100&$orderby=Title&$top=500`,
       SPHttpClient.configurations.v1,
@@ -101,7 +102,7 @@ export class SiteDirectoryService {
       throw new Error(`Falha ao consultar as listas (HTTP ${response.status}).`);
     }
     const body: { value: { Title: string }[] } = (await response.json()) as { value: { Title: string }[] };
-    return body.value.map((list: { Title: string }) => list.Title).filter((name: string) => name.indexOf('HML_') !== 0);
+    return nomesBase(body.value.map((list: { Title: string }) => list.Title), prefixos);
   }
 
   private _isSameHost(url: string): boolean {

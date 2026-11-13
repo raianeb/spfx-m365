@@ -1,3 +1,4 @@
+import { IPrefixosListas } from './prefixos';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styles from './core.module.scss';
@@ -235,28 +236,30 @@ export const GroupPickerField: React.FC<IGroupPickerProps> = ({ label, siteUrl, 
   );
 };
 
-/** Seleção de uma lista do site de dados. Lista somente listas de itens, sem as cópias HML_. */
+/** Seleção de uma lista do site de dados. Lista somente listas de itens, sem as cópias de HML. */
 export interface IListPickerProps {
   label: string;
   /** 'lista' carrega listas de itens; 'biblioteca' carrega bibliotecas de documentos. */
   kind?: 'lista' | 'biblioteca';
   siteUrl: string;
+  prefixos: IPrefixosListas;
   service: SiteDirectoryService;
   value: string;
   onChange: (listName: string) => void;
 }
 
-export const ListPickerField: React.FC<IListPickerProps> = ({ label, kind = 'lista', siteUrl, service, value, onChange }) => {
+export const ListPickerField: React.FC<IListPickerProps> = ({ label, kind = 'lista', siteUrl, service, prefixos, value, onChange }) => {
   const isLibrary: boolean = kind === 'biblioteca';
   const [lists, setLists] = useState<string[]>([]);
   const [status, setStatus] = useState<LoadStatus>('idle');
   const [attempt, setAttempt] = useState<number>(0);
   const selectId: string = React.useId();
 
+  const prefixoKey: string = `${prefixos.PROD}|${prefixos.HML}`;
   useEffect(() => {
     let active: boolean = true;
     setStatus('loading');
-    const request: Promise<string[]> = isLibrary ? service.getSiteLibraries(siteUrl) : service.getSiteLists(siteUrl);
+    const request: Promise<string[]> = isLibrary ? service.getSiteLibraries(siteUrl, prefixos) : service.getSiteLists(siteUrl, prefixos);
     request
       .then((result: string[]) => {
         if (active) {
@@ -272,7 +275,7 @@ export const ListPickerField: React.FC<IListPickerProps> = ({ label, kind = 'lis
     return () => {
       active = false;
     };
-  }, [siteUrl, service, attempt, isLibrary]);
+  }, [siteUrl, service, attempt, isLibrary, prefixoKey]);
 
   const missing: boolean = status === 'ready' && value !== '' && lists.indexOf(value) === -1;
 

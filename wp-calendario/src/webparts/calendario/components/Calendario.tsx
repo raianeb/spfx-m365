@@ -7,7 +7,7 @@ import coreStyles from '../../../core/core.module.scss';
 import { CalendarView, ICalendarioProps, IEvento } from './IEventoProps';
 import { ICrudList, ICrudWriteHooks, useCrudList } from '../../../crud/useCrudList';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
-import { resolveListTitle } from '../../../core/config';
+import { nomeFisico } from '../../../core/prefixos';
 import { GraphCalendarService } from '../../../services/GraphCalendarService';
 import { describeGraphError, listToGraphBody, mergeCalendarEvents, syncError } from '../calendarSync';
 import { useGroupCalendarEvents } from './useGroupCalendarEvents';
@@ -78,6 +78,7 @@ const Calendario: React.FC<ICalendarioProps> = ({
   service,
   logger,
   environment,
+  prefixos,
   adminGroupIds,
   title,
   themeStyle,
@@ -98,7 +99,7 @@ const Calendario: React.FC<ICalendarioProps> = ({
   const [syncVersion, setSyncVersion] = React.useState<number>(0);
 
   const base: string = listName.trim();
-  const listTitle: string = base === '' || base.indexOf('HML_') === 0 ? '' : resolveListTitle(base, environment);
+  const listTitle: string = nomeFisico(base, environment, prefixos);
   const configured: boolean = listTitle !== '';
   const groupIdentifier: string = configured ? identifier.trim() : '';
   const sync: boolean = groupIdentifier !== '';

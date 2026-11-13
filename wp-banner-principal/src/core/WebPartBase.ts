@@ -1,3 +1,4 @@
+import { prefixosDe } from './prefixos';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import { Root, createRoot } from 'react-dom/client';
@@ -103,6 +104,7 @@ export abstract class WebPartBase<TProps extends IWebPartBaseProps> extends Base
       service,
       logger: this._logger,
       environment,
+      prefixos: prefixosDe(this.properties),
       adminGroupIds: getAdminGroupIds(this.properties.adminGroups, environment),
       title: this.properties.title,
       themeStyle: this.properties.inheritSiteTheme ? themeToCssVars(this._theme) : {},
@@ -159,6 +161,16 @@ export abstract class WebPartBase<TProps extends IWebPartBaseProps> extends Base
                   label: 'Ambiente',
                   options: ENVIRONMENT_OPTIONS.map((option) => ({ key: option.key, text: option.text })),
                   selectedKey: this.properties.environment ?? 'PROD'
+                }),
+                PropertyPaneTextField('prefixoProd', {
+                  label: 'Prefixo das listas de PROD',
+                  description: 'Vazio se as listas de PROD não têm prefixo. Use o mesmo valor do script de provisionamento.',
+                  value: this.properties.prefixoProd ?? ''
+                }),
+                PropertyPaneTextField('prefixoHml', {
+                  label: 'Prefixo das listas de HML',
+                  description: 'Obrigatório no ambiente HML. Deve ser diferente do prefixo de PROD e igual ao do script de provisionamento.',
+                  value: this.properties.prefixoHml ?? ''
                 })
               ]
             },

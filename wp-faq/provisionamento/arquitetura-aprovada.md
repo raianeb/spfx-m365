@@ -7,7 +7,7 @@ Status: **proposta para validação.** Os scripts desta pasta só devem ser exec
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| FAQ | HML_FAQ | Lista (modelo 100, versionamento ativo) | Perguntas e respostas publicadas |
+| FAQ | [prefixo HML]FAQ | Lista (modelo 100, versionamento ativo) | Perguntas e respostas publicadas |
 
 Não há bibliotecas nem listas auxiliares: pergunta e resposta ficam na mesma lista, e categorias não estão previstas nesta versão.
 

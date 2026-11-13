@@ -39,14 +39,15 @@
   const pedirPrefixos = () => {
     const pedir = (ambiente, padrao) => {
       for (;;) {
-        const digitado = window.prompt(`Prefixo dos nomes das listas no ambiente ${ambiente} (deixe vazio para nenhum):`, padrao);
+        const digitado = window.prompt(`Prefixo dos nomes das listas no ambiente ${ambiente} ${ambiente === 'HML' ? '(obrigatório)' : '(deixe vazio para nenhum)'}:`, padrao);
         if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
         const valor = digitado.trim();
         if (/^[A-Za-z0-9_]*$/.test(valor)) return valor;
         window.alert('Use apenas letras sem acento, números e _.');
       }
     };
-    const hml = pedir('HML', 'HML_');
+    const hml = pedir('HML', '');
+    if (hml === '') throw new Error('O prefixo de HML é obrigatório: as listas de HML precisam de prefixo próprio.');
     const prod = pedir('PROD', '');
     if (hml === prod) throw new Error('Os prefixos de HML e PROD precisam ser diferentes, senão as listas colidem.');
     return { HML: hml, PROD: prod };
@@ -61,7 +62,7 @@
     schemaVersion: 1
   };
 
-  // Catálogo único. PROD usa o nome base; HML recebe o prefixo HML_.
+  // Catálogo único. Cada ambiente usa o prefixo informado na execução.
   // template: 100 = Lista genérica. versioning: false (eventos não são versionados).
   // native: campo que já existe (Title, usado como Assunto) — apenas o rótulo é ajustado.
   // Índices: DataInicio e DataFim, que formam o filtro de período (DataInicio < fim e DataFim > início).

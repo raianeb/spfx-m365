@@ -9,7 +9,7 @@ import coreStyles from '../../../core/core.module.scss';
 import { ICategoria, IComunicado, IComunicadosProps } from './IComunicadosProps';
 import { ICrudList, useCrudList } from '../../../crud/useCrudList';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
-import { resolveListTitle } from '../../../core/config';
+import { nomeFisico } from '../../../core/prefixos';
 import { secondaryButtonStyles } from '../../../crud/modalStyles';
 import { escapeOData } from '../../../services/SpListService';
 import ComunicadoForm from './ComunicadoForm';
@@ -177,6 +177,7 @@ const Comunicados: React.FC<IComunicadosProps> = ({
   service,
   logger,
   environment,
+  prefixos,
   adminGroupIds,
   title,
   themeStyle,
@@ -198,10 +199,10 @@ const Comunicados: React.FC<IComunicadosProps> = ({
   const categoryRef: React.MutableRefObject<ICategoria[]> = React.useRef<ICategoria[]>([]);
   const contextLabel: string = title || 'Comunicados';
 
-  /** Nome físico da lista no ambiente. Vazio enquanto não houver lista escolhida (ou se for uma cópia HML_). */
+  /** Nome físico da lista no ambiente. Vazio enquanto não houver lista escolhida (ou se for uma cópia de HML). */
   const resolveName = (baseName: string): string => {
     const base: string = baseName.trim();
-    return base === '' || base.indexOf('HML_') === 0 ? '' : resolveListTitle(base, environment);
+    return nomeFisico(base, environment, prefixos);
   };
   const comunicadosList: string = resolveName(listName);
   const categoriasList: string = resolveName(categoriesListName);

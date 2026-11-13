@@ -43,7 +43,7 @@ A lista nunca é carregada inteira no navegador. Cada página traz no máximo 10
 
 ## Configurações
 
-Padrão das Web Parts: título, site de dados, ambiente (PROD/HML com prefixo configurável nos scripts; as Web Parts usam `HML_` por padrão), grupos de Administradores por ambiente, herança de tema e log. Específicas: lista, campos de filtro, campos de exibição, registros por página, modo de busca em texto, carregar ao abrir, ordem sem filtros e link para o item.
+Padrão das Web Parts: título, site de dados, ambiente (PROD/HML com prefixo configurável nos scripts; cada Web Part guarda os próprios prefixos de PROD e HML), grupos de Administradores por ambiente, herança de tema e log. Específicas: lista, campos de filtro, campos de exibição, registros por página, modo de busca em texto, carregar ao abrir, ordem sem filtros e link para o item.
 
 O perfil Administradores vê o atalho "Abrir lista". Isso é conveniência de interface, não controle de acesso.
 

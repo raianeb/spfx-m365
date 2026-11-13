@@ -13,7 +13,7 @@ export interface IBanner {
 }
 
 export interface IBannerPrincipalProps extends IWebPartCommonProps {
-  /** Nome da biblioteca de imagens (sem HML_); o prefixo é aplicado conforme o ambiente. */
+  /** Nome da biblioteca de imagens (sem prefixo); o prefixo é aplicado conforme o ambiente. */
   libraryName: string;
   /** Segundos entre os slides. Zero desativa a troca automática. */
   carouselInterval: number;

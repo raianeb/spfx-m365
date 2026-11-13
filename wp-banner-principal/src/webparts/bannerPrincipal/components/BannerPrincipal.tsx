@@ -7,7 +7,7 @@ import { IBanner, IBannerPrincipalProps } from './IBannerPrincipalProps';
 import { odataDate, toIsoNow } from '../../../services/SpListService';
 import { useCrudList } from '../../../crud/useCrudList';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
-import { resolveListTitle } from '../../../core/config';
+import { nomeFisico } from '../../../core/prefixos';
 import BannerForm from './BannerForm';
 
 const LIST_BASE: string = 'Banner';
@@ -61,6 +61,7 @@ const BannerPrincipal: React.FC<IBannerPrincipalProps> = ({
   service,
   logger,
   environment,
+  prefixos,
   adminGroupIds,
   title,
   themeStyle,
@@ -74,8 +75,8 @@ const BannerPrincipal: React.FC<IBannerPrincipalProps> = ({
 }) => {
   const [current, setCurrent] = React.useState<number>(0);
   const [paused, setPaused] = React.useState<boolean>(false);
-  const listTitle: string = resolveListTitle(LIST_BASE, environment);
-  const libraryTitle: string = resolveListTitle(libraryName, environment);
+  const listTitle: string = nomeFisico(LIST_BASE, environment, prefixos);
+  const libraryTitle: string = nomeFisico(libraryName, environment, prefixos);
   const origin: string = React.useMemo((): string => new URL(service.webUrl).origin, [service.webUrl]);
   const overlayGradient: string = React.useMemo((): string => toOverlayGradient(overlayColor, overlayOpacity), [overlayColor, overlayOpacity]);
 

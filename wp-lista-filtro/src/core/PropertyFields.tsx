@@ -1,3 +1,4 @@
+import { IPrefixosListas } from './prefixos';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styles from './core.module.scss';
@@ -236,26 +237,28 @@ export const GroupPickerField: React.FC<IGroupPickerProps> = ({ label, siteUrl, 
   );
 };
 
-/** Seleção de uma lista do site de dados. Mostra somente listas de itens, sem as cópias HML_. */
+/** Seleção de uma lista do site de dados. Mostra somente listas de itens, sem as cópias de HML. */
 export interface IListPickerProps {
   label: string;
   siteUrl: string;
+  prefixos: IPrefixosListas;
   service: SiteDirectoryService;
   value: string;
   onChange: (listName: string) => void;
 }
 
-export const ListPickerField: React.FC<IListPickerProps> = ({ label, siteUrl, service, value, onChange }) => {
+export const ListPickerField: React.FC<IListPickerProps> = ({ label, siteUrl, service, prefixos, value, onChange }) => {
   const [lists, setLists] = useState<string[]>([]);
   const [status, setStatus] = useState<LoadStatus>('idle');
   const [attempt, setAttempt] = useState<number>(0);
   const selectId: string = React.useId();
 
+  const prefixoKey: string = `${prefixos.PROD}|${prefixos.HML}`;
   useEffect(() => {
     let active: boolean = true;
     setStatus('loading');
     service
-      .getSiteLists(siteUrl)
+      .getSiteLists(siteUrl, prefixos)
       .then((result: string[]) => {
         if (active) {
           setLists(result);
@@ -270,7 +273,7 @@ export const ListPickerField: React.FC<IListPickerProps> = ({ label, siteUrl, se
     return () => {
       active = false;
     };
-  }, [siteUrl, service, attempt]);
+  }, [siteUrl, service, attempt, prefixoKey]);
 
   const missing: boolean = status === 'ready' && value !== '' && lists.indexOf(value) === -1;
 

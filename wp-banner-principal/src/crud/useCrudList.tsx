@@ -35,7 +35,7 @@ export interface ICrudManageOptions<T> {
 export interface ICrudListOptions<T> {
   service: SpListService;
   logger: DiagnosticsLogger;
-  /** Nome físico da lista no ambiente ativo (com HML_ quando aplicável). */
+  /** Nome físico da lista no ambiente ativo (com o prefixo de HML quando aplicável). */
   listTitle: string;
   /** Identificadores dos grupos do perfil Administradores no ambiente ativo. */
   adminGroupIds: number[];

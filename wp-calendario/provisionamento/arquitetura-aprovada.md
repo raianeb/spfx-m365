@@ -7,7 +7,7 @@ Status: **proposta para validação.** Os scripts desta pasta só devem ser exec
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| Calendario | HML_Calendario | Lista (modelo 100, sem versionamento) | Eventos e reuniões exibidos pela WP de calendário |
+| Calendario | [prefixo HML]Calendario | Lista (modelo 100, sem versionamento) | Eventos e reuniões exibidos pela WP de calendário |
 
 Não há bibliotecas nem listas auxiliares nesta versão. Tipo é uma escolha fixa, e não um cadastro próprio.
 

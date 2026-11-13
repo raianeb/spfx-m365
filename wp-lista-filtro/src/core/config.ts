@@ -1,8 +1,9 @@
+import { IPrefixosListas } from './prefixos';
 import * as React from 'react';
 import { ListQueryService } from '../services/ListQueryService';
 import { DiagnosticsLogger } from './diagnostics';
 
-/** Ambiente técnico persistido. Listas de HML recebem o prefixo HML_. */
+/** Ambiente técnico persistido. Listas de HML recebem o prefixo de HML configurado na Web Part. */
 export type Environment = 'PROD' | 'HML';
 
 export const ENVIRONMENT_OPTIONS: { key: Environment; text: string }[] = [
@@ -29,10 +30,12 @@ export interface IBaseWebPartProps {
   dataSiteUrl?: string;
   dataSiteTitle?: string;
   environment: Environment;
+  prefixoProd?: string;
+  prefixoHml?: string;
   adminGroups: IAdminGroups;
   inheritSiteTheme: boolean;
   showLog: boolean;
-  /** Lista escolhida no site de dados (nome base, sem HML_). */
+  /** Lista escolhida no site de dados (nome base, sem prefixo). */
   listName?: string;
 }
 
@@ -41,19 +44,11 @@ export interface ICommonProps {
   service: ListQueryService;
   logger: DiagnosticsLogger;
   environment: Environment;
+  prefixos: IPrefixosListas;
   adminGroupIds: number[];
   title: string;
   themeStyle: React.CSSProperties;
 }
-
-/** Nome físico da lista: a configuração guarda o nome base; HML acrescenta o prefixo. Vazio enquanto não houver lista. */
-export const resolveListTitle = (baseName: string | undefined, environment: Environment): string => {
-  const base: string = (baseName ?? '').trim();
-  if (base === '' || base.indexOf('HML_') === 0) {
-    return '';
-  }
-  return environment === 'HML' ? `HML_${base}` : base;
-};
 
 export const getAdminGroupIds = (groups: IAdminGroups | undefined, environment: Environment): number[] => {
   const source: IAdminGroups = groups ?? EMPTY_ADMIN_GROUPS;
