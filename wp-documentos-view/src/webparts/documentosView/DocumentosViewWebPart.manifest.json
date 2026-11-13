@@ -18,10 +18,10 @@
         "default": "Advanced"
       },
       "title": {
-        "default": "Documentos Carreiras"
+        "default": "Documentos"
       },
       "description": {
-        "default": "Pastas e documentos de uma biblioteca do Espaço PUC Carreiras, com abertura direta e compartilhamento por link"
+        "default": "Pastas e documentos de uma biblioteca da Equipe M365, com abertura direta e compartilhamento por link"
       },
       "officeFabricIconFontName": "OpenFolderHorizontal",
       "properties": {

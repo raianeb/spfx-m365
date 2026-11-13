@@ -1,6 +1,6 @@
 # wp-calendario
 
-Web Part SPFx de calendário do Espaço PUC Carreiras, com visualização de dia, semana e mês, template de miniatura e template completo.
+Web Part SPFx de calendário da Equipe M365, com visualização de dia, semana e mês, template de miniatura e template completo.
 
 ## Configurações
 - Site de dados, título, grupos de Administradores e ambiente (HML/PROD), conforme o padrão das Web Parts do projeto.

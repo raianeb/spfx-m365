@@ -18,10 +18,10 @@
         "default": "Advanced"
       },
       "title": {
-        "default": "Comunicados Carreiras"
+        "default": "Comunicados"
       },
       "description": {
-        "default": "Lista de comunicados do Espaço PUC Carreiras, com categorias gerenciadas em lista auxiliar"
+        "default": "Lista de comunicados da Equipe M365, com categorias gerenciadas em lista auxiliar"
       },
       "officeFabricIconFontName": "Megaphone",
       "properties": {

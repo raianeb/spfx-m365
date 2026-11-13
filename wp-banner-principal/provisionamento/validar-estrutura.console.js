@@ -1,11 +1,11 @@
 /*
- * Espaço PUC Carreiras — verificação somente leitura do Banner principal (schema v1).
+ * Equipe M365 — verificação somente leitura do Banner principal (schema v1).
  * Cole no Console com o site alvo aberto. Não cria, altera nem exclui nada.
  *
  * Compara cada recurso PROD e HML com o catálogo aprovado e com o outro ambiente.
  */
 (async () => {
-  const siteUrl = 'https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras';
+  const siteUrl = window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0];
   const web = siteUrl.replace(/\/+$/, '');
   const hdr = { Accept: 'application/json;odata=nometadata' };
   const ENVS = { PROD: '', HML: 'HML_' };
@@ -13,7 +13,7 @@
   // Deve refletir o catálogo de criar-estrutura.console.js.
   const CATALOG = [
     {
-      base: 'Carreiras - Banner',
+      base: 'Banner',
       template: 100,
       fields: [
         { n: 'DataPublicacao', type: 'DateTime', idx: true },

@@ -1,11 +1,11 @@
 # wp-banner-principal
 
-Carrossel de destaques da home, alimentado pela lista **Carreiras - Destaques**.
+Carrossel de destaques da home, alimentado pela lista **Banner**.
 
 ## Lista de origem
 
-- **Carreiras - Destaques** no site `https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras`.
-- Criada pelo script de provisionamento das listas do Espaço PUC Carreiras. As colunas e índices estão descritos abaixo.
+- **Banner** no site `https://<tenant>.sharepoint.com/sites/<nome-do-site>`.
+- Criada pelo script de provisionamento das listas da Equipe M365. As colunas e índices estão descritos abaixo.
 
 ## Stack
 
@@ -26,11 +26,11 @@ O pacote fica em `sharepoint/solution/wp-banner-principal.sppkg`, pronto para o 
 ## Publicação
 
 1. Enviar o `.sppkg` ao App Catalog do tenant e confirmar a implantação.
-2. Editar a página `Home.aspx`, adicionar o web part "Destaques Carreiras" e ajustar as propriedades.
+2. Editar a página `Home.aspx`, adicionar o web part "Banner principal" e ajustar as propriedades.
 
 ## Decisões e trade-offs
 
-- Cada web part é um projeto independente, conforme o padrão do monorepo. O serviço `CarreirasListService.ts` é duplicado em cada projeto para não criar acoplamento de deploy entre eles. Trade-off: uma alteração no serviço precisa ser replicada nos cinco projetos.
+- Cada web part é um projeto independente, conforme o padrão do monorepo. O serviço `SpListService.ts` é duplicado em cada projeto para não criar acoplamento de deploy entre eles. Trade-off: uma alteração no serviço precisa ser replicada nos cinco projetos.
 - Campos de escolha (Choice) não são usados em filtros indexados de forma exclusiva; os índices estão em colunas de data, booleanas e de ordenação.
 - O cache é de memória da página. Não há `localStorage`, porque os dados não são pessoais nem variam por usuário.
 

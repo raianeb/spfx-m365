@@ -1,17 +1,23 @@
 # spfx-m365
 
-Web Parts SPFx do **Espaço PUC Carreiras** (SharePoint Online / Microsoft 365), organizadas em um monorepo: cada pasta de primeiro nível é um projeto SPFx independente, com seu próprio `package.json`, configuração e pacote de solução.
+Web Parts SPFx da **Equipe M365**, organizadas em um monorepo. Cada pasta de primeiro nível é um projeto SPFx independente, com seu próprio `package.json`, configuração e pacote de solução.
+
+As Web Parts são genéricas: não estão vinculadas a um site específico. O site de dados, as listas e o ambiente (HML/PROD) são escolhidos na configuração de cada Web Part, então elas podem ser usadas em outros sites e espaços.
 
 ## Projetos
 
 | Pasta | Web Part | Descrição |
 |---|---|---|
-| `wp-banner-principal/` | Banner principal | Carrossel de destaques da home, alimentado pela lista *Carreiras - Destaques*. |
-| `wp-calendario/` | Calendário | Calendário do Espaço PUC Carreiras com visualização de dia, semana e mês, template de miniatura e template completo. Integra com Microsoft Graph. |
+| `wp-banner-principal/` | Banner principal | Carrossel de banners, alimentado pela lista `Banner`. |
+| `wp-calendario/` | Calendário | Visualização de dia, semana e mês, com template de miniatura e template completo. Integra com Microsoft Graph. *Veja a seção "Status".* |
 | `wp-comunicados/` | Comunicados | Lista de comunicados em ordem de data, com categorias, "Ver mais" e "Carregar mais". Administradores criam, editam e excluem comunicados e categorias. |
 | `wp-documentos-view/` | Documentos | Navegação em pastas e abertura de documentos de uma biblioteca, com busca, grade ou lista e link direto por item. Segue a `REGRA_VOLUME.md`. |
 | `wp-faq/` | Perguntas Frequentes | FAQ em acordeão, com ordenação configurável, busca, link direto por pergunta e sugestão de novas perguntas via Power Automate. |
 | `wp-lista-filtro/` | Lista com filtros | Web Part genérica para filtrar e exibir qualquer lista do SharePoint, sem código. Filtro e paginação no servidor, preparada para listas com 100 mil itens ou mais. |
+
+## Status
+
+- `wp-calendario`: **não compila** no estado atual. `AgendaMicrosoft.tsx` usa `listUpcoming`, `createEvent` e o tipo `EventCount`, que não existem em `GraphCalendarService.ts`. A correção depende de definir essa API.
 
 ## Pré-requisitos
 
@@ -31,24 +37,20 @@ npm run build
 
 Scripts disponíveis em todos os projetos: `build`, `start` (servidor de desenvolvimento), `clean` e `eject-webpack`.
 
-O pacote de implantação `.sppkg` é gerado em `sharepoint/solution/` e **não é versionado** (ver `.gitignore`). Para publicar, envie o `.sppkg` gerado ao App Catalog.
+O pacote de implantação `.sppkg` é gerado em `sharepoint/solution/` e **não é versionado**. Para publicar, envie o `.sppkg` gerado ao App Catalog.
 
 ## Provisionamento das listas
 
-Cada projeto que depende de listas do SharePoint tem uma pasta `provisionamento/` com:
+Projetos que dependem de listas do SharePoint têm uma pasta `provisionamento/` com:
 
 - `INSTRUCOES.md`: passo a passo de execução.
-- `arquitetura*.md`: modelo de dados e decisões aprovadas.
-- Scripts `*.console.js` para criar e validar listas, índices e estrutura, executados no Console do navegador.
+- `arquitetura*.md`: modelo de dados e decisões.
+- Scripts `*.console.js` para criar e validar listas, índices e estrutura. Eles são executados no Console do navegador, com o site de destino aberto e logado, e usam o site aberto como alvo.
 
 Leia o `INSTRUCOES.md` do projeto antes de executar qualquer script, principalmente em produção.
 
 ## Convenções
 
 - Stack: SPFx 1.24, React 18, TypeScript 5.8, Fluent UI.
-- Cada Web Part traz `config/`, `src/core/` (base comum, configuração e diagnóstico), `src/crud/` (modais de administração) e `src/services/` (acesso às listas).
-- Configurações de site de dados, ambiente (HML/PROD) e grupo de administradores seguem o mesmo padrão em todas as Web Parts.
-
-## Dados sensíveis
-
-Nenhum projeto deste repositório deve conter credenciais, tokens ou chaves. Configurações de ambiente são informadas pelo usuário na própria Web Part, não gravadas no código.
+- Estrutura típica de cada Web Part: `config/` (configuração SPFx), `src/core/` (base comum, configuração e diagnóstico), `src/services/` (acesso às listas) e `src/webparts/` (componentes). Os projetos que administram itens também trazem `src/crud/` (modais de administração).
+- Site de dados, ambiente (HML/PROD) e grupos de Administradores seguem o mesmo padrão em todas as Web Parts.

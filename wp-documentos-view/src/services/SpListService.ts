@@ -48,7 +48,75 @@ export interface ILibraryImage {
 const IMAGE_EXTENSION: RegExp = /\.(jpe?g|png|gif|webp)$/i;
 const escapeLiteral = (value: string): string => value.replace(/'/g, "''");
 
-export class CarreirasListService {
+/** Subpasta de uma biblioteca, como retornada pela API de pastas. */
+export interface IFolderEntry {
+  Name: string;
+  ServerRelativeUrl: string;
+  TimeLastModified: string;
+  ItemCount: number;
+}
+
+/** Arquivo de uma biblioteca, como retornado pela API de pastas. */
+export interface IFileEntry {
+  Name: string;
+  ServerRelativeUrl: string;
+  TimeLastModified: string;
+  Length: number;
+  UniqueId: string;
+}
+
+export interface IFolderContent {
+  folders: IFolderEntry[];
+  files: IFileEntry[];
+  /** Link da próxima página de arquivos. Ausente quando a pasta já foi lida por completo. */
+  nextFilesUrl?: string;
+}
+
+/** Arquivo encontrado pela busca recursiva. Location descreve a pasta onde ele está, relativa à pasta pesquisada. */
+export interface ISearchFileEntry extends IFileEntry {
+  location: string;
+}
+
+/** Resultado da busca: truncated indica que havia pastas ou arquivos sem pesquisar por causa dos limites. */
+export interface ISearchResult {
+  items: ISearchFileEntry[];
+  truncated: boolean;
+  failedFolders: number;
+}
+
+/** Uma página de resultados do SharePoint e o link da próxima, quando existir. */
+interface IPage<T> {
+  value: T[];
+  next?: string;
+}
+
+/** Item de arquivo retornado pela consulta à lista durante a busca. */
+interface ISearchItem {
+  FileLeafRef: string;
+  FileRef: string;
+  Modified: string;
+  UniqueId: string;
+}
+
+/** Tamanhos de página e limites. Nenhuma consulta lê a biblioteca inteira de uma vez. */
+const FOLDER_PAGE: number = 1000;
+const FILE_PAGE: number = 200;
+const SEARCH_FILE_PAGE: number = 100;
+const MAX_PAGES: number = 20;
+const SEARCH_CONCURRENCY: number = 4;
+
+/** Caracteres com significado na sintaxe de busca; são removidos do termo digitado. */
+const SEARCH_RESERVED: RegExp = /["'*():\\\[\]{}]/g;
+
+const safeDecode = (value: string): string => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
+export class SpListService {
   private _digest: IDigestCache | undefined;
   private _currentGroups: Promise<number[]> | undefined;
   private readonly _permissions: Map<string, Promise<boolean>> = new Map<string, Promise<boolean>>();
@@ -162,19 +230,6 @@ export class CarreirasListService {
     return this._currentGroups;
   }
 
-  /** Total de itens da lista, sem filtro e sem limite de página. Usa a propriedade ItemCount do site. */
-  public async getItemCount(listTitle: string): Promise<number> {
-    const url: string = `${this._webUrl}/_api/web/lists/getbytitle('${encodeURIComponent(listTitle)}')?$select=ItemCount`;
-    const response: SPHttpClientResponse = await this._client.get(url, SPHttpClient.configurations.v1, {
-      headers: NO_METADATA
-    });
-    if (!response.ok) {
-      throw new Error(`Falha ao contar os registros da lista (HTTP ${response.status}).`);
-    }
-    const body: { ItemCount: number } = (await response.json()) as { ItemCount: number };
-    return body.ItemCount;
-  }
-
   public createItem(listTitle: string, body: object): Promise<void> {
     return this._write(listTitle, this._itemsUrl(listTitle), 'POST', body, {});
   }
@@ -245,6 +300,173 @@ export class CarreirasListService {
     };
     this._logger?.log('info', `Biblioteca ${libraryTitle}`, 'Imagem enviada');
     return { name: created.Name, serverRelativeUrl: created.ServerRelativeUrl };
+  }
+
+  /** Caminho no servidor da raiz de uma biblioteca, por exemplo /sites/<nome-do-site>/Documentos. */
+  public async getLibraryRootPath(libraryTitle: string): Promise<string> {
+    const response: SPHttpClientResponse = await this._client.get(
+      `${this._webUrl}/_api/web/lists/getbytitle('${encodeURIComponent(libraryTitle)}')/rootfolder?$select=ServerRelativeUrl`,
+      SPHttpClient.configurations.v1,
+      { headers: NO_METADATA }
+    );
+    if (!response.ok) {
+      throw new Error(`Falha ao consultar a biblioteca (HTTP ${response.status}).`);
+    }
+    const body: { ServerRelativeUrl: string } = (await response.json()) as { ServerRelativeUrl: string };
+    return body.ServerRelativeUrl;
+  }
+
+  /**
+   * Subpastas e arquivos de uma pasta, por duas consultas diretas à própria pasta.
+   * Não usa CAML nem filtro por FileDirRef: o custo depende da pasta aberta, não do tamanho da biblioteca.
+   */
+  /**
+   * Subpastas e a primeira página de arquivos de uma pasta. As demais páginas vêm por getMoreFiles,
+   * enquanto houver nextFilesUrl. A pasta nunca é lida inteira de uma vez.
+   */
+  public async getFolderContent(folderPath: string): Promise<IFolderContent> {
+    const folder: string = this._folderApi(folderPath);
+    const [folders, filesPage]: [IFolderEntry[], IPage<IFileEntry>] = await Promise.all([
+      this._getAllPages<IFolderEntry>(`${folder}/folders?$select=Name,ServerRelativeUrl,TimeLastModified,ItemCount&$top=${FOLDER_PAGE}`),
+      this._getPage<IFileEntry>(`${folder}/files?$select=Name,ServerRelativeUrl,TimeLastModified,Length,UniqueId&$top=${FILE_PAGE}`)
+    ]);
+    return { folders, files: filesPage.value, nextFilesUrl: filesPage.next };
+  }
+
+  /** Próxima página de arquivos de uma pasta, pelo link que o SharePoint devolveu na página anterior. */
+  public async getMoreFiles(nextUrl: string): Promise<{ files: IFileEntry[]; nextFilesUrl?: string }> {
+    const page: IPage<IFileEntry> = await this._getPage<IFileEntry>(nextUrl);
+    return { files: page.value, nextFilesUrl: page.next };
+  }
+
+  /**
+   * Quantidade de arquivos diretamente na pasta: itens da pasta menos as subpastas.
+   * Não lista os arquivos, então a contagem não depende do tamanho da pasta.
+   */
+  public async getFileCount(folderPath: string): Promise<number> {
+    const folder: string = this._folderApi(folderPath);
+    const [info, subfolders]: [{ ItemCount: number }, { Name: string }[]] = await Promise.all([
+      this._getJson<{ ItemCount: number }>(`${folder}?$select=ItemCount`),
+      this._getAllPages<{ Name: string }>(`${folder}/folders?$select=Name&$top=${FOLDER_PAGE}`)
+    ]);
+    return Math.max(0, info.ItemCount - subfolders.length);
+  }
+
+  /**
+   * Busca recursiva por nome, percorrendo as subpastas uma a uma. Cada consulta fica restrita a uma pasta,
+   * então o tamanho total da biblioteca não estoura o limite de consulta do SharePoint.
+   * Para ao atingir maxFolders ou maxResults; truncated indica que ainda havia pastas ou resultados sem pesquisar.
+   */
+  public async searchFolderTree(libraryTitle: string, scopePath: string, term: string, maxResults: number, maxFolders: number): Promise<ISearchResult> {
+    const words: string[] = term
+      .replace(SEARCH_RESERVED, ' ')
+      .split(/\s+/)
+      .filter((word: string) => word !== '');
+    if (words.length === 0) {
+      return { items: [], truncated: false, failedFolders: 0 };
+    }
+    const root: string = scopePath.replace(/\/+$/, '');
+    // substringof na lista não diferencia maiúsculas de minúsculas; no endpoint de pastas diferencia.
+    const nameFilter: string = words.map((word: string) => `substringof('${escapeLiteral(word)}', FileLeafRef)`).join(' and ');
+    const pending: string[] = [root];
+    const found: ISearchFileEntry[] = [];
+    let visited: number = 0;
+    let failedFolders: number = 0;
+    this._logger?.log('info', 'Busca', `Pesquisa em ${root}: termos "${words.join(' ')}"`);
+
+    while (pending.length > 0 && found.length < maxResults && visited < maxFolders) {
+      const batch: string[] = pending.splice(0, Math.min(SEARCH_CONCURRENCY, maxFolders - visited));
+      visited += batch.length;
+      const results: ({ folders: string[]; files: ISearchFileEntry[] } | undefined)[] = await Promise.all(
+        batch.map((path: string) =>
+          this._searchFolder(libraryTitle, path, root, nameFilter).catch(() => {
+            failedFolders += 1;
+            return undefined;
+          })
+        )
+      );
+      results.forEach((result) => {
+        if (result) {
+          pending.push(...result.folders);
+          found.push(...result.files);
+        }
+      });
+    }
+
+    const sorted: ISearchFileEntry[] = found.sort((a: ISearchFileEntry, b: ISearchFileEntry) => b.TimeLastModified.localeCompare(a.TimeLastModified));
+    const truncated: boolean = pending.length > 0 || found.length >= maxResults;
+    this._logger?.log(
+      'info',
+      'Busca',
+      `${visited} pasta(s) pesquisada(s), ${sorted.length} arquivo(s)${truncated ? ' (limite atingido)' : ''}${failedFolders > 0 ? `, ${failedFolders} falha(s)` : ''}`
+    );
+    return { items: sorted.slice(0, maxResults), truncated, failedFolders };
+  }
+
+  /**
+   * Subpastas e arquivos de uma pasta que combinam com o filtro de nome. Uma pasta por consulta.
+   * Os arquivos vêm da lista, filtrados por FileDirRef (somente a pasta, sem as subpastas), para que a busca
+   * não diferencie maiúsculas de minúsculas.
+   */
+  private async _searchFolder(libraryTitle: string, path: string, root: string, nameFilter: string): Promise<{ folders: string[]; files: ISearchFileEntry[] }> {
+    const folder: string = this._folderApi(path);
+    const itemsUrl: string = `${this._webUrl}/_api/web/lists/getbytitle('${encodeURIComponent(libraryTitle)}')/items`;
+    const filter: string = `FSObjType eq 0 and FileDirRef eq '${escapeLiteral(path)}' and ${nameFilter}`;
+    const [subfolders, files]: [IPage<{ ServerRelativeUrl: string }>, IPage<ISearchItem>] = await Promise.all([
+      this._getPage<{ ServerRelativeUrl: string }>(`${folder}/folders?$select=ServerRelativeUrl&$top=${FOLDER_PAGE}`),
+      this._getPage<ISearchItem>(
+        `${itemsUrl}?$select=FileLeafRef,FileRef,Modified,UniqueId&$filter=${encodeURIComponent(filter)}&$top=${SEARCH_FILE_PAGE}`
+      )
+    ]);
+    const relative: string = safeDecode(path).slice(root.length).replace(/^\/+/, '');
+    const location: string = relative === '' ? 'Raiz' : relative.split('/').join(' › ');
+    return {
+      folders: subfolders.value.map((item: { ServerRelativeUrl: string }) => item.ServerRelativeUrl).filter((url: string) => url !== `${root}/Forms`),
+      files: files.value.map(
+        (item: ISearchItem): ISearchFileEntry => ({
+          Name: item.FileLeafRef,
+          ServerRelativeUrl: item.FileRef,
+          TimeLastModified: item.Modified,
+          Length: 0,
+          UniqueId: item.UniqueId,
+          location
+        })
+      )
+    };
+  }
+
+  /** Uma página de resultados de uma consulta OData. */
+  private async _getPage<T>(url: string): Promise<IPage<T>> {
+    const response: SPHttpClientResponse = await this._client.get(url, SPHttpClient.configurations.v1, { headers: NO_METADATA });
+    if (!response.ok) {
+      throw new Error(`Falha ao consultar a pasta (HTTP ${response.status}).`);
+    }
+    const body: { value: T[]; 'odata.nextLink'?: string } = (await response.json()) as { value: T[]; 'odata.nextLink'?: string };
+    return { value: body.value, next: body['odata.nextLink'] };
+  }
+
+  /** Todas as páginas de uma consulta, até o limite MAX_PAGES. */
+  private async _getAllPages<T>(url: string): Promise<T[]> {
+    const items: T[] = [];
+    let next: string | undefined = url;
+    for (let pages: number = 0; next && pages < MAX_PAGES; pages++) {
+      const page: IPage<T> = await this._getPage<T>(next);
+      items.push(...page.value);
+      next = page.next;
+    }
+    return items;
+  }
+
+  private async _getJson<T>(url: string): Promise<T> {
+    const response: SPHttpClientResponse = await this._client.get(url, SPHttpClient.configurations.v1, { headers: NO_METADATA });
+    if (!response.ok) {
+      throw new Error(`Falha ao consultar a pasta (HTTP ${response.status}).`);
+    }
+    return (await response.json()) as T;
+  }
+
+  private _folderApi(folderPath: string): string {
+    return `${this._webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${encodeURIComponent(folderPath.replace(/'/g, "''"))}')`;
   }
 
   private _itemsUrl(listTitle: string): string {

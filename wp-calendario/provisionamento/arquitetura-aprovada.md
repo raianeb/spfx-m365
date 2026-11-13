@@ -1,13 +1,13 @@
 # Calendário — arquitetura de dados (schema v1)
 
-Site: https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras
+Site: https://<tenant>.sharepoint.com/sites/<nome-do-site>
 Status: **proposta para validação.** Os scripts desta pasta só devem ser executados em `apply` após a validação desta arquitetura.
 
 ## Estruturas
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| Carreiras - Calendario | HML_Carreiras - Calendario | Lista (modelo 100, sem versionamento) | Eventos e reuniões exibidos pela WP de calendário |
+| Calendario | HML_Calendario | Lista (modelo 100, sem versionamento) | Eventos e reuniões exibidos pela WP de calendário |
 
 Não há bibliotecas nem listas auxiliares nesta versão. Tipo é uma escolha fixa, e não um cadastro próprio.
 
@@ -72,7 +72,7 @@ Nenhum. A lista não usa Lookup nem Pessoa/Grupo. O organizador é texto, e o ti
 
 ## Pontos de validação
 
-1. O nome `Carreiras - Calendario` está correto? (Pode ser "Calendário" com acento, se a equipe preferir.)
+1. O nome `Calendario` está correto? (Pode ser "Calendário" com acento, se a equipe preferir.)
 2. A lista de tipos (Reunião, Evento, Treinamento, Lembrete) está correta? Ela é fixa nesta versão.
 3. Eventos recorrentes (repetir diariamente, semanalmente) não estão previstos nesta versão. Confirme se são necessários já.
 4. Participantes e convites não estão previstos. Se forem necessários, a coluna de pessoas (múltipla) exige uma decisão de desempenho antes da criação.

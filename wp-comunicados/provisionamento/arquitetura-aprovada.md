@@ -1,14 +1,14 @@
 # Comunicados — arquitetura de dados (schema v1)
 
-Site: https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras
+Site: https://<tenant>.sharepoint.com/sites/<nome-do-site>
 Status: **proposta para validação.** Os scripts desta pasta só devem ser executados em `apply` após a validação da arquitetura.
 
 ## Estruturas
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| Carreiras - Comunicados | HML_Carreiras - Comunicados | Lista (modelo 100, versionamento ativo) | Comunicados publicados |
-| Carreiras - Categorias Comunicados | HML_Carreiras - Categorias Comunicados | Lista (modelo 100, versionamento ativo) | Lista auxiliar de categorias, mantida pela própria WP |
+| Comunicados | HML_Comunicados | Lista (modelo 100, versionamento ativo) | Comunicados publicados |
+| Categorias Comunicados | HML_Categorias Comunicados | Lista (modelo 100, versionamento ativo) | Lista auxiliar de categorias, mantida pela própria WP |
 
 Não há bibliotecas nesta versão: o comunicado não tem anexos previstos no print.
 
@@ -82,7 +82,7 @@ Justificativa para não indexar `Title`: a lista terá poucas dezenas de registr
 
 ## Pontos de validação
 
-1. Os nomes `Carreiras - Comunicados` e `Carreiras - Categorias Comunicados` estão corretos?
+1. Os nomes `Comunicados` e `Categorias Comunicados` estão corretos?
 2. Resolvido: `Mensagem` é texto com formatação (negrito, itálico, sublinhado, listas e links), com sanitização na gravação e na exibição.
 3. Deve existir campo "Ativo" para ocultar comunicados sem excluí-los? Não incluído nesta versão.
 4. Comunicados com data futura devem aparecer na lista? A versão atual exibe todos.

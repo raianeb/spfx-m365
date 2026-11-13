@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CarreirasListService } from '../services/CarreirasListService';
+import { SpListService } from '../services/SpListService';
 import { DiagnosticsLogger } from './diagnostics';
 
 /** Ambiente técnico persistido. Listas de HML recebem o prefixo HML_. */
@@ -23,8 +23,8 @@ export interface IAdminGroups {
 
 export const EMPTY_ADMIN_GROUPS: IAdminGroups = { PROD: [], HML: [] };
 
-/** Propriedades comuns a todas as Web Parts do Espaço PUC Carreiras. */
-export interface ICarreirasBaseProps {
+/** Propriedades comuns a todas as Web Parts da Equipe M365. */
+export interface IWebPartBaseProps {
   title: string;
   top: number;
   dataSiteUrl?: string;
@@ -41,8 +41,8 @@ export interface ICarreirasBaseProps {
 }
 
 /** Dados que a Web Part passa para o componente de conteúdo. */
-export interface ICarreirasCommonProps {
-  service: CarreirasListService;
+export interface IWebPartCommonProps {
+  service: SpListService;
   logger: DiagnosticsLogger;
   environment: Environment;
   adminGroupIds: number[];

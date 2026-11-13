@@ -18,10 +18,10 @@
         "default": "Advanced"
       },
       "title": {
-        "default": "Calendário Carreiras"
+        "default": "Calendário"
       },
       "description": {
-        "default": "Calendário de eventos do Espaço PUC Carreiras, com visualização de dia, semana e mês"
+        "default": "Calendário de eventos da Equipe M365, com visualização de dia, semana e mês"
       },
       "officeFabricIconFontName": "Calendar",
       "properties": {

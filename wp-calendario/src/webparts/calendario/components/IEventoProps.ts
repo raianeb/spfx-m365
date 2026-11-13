@@ -1,5 +1,5 @@
 import { MSGraphClientV3 } from '@microsoft/sp-http';
-import { ICarreirasCommonProps } from '../../../core/config';
+import { IWebPartCommonProps } from '../../../core/config';
 
 /** Opções da coluna Tipo. Escolha simples (sem Lookup), gravada como texto. */
 export const TIPOS_EVENTO: string[] = ['Reunião', 'Evento', 'Treinamento', 'Lembrete'];
@@ -31,7 +31,7 @@ export type CalendarTemplate = 'miniatura' | 'completo';
 
 export type CalendarView = 'dia' | 'semana' | 'mes';
 
-export interface ICalendarioProps extends ICarreirasCommonProps {
+export interface ICalendarioProps extends IWebPartCommonProps {
   /** Nome base da lista de eventos, escolhida no site de dados. Vazio = não configurada. */
   listName: string;
   template: CalendarTemplate;

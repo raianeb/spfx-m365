@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { Icon } from '@fluentui/react/lib/Icon';
-import styles from './Carreiras.module.scss';
+import styles from './shared.module.scss';
 import bannerStyles from './Banner.module.scss';
 import coreStyles from '../../../core/core.module.scss';
 import { IBanner, IBannerPrincipalProps } from './IBannerPrincipalProps';
-import { odataDate, toIsoNow } from '../../../services/CarreirasListService';
+import { odataDate, toIsoNow } from '../../../services/SpListService';
 import { useCrudList } from '../../../crud/useCrudList';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
 import { resolveListTitle } from '../../../core/config';
 import BannerForm from './BannerForm';
 
-const LIST_BASE: string = 'Carreiras - Banner';
+const LIST_BASE: string = 'Banner';
 const SELECT: string[] = ['Id', 'Title', 'DataPublicacao', 'DataExpiracao', 'Link', 'ImagemCaminho', 'Ordem'];
 const HEX_COLOR: RegExp = /^#[0-9a-fA-F]{6}$/;
 const MANAGE_DATE_FORMAT: Intl.DateTimeFormatOptions = {

@@ -1,12 +1,12 @@
 /*
- * Espaço PUC Carreiras — verificação somente leitura da biblioteca de Documentos (schema v1).
+ * Equipe M365 — verificação somente leitura da biblioteca de Documentos (schema v1).
  * Cole no Console com o site alvo aberto. Não cria, altera nem exclui nada.
  *
  * Confere, em PROD e em HML, se a biblioteca existe, se é uma biblioteca de documentos (modelo 101)
  * e se a sessão atual consegue ler a raiz e listar os itens.
  */
 (async () => {
-  const siteUrl = 'https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras';
+  const siteUrl = window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0];
   const libraryBase = 'Documentos'; // Nome base escolhido na web part.
   const web = siteUrl.replace(/\/+$/, '');
   const hdr = { Accept: 'application/json;odata=nometadata' };

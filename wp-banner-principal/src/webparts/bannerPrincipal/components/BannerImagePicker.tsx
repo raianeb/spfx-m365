@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { DefaultButton } from '@fluentui/react/lib/Button';
 import { TextField } from '@fluentui/react/lib/TextField';
-import { CarreirasListService, ILibraryImage } from '../../../services/CarreirasListService';
+import { SpListService, ILibraryImage } from '../../../services/SpListService';
 import formStyles from '../../../crud/crud.module.scss';
 import bannerStyles from './Banner.module.scss';
 import { secondaryButtonStyles, textFieldStyles } from '../../../crud/modalStyles';
 
 export interface IBannerImagePickerProps {
-  service: CarreirasListService;
+  service: SpListService;
   libraryTitle: string;
   origin: string;
   value: ILibraryImage | undefined;

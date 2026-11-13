@@ -14,19 +14,19 @@ import {
   PropertyPaneTextField,
   PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
-import { CarreirasListService } from '../services/CarreirasListService';
+import { SpListService } from '../services/SpListService';
 import {
   EMPTY_ADMIN_GROUPS,
   ENVIRONMENT_OPTIONS,
   Environment,
   IAdminGroups,
-  ICarreirasBaseProps,
-  ICarreirasCommonProps,
+  IWebPartBaseProps,
+  IWebPartCommonProps,
   IGroupRef,
   getAdminGroupIds
 } from './config';
 import { DiagnosticsLogger } from './diagnostics';
-import { GroupPickerField, SitePickerField } from './PropertyFields';
+import { GroupPickerField, ListPickerField, SitePickerField } from './PropertyFields';
 import { ISiteRef, SiteDirectoryService } from './siteDirectory';
 import { mountField, unmountField } from './mountField';
 import { themeToCssVars } from './themeVars';
@@ -49,13 +49,18 @@ const customField = (
   } as unknown as IPropertyPaneCustomFieldProps
 });
 
+/** Propriedades de lista escolhida no site de dados. */
+export type ListPropertyKey = 'listName' | 'categoriesListName';
+
+type ListFieldState = { element: HTMLElement; label: string; callback?: ChangeCallback };
+
 /**
- * Base das Web Parts do Espaço PUC Carreiras. Concentra as seis configurações obrigatórias:
+ * Base das Web Parts da Equipe M365. Concentra as seis configurações obrigatórias:
  * título, site de dados, ambiente, grupos por perfil, herança de tema e log.
  */
-export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> extends BaseClientSideWebPart<TProps> {
+export abstract class WebPartBase<TProps extends IWebPartBaseProps> extends BaseClientSideWebPart<TProps> {
   private _root: Root | undefined;
-  private _service: CarreirasListService | undefined;
+  private _service: SpListService | undefined;
   private _siteDirectory: SiteDirectoryService | undefined;
   private _contextKey: string | undefined;
   private readonly _logger: DiagnosticsLogger = new DiagnosticsLogger();
@@ -64,9 +69,14 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
   private _siteEl: HTMLElement | undefined;
   private _groupEl: HTMLElement | undefined;
   private _changeCallback: ChangeCallback | undefined;
+  private _listFields: Partial<Record<ListPropertyKey, ListFieldState>> = {};
 
   protected abstract get defaultTitle(): string;
-  protected abstract createContent(common: ICarreirasCommonProps): React.ReactElement;
+  /** Quantidade máxima de itens no painel. Falso quando a WP não consulta por essa quantidade. */
+  protected get showTopSlider(): boolean {
+    return true;
+  }
+  protected abstract createContent(common: IWebPartCommonProps): React.ReactElement;
   /** Campos extras do grupo "Geral", antes do controle de quantidade. */
   protected abstract getDisplayFields(): IPropertyPaneField<any>[];
 
@@ -75,7 +85,7 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
     this._theme = this._themeProvider.tryGetTheme();
     this._themeProvider.themeChangedEvent.add(this, this._onThemeChanged);
 
-    const properties: ICarreirasBaseProps = this.properties;
+    const properties: IWebPartBaseProps = this.properties;
     // Título em branco é uma escolha válida (oculta o cabeçalho). Só usa o padrão quando nunca foi definido.
     if (properties.title === undefined || properties.title === null) {
       properties.title = this.defaultTitle;
@@ -96,10 +106,10 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
   }
 
   public render(): void {
-    const service: CarreirasListService = this._ensureService();
+    const service: SpListService = this._ensureService();
     const environment: Environment = this.properties.environment ?? 'PROD';
 
-    const common: ICarreirasCommonProps = {
+    const common: IWebPartCommonProps = {
       service,
       logger: this._logger,
       environment,
@@ -140,14 +150,18 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
                   label: 'Título da Web Part',
                   value: this.properties.title
                 }),
-                PropertyPaneSlider('top', {
-                  label: 'Quantidade máxima de itens',
-                  min: 1,
-                  max: 10,
-                  step: 1,
-                  value: this.properties.top || 5,
-                  showValue: true
-                }),
+                ...(this.showTopSlider
+                  ? [
+                      PropertyPaneSlider('top', {
+                        label: 'Quantidade máxima de itens',
+                        min: 1,
+                        max: 10,
+                        step: 1,
+                        value: this.properties.top || 5,
+                        showValue: true
+                      })
+                    ]
+                  : []),
                 ...this.getDisplayFields()
               ]
             },
@@ -155,6 +169,7 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
               groupName: 'Dados e ambiente',
               groupFields: [
                 this._siteField(),
+                ...this.getSourceFields(),
                 PropertyPaneDropdown('environment', {
                   label: 'Ambiente',
                   options: ENVIRONMENT_OPTIONS.map((option) => ({ key: option.key, text: option.text })),
@@ -194,14 +209,61 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
     };
   }
 
-  private _ensureService(): CarreirasListService {
+  /** Campos extras de origem de dados (listas escolhidas), exibidos logo após o site de dados. */
+  protected getSourceFields(): IPropertyPaneField<any>[] {
+    return [];
+  }
+
+  /** Seletor de lista do site de dados. Ao trocar o site, as listas escolhidas são limpas. */
+  protected listPickerField(property: ListPropertyKey, label: string): IPropertyPaneField<IPropertyPaneCustomFieldProps> {
+    return customField(
+      `list-${property}`,
+      (element: HTMLElement, changeCallback?: ChangeCallback) => {
+        this._listFields[property] = { element, label, callback: changeCallback };
+        this._renderListField(property);
+      },
+      (element: HTMLElement) => {
+        unmountField(element);
+        delete this._listFields[property];
+      }
+    );
+  }
+
+  private _renderListField(property: ListPropertyKey): void {
+    const field: ListFieldState | undefined = this._listFields[property];
+    if (!field) {
+      return;
+    }
+    const props: IWebPartBaseProps = this.properties;
+    const siteUrl: string = props.dataSiteUrl || this.context.pageContext.web.absoluteUrl;
+    mountField(
+      field.element,
+      React.createElement(ListPickerField, {
+        key: siteUrl,
+        label: field.label,
+        siteUrl,
+        service: this._getSiteDirectory(),
+        value: props[property] ?? '',
+        onChange: (name: string) => this._setList(property, name)
+      })
+    );
+  }
+
+  private _setList(property: ListPropertyKey, name: string): void {
+    const props: IWebPartBaseProps = this.properties;
+    props[property] = name;
+    this._listFields[property]?.callback?.(property, name);
+    this.render();
+  }
+
+  private _ensureService(): SpListService {
     const siteUrl: string = this.properties.dataSiteUrl || this.context.pageContext.web.absoluteUrl;
     const environment: Environment = this.properties.environment ?? 'PROD';
     const key: string = `${siteUrl}|${environment}`;
 
     this._logger.setEnabled(this.properties.showLog === true);
     if (!this._service || this._service.webUrl !== siteUrl) {
-      this._service = new CarreirasListService(this.context.spHttpClient, siteUrl, this._logger);
+      this._service = new SpListService(this.context.spHttpClient, siteUrl, this._logger);
     }
     if (this._contextKey !== key) {
       this._logger.clear();
@@ -224,7 +286,7 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
 
   private _siteField(): IPropertyPaneField<IPropertyPaneCustomFieldProps> {
     return customField(
-      'carreirasDataSite',
+      'dataSiteField',
       (element: HTMLElement, changeCallback?: ChangeCallback) => {
         this._siteEl = element;
         this._changeCallback = changeCallback;
@@ -239,7 +301,7 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
 
   private _groupField(): IPropertyPaneField<IPropertyPaneCustomFieldProps> {
     return customField(
-      'carreirasAdminGroups',
+      'adminGroupsField',
       (element: HTMLElement, changeCallback?: ChangeCallback) => {
         this._groupEl = element;
         this._changeCallback = changeCallback;
@@ -317,6 +379,12 @@ export abstract class CarreirasWebPartBase<TProps extends ICarreirasBaseProps> e
     this._changeCallback?.('adminGroups', this.properties.adminGroups);
     this._renderSiteField();
     this._renderGroupFields();
+    const props: IWebPartBaseProps = this.properties;
+    (['listName', 'categoriesListName'] as ListPropertyKey[]).forEach((key: ListPropertyKey) => {
+      props[key] = '';
+      this._listFields[key]?.callback?.(key, '');
+      this._renderListField(key);
+    });
     this.render();
   }
 

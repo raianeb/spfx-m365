@@ -1,4 +1,4 @@
-import { ICarreirasCommonProps } from '../../../core/config';
+import { IWebPartCommonProps } from '../../../core/config';
 
 /** Banner publicado. Datas em ISO (UTC); ImagemCaminho guarda o caminho relativo do arquivo na biblioteca. */
 export interface IBanner {
@@ -12,7 +12,7 @@ export interface IBanner {
   Ordem?: number;
 }
 
-export interface IBannerPrincipalProps extends ICarreirasCommonProps {
+export interface IBannerPrincipalProps extends IWebPartCommonProps {
   /** Nome da biblioteca de imagens (sem HML_); o prefixo é aplicado conforme o ambiente. */
   libraryName: string;
   /** Segundos entre os slides. Zero desativa a troca automática. */

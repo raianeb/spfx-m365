@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { IPropertyPaneField, PropertyPaneSlider, PropertyPaneTextField, PropertyPaneToggle } from '@microsoft/sp-property-pane';
-import { CarreirasWebPartBase } from '../../core/CarreirasWebPartBase';
-import { ICarreirasBaseProps, ICarreirasCommonProps } from '../../core/config';
+import { WebPartBase } from '../../core/WebPartBase';
+import { IWebPartBaseProps, IWebPartCommonProps } from '../../core/config';
 import BannerPrincipal from './components/BannerPrincipal';
 
-export interface IBannerPrincipalWebPartProps extends ICarreirasBaseProps {
+export interface IBannerPrincipalWebPartProps extends IWebPartBaseProps {
   libraryName: string;
   carouselInterval: number;
   showArrows: boolean;
@@ -13,12 +13,12 @@ export interface IBannerPrincipalWebPartProps extends ICarreirasBaseProps {
   overlayOpacity: number;
 }
 
-export default class BannerPrincipalWebPart extends CarreirasWebPartBase<IBannerPrincipalWebPartProps> {
+export default class BannerPrincipalWebPart extends WebPartBase<IBannerPrincipalWebPartProps> {
   protected get defaultTitle(): string {
     return 'Banner principal';
   }
 
-  protected createContent(common: ICarreirasCommonProps): React.ReactElement {
+  protected createContent(common: IWebPartCommonProps): React.ReactElement {
     return React.createElement(BannerPrincipal, {
       ...common,
       libraryName: this.properties.libraryName || 'Banner',

@@ -48,7 +48,7 @@ export interface ILibraryImage {
 const IMAGE_EXTENSION: RegExp = /\.(jpe?g|png|gif|webp)$/i;
 const escapeLiteral = (value: string): string => value.replace(/'/g, "''");
 
-export class CarreirasListService {
+export class SpListService {
   private _digest: IDigestCache | undefined;
   private _currentGroups: Promise<number[]> | undefined;
   private readonly _permissions: Map<string, Promise<boolean>> = new Map<string, Promise<boolean>>();

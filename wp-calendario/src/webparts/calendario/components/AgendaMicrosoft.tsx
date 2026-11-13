@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DefaultButton, IButtonStyles } from '@fluentui/react/lib/Button';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { MSGraphClientV3 } from '@microsoft/sp-http';
-import styles from './Carreiras.module.scss';
+import styles from './shared.module.scss';
 import coreStyles from '../../../core/core.module.scss';
 import agendaStyles from './AgendaMicrosoft.module.scss';
 import { DiagnosticsLogger, DiagnosticsPanel } from '../../../core/diagnostics';

@@ -1,18 +1,18 @@
 /*
- * Espaço PUC Carreiras — verificação somente leitura do FAQ (schema v1).
+ * Equipe M365 — verificação somente leitura do FAQ (schema v1).
  * Cole no Console com o site alvo aberto. Não cria, altera nem exclui nada.
  *
  * Compara cada lista PROD e HML com o catálogo aprovado e com o outro ambiente.
  */
 (async () => {
-  const siteUrl = 'https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras';
+  const siteUrl = window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0];
   const web = siteUrl.replace(/\/+$/, '');
   const hdr = { Accept: 'application/json;odata=nometadata' };
   const ENVS = { PROD: '', HML: 'HML_' };
 
   const CATALOG = [
     {
-      base: 'Carreiras - FAQ',
+      base: 'FAQ',
       template: 100,
       fields: [
         { n: 'Title', type: 'Text' },

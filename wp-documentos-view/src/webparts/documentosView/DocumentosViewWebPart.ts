@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { IPropertyPaneField, PropertyPaneDropdown } from '@microsoft/sp-property-pane';
-import { CarreirasWebPartBase } from '../../core/CarreirasWebPartBase';
-import { ICarreirasBaseProps, ICarreirasCommonProps } from '../../core/config';
+import { WebPartBase } from '../../core/WebPartBase';
+import { IWebPartBaseProps, IWebPartCommonProps } from '../../core/config';
 import Documentos from './components/Documentos';
 import { DocumentosLayout } from './components/IDocumentosProps';
 
-export interface IDocumentosViewWebPartProps extends ICarreirasBaseProps {
+export interface IDocumentosViewWebPartProps extends IWebPartBaseProps {
   layout?: DocumentosLayout;
 }
 
-export default class DocumentosViewWebPart extends CarreirasWebPartBase<IDocumentosViewWebPartProps> {
+export default class DocumentosViewWebPart extends WebPartBase<IDocumentosViewWebPartProps> {
   protected get defaultTitle(): string {
     return 'Documentos';
   }
@@ -19,7 +19,7 @@ export default class DocumentosViewWebPart extends CarreirasWebPartBase<IDocumen
     return false;
   }
 
-  protected createContent(common: ICarreirasCommonProps): React.ReactElement {
+  protected createContent(common: IWebPartCommonProps): React.ReactElement {
     const props: IDocumentosViewWebPartProps = this.properties;
     return React.createElement(Documentos, {
       ...common,

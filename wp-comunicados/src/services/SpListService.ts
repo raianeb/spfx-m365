@@ -48,7 +48,7 @@ export interface ILibraryImage {
 const IMAGE_EXTENSION: RegExp = /\.(jpe?g|png|gif|webp)$/i;
 const escapeLiteral = (value: string): string => value.replace(/'/g, "''");
 
-export class CarreirasListService {
+export class SpListService {
   private _digest: IDigestCache | undefined;
   private _currentGroups: Promise<number[]> | undefined;
   private readonly _permissions: Map<string, Promise<boolean>> = new Map<string, Promise<boolean>>();
@@ -160,6 +160,19 @@ export class CarreirasListService {
         });
     }
     return this._currentGroups;
+  }
+
+  /** Total de itens da lista, sem filtro e sem limite de página. Usa a propriedade ItemCount do site. */
+  public async getItemCount(listTitle: string): Promise<number> {
+    const url: string = `${this._webUrl}/_api/web/lists/getbytitle('${encodeURIComponent(listTitle)}')?$select=ItemCount`;
+    const response: SPHttpClientResponse = await this._client.get(url, SPHttpClient.configurations.v1, {
+      headers: NO_METADATA
+    });
+    if (!response.ok) {
+      throw new Error(`Falha ao contar os registros da lista (HTTP ${response.status}).`);
+    }
+    const body: { ItemCount: number } = (await response.json()) as { ItemCount: number };
+    return body.ItemCount;
   }
 
   public createItem(listTitle: string, body: object): Promise<void> {

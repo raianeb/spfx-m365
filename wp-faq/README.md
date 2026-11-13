@@ -1,4 +1,4 @@
-# wp-faq — Perguntas Frequentes (Espaço PUC Carreiras)
+# wp-faq — Perguntas Frequentes (Equipe M365)
 
 Web Part SPFx de perguntas e respostas, com acordeão, ordenação configurável, link direto por pergunta, busca e sugestão de novas perguntas por fluxo do Power Automate.
 
@@ -11,13 +11,13 @@ Web Part SPFx de perguntas e respostas, com acordeão, ordenação configurável
 - Busca instantânea no título e na resposta, sem acentos e sem diferença entre maiúsculas e minúsculas.
 - Sugestão de novas perguntas: botão "Sugerir nova pergunta" aparece quando o envio está ativado e a URL do fluxo é válida. O envio é um POST JSON ao gatilho HTTP do Power Automate.
 - Administradores cadastram, editam e excluem perguntas pelos botões "+" e nas ações de cada linha. O botão "Ordenar" define a ordem de exibição, como na WP banner. Os controles aparecem para quem tem Controle Total na lista e pertence ao grupo do perfil Administradores configurado na WP.
-- Seis configurações obrigatórias do padrão Carreiras: título, site de dados, grupos de Administradores por ambiente, ambiente PROD/HML, herança de tema e log.
+- Seis configurações obrigatórias do padrão Equipe M365: título, site de dados, grupos de Administradores por ambiente, ambiente PROD/HML, herança de tema e log.
 
 ## Configurações da Web Part
 
 | Configuração | Opções |
 |---|---|
-| Lista de perguntas frequentes | Lista escolhida no site de dados. Padrão: `Carreiras - FAQ`. |
+| Lista de perguntas frequentes | Lista escolhida no site de dados. Padrão: `FAQ`. |
 | Modo de abertura | Todos fechados · Todos abertos · Primeiro aberto |
 | Ordenação | Ordem definida · Pergunta (A a Z) · Mais recentes primeiro |
 | Permitir envio de sugestões | Sim · Não |
@@ -40,7 +40,7 @@ Melhorias recomendadas: busca instantânea (incluída nesta versão). Votação 
 
 ```
 src/
-  core/        base das WPs Carreiras (configurações obrigatórias), config, diagnóstico, seletores
+  core/        base das WPs Equipe M365 (configurações obrigatórias), config, diagnóstico, seletores
   crud/        CRUD com modais, reordenação e gerenciamento
   services/    acesso às listas (SharePoint REST) e envio de sugestões
   webparts/faq/
@@ -65,7 +65,7 @@ O pacote gerado fica em `sharepoint/solution/wp-faq.sppkg`. Envie-o ao catálogo
 
 ## Provisionamento
 
-Siga `provisionamento/INSTRUCOES.md`. O script cria a lista `Carreiras - FAQ` e a coluna `Ordem`, com índice, em PROD e HML, sem excluir nem alterar recursos existentes.
+Siga `provisionamento/INSTRUCOES.md`. O script cria a lista `FAQ` e a coluna `Ordem`, com índice, em PROD e HML, sem excluir nem alterar recursos existentes.
 
 ## Testes de regras
 

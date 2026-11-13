@@ -1,9 +1,9 @@
-# Provisionamento — Calendário (Espaço PUC Carreiras)
+# Provisionamento — Calendário (Equipe M365)
 
 Use somente após validar `arquitetura-aprovada.md`.
 
 ## Pré-requisitos
-- Sessão logada em https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras com permissão de Controle Total no site.
+- Sessão logada em https://<tenant>.sharepoint.com/sites/<nome-do-site> com permissão de Controle Total no site.
 - Navegador Chrome ou Edge.
 
 ## Passo a passo
@@ -32,4 +32,4 @@ O script é idempotente: rodar de novo não duplica lista ou campo. Se um recurs
 - Os grupos de Administradores (HML e PROD) precisam ser definidos nas propriedades da web part, em cada ambiente.
 - Quem apenas consulta eventos não precisa de permissão extra além de leitura no site.
 - Não há fluxos Power Automate nesta etapa.
-- Na web part, escolha a lista "Carreiras - Calendario" (ou `HML_Carreiras - Calendario` no ambiente HML) em "Lista de calendário".
+- Na web part, escolha a lista "Calendario" (ou `HML_Calendario` no ambiente HML) em "Lista de calendário".

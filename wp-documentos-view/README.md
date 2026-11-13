@@ -1,6 +1,6 @@
 # wp-documentos-view
 
-Web Part SPFx para navegar em pastas e abrir documentos de uma biblioteca do Espaço PUC Carreiras.
+Web Part SPFx para navegar em pastas e abrir documentos de uma biblioteca da Equipe M365.
 
 ## Uso
 - Pastas abrem na própria WP, com o caminho clicável no topo.

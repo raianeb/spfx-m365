@@ -1,6 +1,6 @@
 # wp-comunicados
 
-Web part de comunicados do Espaço PUC Carreiras (SharePoint Online, SPFx 1.24.1).
+Web part de comunicados da Equipe M365 (SharePoint Online, SPFx 1.24.1).
 
 - Lista de comunicados em ordem de data, com cartões, "Ver mais" e "Carregar mais".
 - Administradores criam, editam e excluem comunicados e categorias.

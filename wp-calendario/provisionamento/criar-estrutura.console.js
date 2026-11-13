@@ -1,6 +1,6 @@
 /*
- * Espaço PUC Carreiras — provisionamento do Calendário (schema v1, PROPOSTA PARA VALIDAÇÃO)
- * Cole este arquivo no Console do navegador com o site do Espaço PUC Carreiras aberto e logado.
+ * Equipe M365 — provisionamento do Calendário (schema v1, PROPOSTA PARA VALIDAÇÃO)
+ * Cole este arquivo no Console do navegador com o site da Equipe M365 aberto e logado.
  * Não execute em apply antes da validação de arquitetura-aprovada.md.
  *
  * Padrão: mode = "plan" (não altera nada; só lista o que faria).
@@ -13,7 +13,7 @@
  */
 (async () => {
   const CONFIG = {
-    siteUrl: 'https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras',
+    siteUrl: window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0],
     mode: 'plan', // 'plan' | 'apply'
     createInProd: true, // em 'apply', cria também em PROD, somente se o HML estiver sem erro ou divergência
     schemaVersion: 1
@@ -27,7 +27,7 @@
   // Dia inteiro é booleano com padrão Não.
   const CATALOG = [
     {
-      base: 'Carreiras - Calendario',
+      base: 'Calendario',
       kind: 'Lista',
       template: 100,
       versioning: false,

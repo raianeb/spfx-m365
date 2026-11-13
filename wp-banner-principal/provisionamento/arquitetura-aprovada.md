@@ -1,13 +1,13 @@
 # Banner principal — arquitetura de dados (schema v1)
 
-Site: https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras
+Site: https://<tenant>.sharepoint.com/sites/<nome-do-site>
 Status: **proposta para validação.** Os scripts desta pasta só devem ser executados em `apply` após a validação da arquitetura.
 
 ## Estruturas
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| Carreiras - Banner | HML_Carreiras - Banner | Lista (modelo 100, versionamento ativo) | Registro dos banners do carrossel |
+| Banner | HML_Banner | Lista (modelo 100, versionamento ativo) | Registro dos banners do carrossel |
 | Banner | HML_Banner | Biblioteca de documentos (modelo 101, versionamento ativo) | Imagens dos banners, enviadas pelo usuário ou pelo upload da WP |
 
 O nome da biblioteca é configurável na WP (propriedade `libraryName`, padrão `Banner`). O script cria a biblioteca padrão; se a WP apontar para outra, o recurso deve ser criado com o mesmo padrão de nomes.
@@ -42,7 +42,7 @@ Observação: a obrigatoriedade de Publicação e Imagem é validada no formulá
 
 - Os controles de criar, editar e excluir aparecem somente para quem tem **Controle Total** na lista e pertence a um grupo do perfil **Administradores** do ambiente ativo (configurado nas propriedades da WP).
 - Envio de imagens: o usuário precisa de permissão de **Colaborar** na biblioteca `Banner` para salvar arquivos. Sem essa permissão, o upload falha com mensagem de acesso.
-- **Pendente de decisão:** os grupos de Administradores HML e PROD não são criados por este script (mesmo padrão do projeto Carreiras). Confirme se devem ser criados e quais membros terão acesso.
+- **Pendente de decisão:** os grupos de Administradores HML e PROD não são criados por este script (mesmo padrão do monorepo). Confirme se devem ser criados e quais membros terão acesso.
 - O script não cria grupos nem concede permissões em PROD ou HML.
 
 ## Ambientes
@@ -53,7 +53,7 @@ Observação: a obrigatoriedade de Publicação e Imagem é validada no formulá
 
 ## Pontos de validação
 
-1. Os nomes `Carreiras - Banner` e `Banner` estão corretos?
+1. Os nomes `Banner` e `Banner` estão corretos?
 2. Deseja um campo "Ativo" para desligar um banner sem excluí-lo? (não incluído)
 3. O campo Title mantém o rótulo nativo "Title" ou deve ser exibido como "Título"? (rótulo nativo mantido)
 4. Os grupos HML devem ser criados separadamente do acesso de PROD?

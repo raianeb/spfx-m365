@@ -18,10 +18,10 @@
         "default": "Advanced"
       },
       "title": {
-        "default": "Banner principal Carreiras"
+        "default": "Banner principal"
       },
       "description": {
-        "default": "Carrossel de banners do Espaço PUC Carreiras, com imagens da biblioteca Banner"
+        "default": "Carrossel de banners da Equipe M365, com imagens da biblioteca Banner"
       },
       "officeFabricIconFontName": "Photo2",
       "properties": {

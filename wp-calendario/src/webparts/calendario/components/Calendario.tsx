@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DefaultButton, IButtonStyles, PrimaryButton } from '@fluentui/react/lib/Button';
 import { Icon } from '@fluentui/react/lib/Icon';
-import styles from './Carreiras.module.scss';
+import styles from './shared.module.scss';
 import calendarioStyles from './Calendario.module.scss';
 import coreStyles from '../../../core/core.module.scss';
 import { CalendarView, ICalendarioProps, IEvento } from './IEventoProps';

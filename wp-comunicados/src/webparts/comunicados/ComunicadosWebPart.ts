@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { IPropertyPaneField, PropertyPaneDropdown, PropertyPaneSlider, PropertyPaneToggle } from '@microsoft/sp-property-pane';
-import { CarreirasWebPartBase } from '../../core/CarreirasWebPartBase';
-import { ICarreirasBaseProps, ICarreirasCommonProps } from '../../core/config';
+import { WebPartBase } from '../../core/WebPartBase';
+import { IWebPartBaseProps, IWebPartCommonProps } from '../../core/config';
 import Comunicados from './components/Comunicados';
 import { ComunicadoLayout } from './components/IComunicadosProps';
 
 /** Nomes padrão usados enquanto a WP ainda não tiver listas escolhidas. */
-const DEFAULT_LIST: string = 'Carreiras - Comunicados';
-const DEFAULT_CATEGORIES_LIST: string = 'Carreiras - Categorias Comunicados';
+const DEFAULT_LIST: string = 'Comunicados';
+const DEFAULT_CATEGORIES_LIST: string = 'Categorias Comunicados';
 const DEFAULT_COLUMNS: number = 2;
 const MAX_COLUMNS: number = 4;
 
-export interface IComunicadosWebPartProps extends ICarreirasBaseProps {
+export interface IComunicadosWebPartProps extends IWebPartBaseProps {
   layout?: ComunicadoLayout;
   columns?: number;
   showMessage?: boolean;
@@ -19,7 +19,7 @@ export interface IComunicadosWebPartProps extends ICarreirasBaseProps {
   showAuthor?: boolean;
 }
 
-export default class ComunicadosWebPart extends CarreirasWebPartBase<IComunicadosWebPartProps> {
+export default class ComunicadosWebPart extends WebPartBase<IComunicadosWebPartProps> {
   protected get defaultTitle(): string {
     return 'Comunicados';
   }
@@ -29,7 +29,7 @@ export default class ComunicadosWebPart extends CarreirasWebPartBase<IComunicado
     return false;
   }
 
-  protected createContent(common: ICarreirasCommonProps): React.ReactElement {
+  protected createContent(common: IWebPartCommonProps): React.ReactElement {
     const props: IComunicadosWebPartProps = this.properties;
     const columns: number = Math.min(MAX_COLUMNS, Math.max(1, Math.round(props.columns ?? DEFAULT_COLUMNS)));
     return React.createElement(Comunicados, {

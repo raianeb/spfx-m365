@@ -4,10 +4,10 @@ import { IconButton } from '@fluentui/react/lib/Button';
 import { SearchBox } from '@fluentui/react/lib/SearchBox';
 import styles from './Documentos.module.scss';
 import coreStyles from '../../../core/core.module.scss';
-import carreirasStyles from './Carreiras.module.scss';
+import sharedStyles from './shared.module.scss';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
 import { resolveListTitle } from '../../../core/config';
-import { IFileEntry, IFolderContent, IFolderEntry, ISearchFileEntry, ISearchResult } from '../../../services/CarreirasListService';
+import { IFileEntry, IFolderContent, IFolderEntry, ISearchFileEntry, ISearchResult } from '../../../services/SpListService';
 import { categoryOf, DocumentosLayout, FileCategory, formatBytes, ICON_BY_CATEGORY, IDocumentosProps, isOfficeCategory } from './IDocumentosProps';
 
 /** Um nível de navegação: nome exibido e caminho do servidor. */
@@ -438,22 +438,22 @@ const Documentos: React.FC<IDocumentosProps> = ({ service, logger, environment, 
 
   let body: React.ReactNode;
   if (!configured) {
-    body = <div className={carreirasStyles.empty}>Escolha a biblioteca de documentos nas configurações da Web Part.</div>;
+    body = <div className={sharedStyles.empty}>Escolha a biblioteca de documentos nas configurações da Web Part.</div>;
   } else if (rootError) {
-    body = <div className={carreirasStyles.message} role="alert">Não foi possível acessar a biblioteca. Verifique se você tem permissão de leitura.</div>;
+    body = <div className={sharedStyles.message} role="alert">Não foi possível acessar a biblioteca. Verifique se você tem permissão de leitura.</div>;
   } else if (term !== '') {
     if (searchError) {
-      body = <div className={carreirasStyles.message} role="alert">Não foi possível concluir a busca. Tente novamente em instantes.</div>;
+      body = <div className={sharedStyles.message} role="alert">Não foi possível concluir a busca. Tente novamente em instantes.</div>;
     } else if (searching || searchResult === undefined) {
-      body = <div className={carreirasStyles.skeleton} aria-busy="true" aria-label="Buscando documentos" />;
+      body = <div className={sharedStyles.skeleton} aria-busy="true" aria-label="Buscando documentos" />;
     } else if (entries.length === 0) {
-      body = <div className={carreirasStyles.empty}>{`Nenhum arquivo encontrado para "${term}" nesta pasta e nas subpastas.`}</div>;
+      body = <div className={sharedStyles.empty}>{`Nenhum arquivo encontrado para "${term}" nesta pasta e nas subpastas.`}</div>;
     } else {
       body = renderEntries();
     }
   } else if (contentError) {
     body = (
-      <div className={carreirasStyles.message} role="alert">
+      <div className={sharedStyles.message} role="alert">
         Não foi possível carregar esta pasta.{' '}
         <button type="button" className={styles.linkButton} onClick={() => setReloadKey((value: number) => value + 1)}>
           Tentar novamente
@@ -461,15 +461,15 @@ const Documentos: React.FC<IDocumentosProps> = ({ service, logger, environment, 
       </div>
     );
   } else if (!content || rootPath === undefined) {
-    body = <div className={carreirasStyles.skeleton} aria-busy="true" aria-label="Carregando documentos" />;
+    body = <div className={sharedStyles.skeleton} aria-busy="true" aria-label="Carregando documentos" />;
   } else if (entries.length === 0) {
-    body = <div className={carreirasStyles.empty}>Esta pasta está vazia.</div>;
+    body = <div className={sharedStyles.empty}>Esta pasta está vazia.</div>;
   } else {
     body = renderEntries();
   }
 
   return (
-    <section className={carreirasStyles.root} style={themeStyle} aria-label={contextLabel}>
+    <section className={sharedStyles.root} style={themeStyle} aria-label={contextLabel}>
       <div className={styles.header}>
         <header className={coreStyles.wpHeader}>
           {title && (

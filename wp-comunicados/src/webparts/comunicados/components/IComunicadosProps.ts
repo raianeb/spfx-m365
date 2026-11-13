@@ -1,4 +1,4 @@
-import { ICarreirasCommonProps } from '../../../core/config';
+import { IWebPartCommonProps } from '../../../core/config';
 
 /**
  * Comunicado. CategoriaId referencia o Id da lista de categorias: a consulta não usa Lookup,
@@ -24,7 +24,7 @@ export interface ICategoria {
 export type ComunicadoLayout = 'cards' | 'compact' | 'featured';
 
 /** Propriedades que chegam ao componente, já resolvidas pela Web Part. */
-export interface IComunicadosProps extends ICarreirasCommonProps {
+export interface IComunicadosProps extends IWebPartCommonProps {
   /** Nome base da lista de comunicados, escolhida no site de dados. Vazio = ainda não configurada. */
   listName: string;
   /** Nome base da lista de categorias. Vazio = a WP não exibe categorias nem o botão de gerenciá-las. */

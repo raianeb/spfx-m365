@@ -1,9 +1,9 @@
-# Provisionamento HML — Banner principal (Espaço PUC Carreiras)
+# Provisionamento HML — Banner principal (Equipe M365)
 
 Use somente após validar `arquitetura-aprovada.md`.
 
 ## Pré-requisitos
-- Sessão logada em https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras com permissão de Controle Total no site.
+- Sessão logada em https://<tenant>.sharepoint.com/sites/<nome-do-site> com permissão de Controle Total no site.
 - Navegador Chrome ou Edge.
 
 ## Passo a passo

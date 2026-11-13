@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DefaultButton, IconButton } from '@fluentui/react/lib/Button';
-import { CarreirasListService, IListQuery } from '../services/CarreirasListService';
+import { SpListService, IListQuery } from '../services/SpListService';
 import { DiagnosticsLogger, DiagnosticsPanel } from '../core/diagnostics';
 import styles from './crud.module.scss';
 import manageStyles from './manage.module.scss';
@@ -49,7 +49,7 @@ export interface ICrudManageOptions<T> {
 }
 
 export interface ICrudListOptions<T> {
-  service: CarreirasListService;
+  service: SpListService;
   logger: DiagnosticsLogger;
   /** Nome físico da lista no ambiente ativo (com HML_ quando aplicável). */
   listTitle: string;

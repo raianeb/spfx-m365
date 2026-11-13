@@ -97,7 +97,7 @@ export const SitePickerField: React.FC<ISitePickerProps> = ({ value, currentSite
             <label className={styles.pickerOption}>
               <input
                 type="radio"
-                name="carreiras-site-de-dados"
+                name="site-de-dados"
                 checked={site.url === selected.url}
                 disabled={validating}
                 onChange={() => {

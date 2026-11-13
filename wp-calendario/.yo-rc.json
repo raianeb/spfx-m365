@@ -9,7 +9,7 @@
     "componentType": "webpart",
     "template": "react",
     "componentName": "Calendario",
-    "componentDescription": "Calendário do Espaço PUC Carreiras",
+    "componentDescription": "Calendário da Equipe M365",
     "plusBeta": false,
     "isCreatingSolution": true,
     "nodeVersion": "22.23.4",

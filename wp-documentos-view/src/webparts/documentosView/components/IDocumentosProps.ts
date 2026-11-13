@@ -1,8 +1,8 @@
-import { ICarreirasCommonProps } from '../../../core/config';
+import { IWebPartCommonProps } from '../../../core/config';
 
 export type DocumentosLayout = 'grade' | 'lista';
 
-export interface IDocumentosProps extends ICarreirasCommonProps {
+export interface IDocumentosProps extends IWebPartCommonProps {
   /** Nome base da biblioteca escolhida no site de dados. Vazio = não configurada. */
   libraryName: string;
   layout: DocumentosLayout;

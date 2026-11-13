@@ -5,12 +5,12 @@ import formStyles from '../../../crud/crud.module.scss';
 import ModalShell from '../../../crud/ModalShell';
 import { primaryButtonStyles, secondaryButtonStyles, textFieldStyles } from '../../../crud/modalStyles';
 import { ICrudFormContext } from '../../../crud/useCrudList';
-import { CarreirasListService, ILibraryImage } from '../../../services/CarreirasListService';
+import { SpListService, ILibraryImage } from '../../../services/SpListService';
 import { IBanner } from './IBannerPrincipalProps';
 import BannerImagePicker from './BannerImagePicker';
 
 export interface IBannerFormProps extends ICrudFormContext<IBanner> {
-  service: CarreirasListService;
+  service: SpListService;
   libraryTitle: string;
 }
 

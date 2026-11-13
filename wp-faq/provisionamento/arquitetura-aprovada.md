@@ -1,13 +1,13 @@
 # FAQ — arquitetura de dados (schema v1)
 
-Site: https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras
+Site: https://<tenant>.sharepoint.com/sites/<nome-do-site>
 Status: **proposta para validação.** Os scripts desta pasta só devem ser executados em `apply` após a validação desta arquitetura.
 
 ## Estruturas
 
 | Nome PROD | Nome HML | Tipo | Finalidade |
 |---|---|---|---|
-| Carreiras - FAQ | HML_Carreiras - FAQ | Lista (modelo 100, versionamento ativo) | Perguntas e respostas publicadas |
+| FAQ | HML_FAQ | Lista (modelo 100, versionamento ativo) | Perguntas e respostas publicadas |
 
 Não há bibliotecas nem listas auxiliares: pergunta e resposta ficam na mesma lista, e categorias não estão previstas nesta versão.
 
@@ -86,7 +86,7 @@ Consulta única por carregamento, com limite de 500 perguntas. Acima disso, a WP
 
 ## Pontos de validação
 
-1. O nome `Carreiras - FAQ` está correto?
+1. O nome `FAQ` está correto?
 2. A ordenação padrão deve ser "Ordem definida", com "Pergunta (A a Z)" como alternativa?
 3. O fluxo de sugestão encaminha a qual equipe e por qual canal?
 4. Perguntas podem ser ocultadas sem exclusão (campo "Ativo")? Não incluído nesta versão.

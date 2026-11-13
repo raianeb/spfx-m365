@@ -21,7 +21,7 @@
         "default": "Perguntas Frequentes"
       },
       "description": {
-        "default": "Perguntas e respostas do Espaço PUC Carreiras, com link direto por pergunta e sugestão de novas perguntas"
+        "default": "Perguntas e respostas da Equipe M365, com link direto por pergunta e sugestão de novas perguntas"
       },
       "officeFabricIconFontName": "Help",
       "properties": {}

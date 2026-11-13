@@ -1,6 +1,6 @@
 /*
- * Espaço PUC Carreiras — provisionamento dos Comunicados (schema v1)
- * Cole este arquivo no Console do navegador com o site do Espaço PUC Carreiras aberto e logado.
+ * Equipe M365 — provisionamento dos Comunicados (schema v1)
+ * Cole este arquivo no Console do navegador com o site da Equipe M365 aberto e logado.
  *
  * Padrão: mode = "plan" (não altera nada; só lista o que faria).
  * Para aplicar, troque mode para "apply" e execute novamente. O script é idempotente:
@@ -12,7 +12,7 @@
  */
 (async () => {
   const CONFIG = {
-    siteUrl: 'https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras',
+    siteUrl: window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0],
     mode: 'plan', // 'plan' | 'apply'
     createInProd: true, // em 'apply', cria também em PROD, somente se o HML estiver sem erro ou divergência
     schemaVersion: 1
@@ -26,7 +26,7 @@
   // A lista de categorias é pequena e ordenada por Title (nativo), por isso não recebe índice adicional.
   const CATALOG = [
     {
-      base: 'Carreiras - Categorias Comunicados',
+      base: 'Categorias Comunicados',
       kind: 'Lista',
       template: 100,
       fields: [
@@ -34,7 +34,7 @@
       ]
     },
     {
-      base: 'Carreiras - Comunicados',
+      base: 'Comunicados',
       kind: 'Lista',
       template: 100,
       fields: [

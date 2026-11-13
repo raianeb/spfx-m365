@@ -1,22 +1,22 @@
 import * as React from 'react';
 import { MSGraphClientV3 } from '@microsoft/sp-http';
 import { IPropertyPaneField, PropertyPaneDropdown, PropertyPaneTextField } from '@microsoft/sp-property-pane';
-import { CarreirasWebPartBase } from '../../core/CarreirasWebPartBase';
-import { ICarreirasBaseProps, ICarreirasCommonProps } from '../../core/config';
+import { WebPartBase } from '../../core/WebPartBase';
+import { IWebPartBaseProps, IWebPartCommonProps } from '../../core/config';
 import Calendario from './components/Calendario';
 import { CalendarTemplate, CalendarView } from './components/IEventoProps';
 
 /** Lista padrão enquanto a WP não tiver lista escolhida. */
-const DEFAULT_LIST: string = 'Carreiras - Calendario';
+const DEFAULT_LIST: string = 'Calendario';
 
-export interface ICalendarioWebPartProps extends ICarreirasBaseProps {
+export interface ICalendarioWebPartProps extends IWebPartBaseProps {
   template?: CalendarTemplate;
   defaultView?: CalendarView;
   /** E-mail ou ID do grupo/equipe Microsoft 365. Vazio: somente a lista. */
   identifier?: string;
 }
 
-export default class CalendarioWebPart extends CarreirasWebPartBase<ICalendarioWebPartProps> {
+export default class CalendarioWebPart extends WebPartBase<ICalendarioWebPartProps> {
   /** Fábrica estável do cliente Graph do SPFx. O token vem da sessão do usuário, sem app próprio. */
   private readonly graphClientFactory = (): Promise<MSGraphClientV3> => this.context.msGraphClientFactory.getClient('3');
 
@@ -29,7 +29,7 @@ export default class CalendarioWebPart extends CarreirasWebPartBase<ICalendarioW
     return false;
   }
 
-  protected createContent(common: ICarreirasCommonProps): React.ReactElement {
+  protected createContent(common: IWebPartCommonProps): React.ReactElement {
     const props: ICalendarioWebPartProps = this.properties;
     return React.createElement(Calendario, {
       ...common,

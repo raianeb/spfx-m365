@@ -1,6 +1,6 @@
 # Documentos (visualização) — arquitetura de acesso (schema v1)
 
-Site: https://smcgtipucminas.sharepoint.com/sites/espacopuccarreiras
+Site: https://<tenant>.sharepoint.com/sites/<nome-do-site>
 Status: **proposta para validação.** Esta WP não cria estruturas: lê uma biblioteca já existente.
 
 ## Estruturas

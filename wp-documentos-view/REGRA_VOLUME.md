@@ -1,6 +1,6 @@
 # Regra de volume para bibliotecas de documentos
 
-Vale para qualquer Web Part que leia uma biblioteca do Espaço PUC Carreiras, independentemente de quantos itens ela tenha.
+Vale para qualquer Web Part que leia uma biblioteca da Equipe M365, independentemente de quantos itens ela tenha.
 
 ## Princípios
 
@@ -11,7 +11,7 @@ Vale para qualquer Web Part que leia uma biblioteca do Espaço PUC Carreiras, in
 5. **Limites explícitos.** A busca tem teto de resultados e de pastas percorridas. Ao atingir o teto, a tela avisa que o resultado está limitado.
 6. **Lotes pequenos.** Requisições em paralelo são feitas em lotes de até 4.
 
-## Limites atuais (CarreirasListService / Documentos)
+## Limites atuais (SpListService / Documentos)
 
 | Item | Valor |
 |---|---|

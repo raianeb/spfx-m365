@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { IPropertyPaneField, PropertyPaneDropdown, PropertyPaneTextField, PropertyPaneToggle } from '@microsoft/sp-property-pane';
-import { CarreirasWebPartBase } from '../../core/CarreirasWebPartBase';
-import { ICarreirasBaseProps, ICarreirasCommonProps } from '../../core/config';
+import { WebPartBase } from '../../core/WebPartBase';
+import { IWebPartBaseProps, IWebPartCommonProps } from '../../core/config';
 import Faq from './components/Faq';
 import { FaqOpenMode, FaqSortMode } from './components/faqRules';
 
 /** Lista padrão enquanto a WP não tiver lista escolhida. */
-const DEFAULT_LIST: string = 'Carreiras - FAQ';
+const DEFAULT_LIST: string = 'FAQ';
 const DEFAULT_OPEN_MODE: FaqOpenMode = 'fechados';
 const DEFAULT_SORT_MODE: FaqSortMode = 'ordem';
 
-export interface IFaqWebPartProps extends ICarreirasBaseProps {
+export interface IFaqWebPartProps extends IWebPartBaseProps {
   /** Comportamento inicial dos itens (RF-FAQ-03). */
   openMode?: FaqOpenMode;
   /** Ordenação configurável da lista. */
@@ -21,7 +21,7 @@ export interface IFaqWebPartProps extends ICarreirasBaseProps {
   suggestionFlowUrl?: string;
 }
 
-export default class FaqWebPart extends CarreirasWebPartBase<IFaqWebPartProps> {
+export default class FaqWebPart extends WebPartBase<IFaqWebPartProps> {
   protected get defaultTitle(): string {
     return 'Perguntas Frequentes';
   }
@@ -31,7 +31,7 @@ export default class FaqWebPart extends CarreirasWebPartBase<IFaqWebPartProps> {
     return false;
   }
 
-  protected createContent(common: ICarreirasCommonProps): React.ReactElement {
+  protected createContent(common: IWebPartCommonProps): React.ReactElement {
     const props: IFaqWebPartProps = this.properties;
     const user = this.context.pageContext.user;
     return React.createElement(Faq, {

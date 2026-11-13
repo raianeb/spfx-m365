@@ -4,7 +4,7 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { TextField } from '@fluentui/react/lib/TextField';
 import styles from './Faq.module.scss';
 import coreStyles from '../../../core/core.module.scss';
-import { ICarreirasCommonProps, resolveListTitle } from '../../../core/config';
+import { IWebPartCommonProps, resolveListTitle } from '../../../core/config';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
 import { ICrudList, useCrudList } from '../../../crud/useCrudList';
 import { secondaryButtonStyles } from '../../../crud/modalStyles';
@@ -36,7 +36,7 @@ const FAQ_LIMIT: number = 500;
 /** Tempo em que a mensagem de confirmação permanece visível. */
 const NOTICE_MS: number = 3000;
 
-export interface IFaqProps extends ICarreirasCommonProps {
+export interface IFaqProps extends IWebPartCommonProps {
   /** Nome base da lista de perguntas (sem HML_). Vazio = ainda não configurada. */
   listName: string;
   openMode: FaqOpenMode;

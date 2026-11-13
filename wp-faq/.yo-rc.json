@@ -9,7 +9,7 @@
     "componentType": "webpart",
     "template": "react",
     "componentName": "Faq",
-    "componentDescription": "Perguntas frequentes do Espaço PUC Carreiras",
+    "componentDescription": "Perguntas frequentes da Equipe M365",
     "plusBeta": false,
     "isCreatingSolution": true,
     "nodeVersion": "22.23.4",
