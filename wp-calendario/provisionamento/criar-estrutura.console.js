@@ -1,6 +1,6 @@
 /*
  * Equipe M365 — provisionamento do Calendário (schema v1, PROPOSTA PARA VALIDAÇÃO)
- * Cole este arquivo no Console do navegador com o site da Equipe M365 aberto e logado.
+ * Cole este arquivo no Console do navegador com o site de destino aberto e logado. O script pede a URL do site e os prefixos das listas.
  * Não execute em apply antes da validação de arquitetura-aprovada.md.
  *
  * Padrão: mode = "plan" (não altera nada; só lista o que faria).
@@ -12,8 +12,50 @@
  * Não cria grupos nem concede permissões (ver arquitetura-aprovada.md, seção Acesso).
  */
 (async () => {
+  // ---- Entradas pedidas ao executar: nenhuma URL ou prefixo fixo no script ----
+  const pedirUrlSite = () => {
+    const padrao = window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0];
+    for (;;) {
+      const digitado = window.prompt('URL do site de destino (ex.: https://tenant.sharepoint.com/sites/nome-do-site):', padrao);
+      if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
+      try {
+        const url = new URL(digitado.trim());
+        if (url.protocol !== 'https:') throw new Error('A URL precisa começar com https://');
+        return url.origin + url.pathname.replace(/\/+$/, '');
+      } catch (erro) {
+        window.alert(`URL inválida: ${erro.message}`);
+      }
+    }
+  };
+  const pedirTexto = (rotulo, padrao = '') => {
+    for (;;) {
+      const digitado = window.prompt(rotulo, padrao);
+      if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
+      const valor = digitado.trim();
+      if (valor) return valor;
+      window.alert('Informe um valor.');
+    }
+  };
+  const pedirPrefixos = () => {
+    const pedir = (ambiente, padrao) => {
+      for (;;) {
+        const digitado = window.prompt(`Prefixo dos nomes das listas no ambiente ${ambiente} (deixe vazio para nenhum):`, padrao);
+        if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
+        const valor = digitado.trim();
+        if (/^[A-Za-z0-9_]*$/.test(valor)) return valor;
+        window.alert('Use apenas letras sem acento, números e _.');
+      }
+    };
+    const hml = pedir('HML', 'HML_');
+    const prod = pedir('PROD', '');
+    if (hml === prod) throw new Error('Os prefixos de HML e PROD precisam ser diferentes, senão as listas colidem.');
+    return { HML: hml, PROD: prod };
+  };
+  const siteUrl = pedirUrlSite();
+  const prefixos = pedirPrefixos();
+
   const CONFIG = {
-    siteUrl: window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0],
+    siteUrl,
     mode: 'plan', // 'plan' | 'apply'
     createInProd: true, // em 'apply', cria também em PROD, somente se o HML estiver sem erro ou divergência
     schemaVersion: 1
@@ -50,7 +92,7 @@
   ];
 
   // HML vem primeiro: a validação de HML decide se PROD pode ser criado.
-  const ENVIRONMENTS = { HML: 'HML_', PROD: '' };
+  const ENVIRONMENTS = { HML: prefixos.HML, PROD: prefixos.PROD };
   const NO_METADATA = { Accept: 'application/json;odata=nometadata', 'Content-Type': 'application/json;odata=nometadata' };
   const VERBOSE = { Accept: 'application/json;odata=verbose', 'Content-Type': 'application/json;odata=verbose' };
   const web = CONFIG.siteUrl.replace(/\/+$/, '');

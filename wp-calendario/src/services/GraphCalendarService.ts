@@ -61,6 +61,10 @@ export interface IExternalEvento {
 
 /** Teto de eventos lidos por período. Acima disso a WP avisa que a lista pode estar incompleta. */
 export const MAX_EVENTS_SCANNED: number = 2000;
+/** Quantidade de eventos exibida pela agenda. */
+export type EventCount = number;
+/** Janela de leitura de listUpcoming: um ano a partir da data de referência. */
+const UPCOMING_WINDOW_MS: number = 365 * 24 * 60 * 60 * 1000;
 /** $top da calendarView (mínimo 1, máximo 1000). */
 const PAGE_SIZE: number = 500;
 
@@ -162,6 +166,19 @@ export class GraphCalendarService {
       .map((raw: IGraphEvent): IExternalEvento | undefined => toExternalEvent(raw))
       .filter((event: IExternalEvento | undefined): event is IExternalEvento => event !== undefined);
     return { events, truncated: next !== undefined };
+  }
+
+  /**
+   * Próximos eventos do grupo a partir de `from`, em ordem cronológica e limitados a `count`.
+   * A ordenação vale só para o lote lido (ver MAX_EVENTS_SCANNED).
+   */
+  public async listUpcoming(groupId: string, count: EventCount, from: Date): Promise<{ events: IExternalEvento[]; truncated: boolean }> {
+    const range: { events: IExternalEvento[]; truncated: boolean } = await this.listRange(groupId, from, new Date(from.getTime() + UPCOMING_WINDOW_MS));
+    const events: IExternalEvento[] = range.events
+      .filter((evento: IExternalEvento): boolean => evento.fim.getTime() >= from.getTime())
+      .sort((a: IExternalEvento, b: IExternalEvento): number => a.inicio.getTime() - b.inicio.getTime())
+      .slice(0, count);
+    return { events, truncated: range.truncated };
   }
 
   /** Cria o evento no calendário do grupo e devolve o ID gerado pelo Graph. */

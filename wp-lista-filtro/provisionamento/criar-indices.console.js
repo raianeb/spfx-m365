@@ -1,6 +1,6 @@
 /*
  * wp-lista-filtro — criação de índices nos campos de filtro de uma lista.
- * Cole este arquivo no Console do navegador, com o site da lista aberto e logado.
+ * Cole este arquivo no Console do navegador, com o site da lista aberto e logado. O script pede a URL do site, o nome da lista e os prefixos.
  *
  * Padrão: mode = "plan" (não altera nada; só lista o que faria).
  * Para aplicar, troque mode para "apply" e execute novamente. O script é idempotente:
@@ -10,9 +10,52 @@
  * as listas seguintes só recebem índices se as anteriores não tiverem erro nem divergência.
  */
 (async () => {
+  // ---- Entradas pedidas ao executar: nenhuma URL ou prefixo fixo no script ----
+  const pedirUrlSite = () => {
+    const padrao = window.location.origin + (window.location.pathname.match(/^\/sites\/[^/]+/) || [''])[0];
+    for (;;) {
+      const digitado = window.prompt('URL do site de destino (ex.: https://tenant.sharepoint.com/sites/nome-do-site):', padrao);
+      if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
+      try {
+        const url = new URL(digitado.trim());
+        if (url.protocol !== 'https:') throw new Error('A URL precisa começar com https://');
+        return url.origin + url.pathname.replace(/\/+$/, '');
+      } catch (erro) {
+        window.alert(`URL inválida: ${erro.message}`);
+      }
+    }
+  };
+  const pedirTexto = (rotulo, padrao = '') => {
+    for (;;) {
+      const digitado = window.prompt(rotulo, padrao);
+      if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
+      const valor = digitado.trim();
+      if (valor) return valor;
+      window.alert('Informe um valor.');
+    }
+  };
+  const pedirPrefixos = () => {
+    const pedir = (ambiente, padrao) => {
+      for (;;) {
+        const digitado = window.prompt(`Prefixo dos nomes das listas no ambiente ${ambiente} (deixe vazio para nenhum):`, padrao);
+        if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
+        const valor = digitado.trim();
+        if (/^[A-Za-z0-9_]*$/.test(valor)) return valor;
+        window.alert('Use apenas letras sem acento, números e _.');
+      }
+    };
+    const hml = pedir('HML', 'HML_');
+    const prod = pedir('PROD', '');
+    if (hml === prod) throw new Error('Os prefixos de HML e PROD precisam ser diferentes, senão as listas colidem.');
+    return { HML: hml, PROD: prod };
+  };
+  const siteUrl = pedirUrlSite();
+  const prefixos = pedirPrefixos();
+
+  const listaBase = pedirTexto('Nome da lista (sem prefixo):');
   const CONFIG = {
-    siteUrl: '', // vazio = site aberto no navegador
-    lists: ['HML_Nome da Lista', 'Nome da Lista'], // nomes exatos, na ordem de processamento
+    siteUrl, // site informado ao executar
+    lists: [`${prefixos.HML}${listaBase}`, `${prefixos.PROD}${listaBase}`], // HML primeiro
     fields: ['Status', 'DataEvento'], // nomes internos dos campos usados como filtro na Web Part
     mode: 'plan' // 'plan' | 'apply'
   };

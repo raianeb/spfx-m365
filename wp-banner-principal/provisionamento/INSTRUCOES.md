@@ -3,7 +3,7 @@
 Use somente após validar `arquitetura-aprovada.md`.
 
 ## Pré-requisitos
-- Sessão logada em https://<tenant>.sharepoint.com/sites/<nome-do-site> com permissão de Controle Total no site.
+- Sessão logada no site de destino, com permissão de Controle Total. Ao executar, o script pede a URL do site e os prefixos das listas.
 - Navegador Chrome ou Edge.
 
 ## Passo a passo
@@ -33,5 +33,6 @@ O script é idempotente: rodar de novo não duplica lista, biblioteca ou campo. 
 - A coluna `Ordem` é nova. Se a lista HML já existia, a execução em `apply` a cria com padrão 0 e a indexa. Em PROD, ela só é criada se o gate permitir (ver passo 6).
 - A biblioteca `HML_Banner` deve receber permissão de Colaborar para quem envia imagens. Este script não altera permissões.
 - Os grupos de Administradores HML precisam ser definidos nas propriedades da web part, no ambiente HML.
-- Na web part, mantenha o campo "Biblioteca de imagens dos banners" igual ao nome base (`Banner`); o prefixo HML_ é aplicado automaticamente.
+- Na web part, mantenha o campo "Biblioteca de imagens dos banners" igual ao nome base (`Banner`). O prefixo é o informado ao executar o script (padrão `HML_` para HML).
+- **Atenção:** as Web Parts usam `HML_` fixo para localizar as listas de HML (`resolveListTitle`, em `src/core/config.ts`). Se o prefixo informado for outro, ajuste essa função antes de publicar.
 - Não há fluxos Power Automate nesta etapa.

@@ -17,7 +17,8 @@ As Web Parts são genéricas: não estão vinculadas a um site específico. O si
 
 ## Status
 
-- `wp-calendario`: **não compila** no estado atual. `AgendaMicrosoft.tsx` usa `listUpcoming`, `createEvent` e o tipo `EventCount`, que não existem em `GraphCalendarService.ts`. A correção depende de definir essa API.
+- Os cinco projetos com código compilam e geram o pacote (`npm run build`), verificados com Node 22.
+- `wp-calendario`: a agenda do Microsoft 365 (`AgendaMicrosoft.tsx`) compila, mas ainda não é renderizada pela Web Part. A Web Part usa `Calendario.tsx`. Falta decidir se a agenda entra na Web Part ou se é removida.
 
 ## Pré-requisitos
 

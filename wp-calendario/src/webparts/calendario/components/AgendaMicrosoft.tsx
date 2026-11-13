@@ -7,7 +7,7 @@ import coreStyles from '../../../core/core.module.scss';
 import agendaStyles from './AgendaMicrosoft.module.scss';
 import { DiagnosticsLogger, DiagnosticsPanel } from '../../../core/diagnostics';
 import { EventCount, GraphCalendarService, IExternalEvento, MAX_EVENTS_SCANNED } from '../../../services/GraphCalendarService';
-import { INovoEventoValues } from '../../../services/GraphEventInput';
+import { INovoEventoValues, toGraphEventBody } from '../../../services/GraphEventInput';
 import NovoEventoGraphForm from './NovoEventoGraphForm';
 
 export type AgendaSource = 'grupo' | 'equipe';
@@ -144,8 +144,8 @@ const AgendaMicrosoft: React.FC<IAgendaMicrosoftProps> = ({ logger, title, theme
     try {
       const service: GraphCalendarService = new GraphCalendarService(await getClient());
       const groupId: string = await service.resolveGroupId(value);
-      const evento: IExternalEvento = await service.createEvent(groupId, values);
-      logger.log('info', 'Agenda Microsoft 365', `Evento criado em ${SOURCE_LABEL[source]}: ${evento.titulo}.`);
+      await service.createEvent(groupId, toGraphEventBody(values));
+      logger.log('info', 'Agenda Microsoft 365', `Evento criado em ${SOURCE_LABEL[source]}: ${values.titulo.trim()}.`);
       setFormOpen(false);
       setReloadToken((token: number) => token + 1);
     } catch (error: unknown) {

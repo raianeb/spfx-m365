@@ -9,9 +9,8 @@ A Web Part filtra no servidor. Em listas com mais de 5.000 itens, o SharePoint s
 ## Passo a passo
 1. Abra qualquer página do site da lista, pressione F12 e abra a aba **Console**.
 2. Se aparecer aviso para permitir colar código, digite `allow pasting` e Enter.
-3. No arquivo, ajuste `CONFIG`:
-   - `lists`: nomes exatos das listas, com a de homologação primeiro (por exemplo `HML_Pedidos` e depois `Pedidos`).
-   - `fields`: nomes internos dos campos usados como filtro. O painel da Web Part mostra quais estão "sem índice".
+3. O script pede três entradas ao executar: a URL do site (padrão: o site aberto), o nome da lista sem prefixo e os prefixos de HML (padrão `HML_`) e PROD (padrão vazio). As listas são processadas HML primeiro.
+   - Em `CONFIG`, ajuste apenas `fields`: nomes internos dos campos usados como filtro. O painel da Web Part mostra quais estão "sem índice".
 4. Cole e execute com `mode: 'plan'`. Confira a tabela: nada foi alterado.
 5. Troque para `mode: 'apply'` e execute de novo. Uma lista só é alterada se as anteriores não tiverem `erro` nem `divergente`.
 6. Reabra o painel da Web Part: os campos devem aparecer como "indexado".

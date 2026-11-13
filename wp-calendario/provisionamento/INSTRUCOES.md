@@ -3,7 +3,7 @@
 Use somente após validar `arquitetura-aprovada.md`.
 
 ## Pré-requisitos
-- Sessão logada em https://<tenant>.sharepoint.com/sites/<nome-do-site> com permissão de Controle Total no site.
+- Sessão logada no site de destino, com permissão de Controle Total. Ao executar, o script pede a URL do site e os prefixos das listas.
 - Navegador Chrome ou Edge.
 
 ## Passo a passo
