@@ -110,6 +110,12 @@ const dateParts = (text: string): { y: string; m: string; d: string } | undefine
   return undefined;
 };
 
+/** Dia de um valor de data, como yyyy-MM-dd. Sem data reconhecível, devolve undefined. */
+export const dayKeyOf = (raw: unknown): string | undefined => {
+  const parts: { y: string; m: string; d: string } | undefined = dateParts(formatCell(raw, 'DateTime'));
+  return parts ? `${parts.y}-${parts.m}-${parts.d}` : undefined;
+};
+
 /** Chave e rótulo do grupo de um valor. Datas são agrupadas pela granularidade escolhida. */
 const groupOf = (raw: unknown, field: IListField, granularity: Granularity | undefined): { key: string; label: string } => {
   if (field.type === 'DateTime') {

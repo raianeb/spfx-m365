@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { Modal } from '@fluentui/react/lib/Modal';
 import styles from './ListaFiltro.module.scss';
-import { MODAL_STYLES, buttonStyles } from './controlStyles';
+import { MODAL_STYLES, buttonStyles, primaryButtonStyles } from './controlStyles';
 import { ICondition, buildViewXml } from '../../../services/camlBuilder';
 import { IListField } from '../../../services/fieldSchema';
 import { formatCell, isHttpUrl } from '../../../services/formatValue';
@@ -20,6 +20,8 @@ export interface IItemModalProps {
   contextLabel: string;
   /** Endereço do formulário de exibição no SharePoint. Ausente = sem botão de abrir. */
   openUrl?: string;
+  /** Variáveis de tema: a modal é renderizada em portal e não herda as da Web Part. */
+  themeStyle: React.CSSProperties;
   onDismiss: () => void;
 }
 
@@ -54,7 +56,7 @@ const displayValue = (row: ListRow, field: IListField): React.ReactNode => {
  * Informações completas de um item, em modal. Os dados vêm de uma consulta por ID, com a mesma
  * formatação da grade (pessoa, consulta, data e texto longo).
  */
-const ItemModal: React.FC<IItemModalProps> = ({ service, listTitle, fields, columns, itemId, itemCount, contextLabel, openUrl, onDismiss }) => {
+const ItemModal: React.FC<IItemModalProps> = ({ service, listTitle, fields, columns, itemId, itemCount, contextLabel, openUrl, themeStyle, onDismiss }) => {
   const [state, setState] = React.useState<LoadState>({ status: 'loading' });
 
   // Mesma ordem da grade: primeiro as colunas configuradas, na ordem delas; depois os demais campos.
@@ -123,13 +125,14 @@ const ItemModal: React.FC<IItemModalProps> = ({ service, listTitle, fields, colu
 
   return (
     <Modal isOpen onDismiss={onDismiss} isBlocking={false} styles={MODAL_STYLES} titleAriaId="lista-filtro-item-titulo">
+      <div className={styles.modalTheme} style={themeStyle}>
       <div className={styles.chartsHeader}>
         <h2 id="lista-filtro-item-titulo" className={styles.chartsTitle}>
           Item {itemId} · {contextLabel}
         </h2>
         <div className={styles.resultsActions}>
           {openUrl && (
-            <PrimaryButton text="Abrir no SharePoint" iconProps={{ iconName: 'OpenInNewWindow' }} href={openUrl} target="_blank" styles={buttonStyles} />
+            <PrimaryButton text="Abrir no SharePoint" iconProps={{ iconName: 'OpenInNewWindow' }} href={openUrl} target="_blank" styles={primaryButtonStyles} />
           )}
           <DefaultButton text="Fechar" onClick={onDismiss} styles={buttonStyles} />
         </div>
@@ -160,6 +163,7 @@ const ItemModal: React.FC<IItemModalProps> = ({ service, listTitle, fields, colu
           ))}
         </dl>
       )}
+      </div>
     </Modal>
   );
 };
