@@ -9,6 +9,7 @@ import { nomeFisico } from '../../../core/prefixos';
 import { DiagnosticsPanel } from '../../../core/diagnostics';
 import {
   FilterValues,
+  ICondition,
   IConditionResult,
   IFilterValue,
   TextMatch,
@@ -20,12 +21,16 @@ import {
 import { IListField, isFilterable, pickFields } from '../../../services/fieldSchema';
 import { exportRowsToExcel, EXPORT_MAX_ROWS } from '../../../services/exportExcel';
 import { IListInfo } from '../../../services/ListQueryService';
+import { IAppliedFilter, describeAppliedFilters, pluralize, withoutFilter } from '../../../services/filterSummary';
 import { IScanToken, isScanCancelled, scanItems } from '../../../services/scanService';
+import { ISort, ISortAvailability, ISortContext, nextSort, sortAvailability } from '../../../services/sortRules';
 import ChartsModal from './ChartsModal';
+import DashboardView from './DashboardView';
 import ItemModal from './ItemModal';
-import { buttonStyles } from './controlStyles';
+import { buttonStyles, iconButtonStyles } from './controlStyles';
 import FilterBar from './FilterBar';
 import ResultsTable from './ResultsTable';
+import { DashboardCache, createDashboardCache } from './useDashboard';
 import { IAppliedQuery, IPagedQuery, usePagedQuery } from './usePagedQuery';
 
 interface ICountState {
@@ -36,12 +41,15 @@ interface ICountState {
 }
 
 const IDLE_COUNT: ICountState = { status: 'idle', scanned: 0, total: 0 };
+const NO_CONDITIONS: ICondition[] = [];
 
 export interface IListaFiltroProps extends ICommonProps {
   /** Nome base da lista (sem prefixo). Vazio = ainda não configurada. */
   listName: string;
   filterFields: string[];
   displayFields: string[];
+  /** Campos de agrupamento da gestão à vista. */
+  dashboardFields: string[];
   pageSize: number;
   textMatch: TextMatch;
   loadOnOpen: boolean;
@@ -75,6 +83,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
   listName,
   filterFields,
   displayFields,
+  dashboardFields,
   pageSize,
   textMatch,
   loadOnOpen,
@@ -94,13 +103,25 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [notice, setNotice] = React.useState<string>('');
   const [query, setQuery] = React.useState<IAppliedQuery | undefined>(undefined);
+  /** Valores da consulta aplicada: alimentam as etiquetas de filtro acima da tabela. */
+  const [applied, setApplied] = React.useState<FilterValues>({});
   const [isAdmin, setIsAdmin] = React.useState<boolean>(false);
   const [count, setCount] = React.useState<ICountState>(IDLE_COUNT);
   const [exporting, setExporting] = React.useState<boolean>(false);
   const [exportNote, setExportNote] = React.useState<string>('');
   const [chartsOpen, setChartsOpen] = React.useState<boolean>(false);
   const [openItemId, setOpenItemId] = React.useState<number | undefined>(undefined);
+  /** Tela atual: a consulta ou a gestão à vista. Os filtros e a página da consulta são preservados na troca. */
+  const [view, setView] = React.useState<'consulta' | 'painel'>('consulta');
+  const dashboardCache: React.MutableRefObject<DashboardCache> = React.useRef<DashboardCache>(createDashboardCache());
   const queryCounter: React.MutableRefObject<number> = React.useRef<number>(0);
+  /** Ordenação pedida no cabeçalho da grade. A referência evita recriar `run` (e limpar os filtros) a cada troca. */
+  const [sort, setSort] = React.useState<ISort | undefined>(undefined);
+  const sortRef: React.MutableRefObject<ISort | undefined> = React.useRef<ISort | undefined>(undefined);
+  const applySort = (next: ISort | undefined): void => {
+    sortRef.current = next;
+    setSort(next);
+  };
 
   // Estrutura da lista: total de itens e campos. Uma leitura por lista.
   React.useEffect((): (() => void) | undefined => {
@@ -191,6 +212,16 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
         return;
       }
       setNotice('');
+      setApplied(values);
+      // Filtro novo: a ordenação só é mantida se continuar segura sem conhecer o total do novo filtro.
+      const currentSort: ISort | undefined = sortRef.current;
+      const sortField: IListField | undefined = currentSort ? columns.find((column: IListField) => column.name === currentSort.field) : undefined;
+      const keptSort: ISort | undefined =
+        sortField && sortAvailability(sortField, { itemCount: list.itemCount, hasFilter: result.conditions.length > 0 }).allowed
+          ? currentSort
+          : undefined;
+      sortRef.current = keptSort;
+      setSort(keptSort);
       queryCounter.current += 1;
       logger.log(
         'info',
@@ -207,7 +238,8 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
           conditions: result.conditions,
           pageSize,
           itemCount: list.itemCount,
-          newestFirst
+          newestFirst,
+          sort: keptSort
         })
       });
     },
@@ -230,8 +262,9 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
 
   // Total de registros do filtro: uma varredura só de IDs, cancelada quando a consulta muda.
   const itemCount: number | undefined = list?.itemCount;
+  const queryConditions: ICondition[] | undefined = query?.conditions;
   React.useEffect((): (() => void) | undefined => {
-    if (!query || itemCount === undefined) {
+    if (!queryConditions || itemCount === undefined) {
       setCount(IDLE_COUNT);
       return undefined;
     }
@@ -241,7 +274,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
       service,
       listTitle,
       listItemCount: itemCount,
-      conditions: query.conditions,
+      conditions: queryConditions,
       viewFields: ['ID'],
       collect: false,
       maxRows: 0,
@@ -266,7 +299,8 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
     return (): void => {
       token.cancelled = true;
     };
-  }, [service, listTitle, itemCount, query, logger]);
+    // Depende das condições, não da consulta: trocar só a ordenação não refaz a contagem.
+  }, [service, listTitle, itemCount, queryConditions, logger]);
 
   const exportToExcel = async (): Promise<void> => {
     if (!query || !list || exporting) {
@@ -290,7 +324,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
       setExportNote(
         result.truncated
           ? `Exportados os primeiros ${NUMBER_FORMAT.format(EXPORT_MAX_ROWS)} de ${NUMBER_FORMAT.format(result.total)} registros. Refine o filtro para exportar tudo.`
-          : `${NUMBER_FORMAT.format(result.rows.length)} registro(s) exportado(s).`
+          : `${pluralize(result.rows.length, NUMBER_FORMAT.format(result.rows.length), 'registro exportado', 'registros exportados')}.`
       );
       logger.log('info', 'Exportação', `${result.rows.length} registro(s) exportado(s) para Excel`);
     } catch (failure: unknown) {
@@ -305,16 +339,77 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
     count.status === 'counting'
       ? `Contando registros… ${NUMBER_FORMAT.format(count.scanned)} lidos`
       : count.status === 'done'
-        ? `${NUMBER_FORMAT.format(count.total)} registro(s) encontrado(s)`
+        ? pluralize(count.total, NUMBER_FORMAT.format(count.total), 'registro encontrado', 'registros encontrados')
         : count.status === 'error'
           ? 'Não foi possível contar os registros'
           : '';
+  const sortContext: ISortContext = {
+    itemCount: itemCount ?? 0,
+    hasFilter: (queryConditions?.length ?? 0) > 0,
+    filteredTotal: count.status === 'done' ? count.total : undefined
+  };
+  const getSortAvailability = (column: IListField): ISortAvailability => sortAvailability(column, sortContext);
+  /** Ordena no servidor: nova consulta com as mesmas condições, a partir da primeira página. */
+  const changeSort = (column: IListField): void => {
+    if (!query || !list || !getSortAvailability(column).allowed) {
+      return;
+    }
+    const next: ISort | undefined = nextSort(sort, column.name);
+    applySort(next);
+    queryCounter.current += 1;
+    logger.log('info', 'Consulta', next ? `Ordenação por ${column.name} (${next.ascending ? 'crescente' : 'decrescente'})` : 'Ordenação padrão');
+    setQuery({
+      id: queryCounter.current,
+      conditions: query.conditions,
+      viewXml: buildViewXml({
+        viewFields: columns.map((item: IListField) => item.name),
+        conditions: query.conditions,
+        pageSize,
+        itemCount: list.itemCount,
+        newestFirst,
+        sort: next
+      })
+    });
+  };
+
+  const appliedFilters: IAppliedFilter[] = React.useMemo(
+    (): IAppliedFilter[] => (query ? describeAppliedFilters(filters, applied, textMatch) : []),
+    [query, filters, applied, textMatch]
+  );
+  /** Remove um filtro aplicado e refaz a consulta com os demais. */
+  const removeFilter = (name: string): void => {
+    const next: FilterValues = withoutFilter(applied, name);
+    setDraft(next);
+    run(next);
+  };
+
   // A barra aparece com a lista carregada; exportar e contar dependem de um filtro aplicado.
   const actions: React.ReactNode = list ? (
     <div className={styles.resultsBar}>
-      <span className={styles.resultsCount} role="status" aria-live="polite">
-        {countText}
-      </span>
+      <div className={styles.resultsSummary}>
+        <span className={styles.resultsCount} role="status" aria-live="polite">
+          {countText}
+        </span>
+        {appliedFilters.length > 0 && (
+          <ul className={styles.appliedFilters} aria-label="Filtros aplicados">
+            {appliedFilters.map((filter: IAppliedFilter) => (
+              <li key={filter.name} className={styles.appliedFilter}>
+                <span className={styles.appliedFilterText}>{filter.label}</span>
+                <button
+                  type="button"
+                  className={styles.appliedFilterRemove}
+                  aria-label={`Remover filtro ${filter.label}`}
+                  title="Remover filtro"
+                  disabled={paged.loading}
+                  onClick={(): void => removeFilter(filter.name)}
+                >
+                  <Icon iconName="Cancel" aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <div className={styles.resultsActions}>
         <DefaultButton
           text={exporting ? 'Exportando…' : 'Exportar Excel'}
@@ -364,18 +459,32 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
     results = <div className={styles.empty}>Nenhum registro encontrado.</div>;
   } else {
     // Total de páginas do filtro: vem da contagem. Enquanto ela roda, o rodapé mostra só a página atual.
-    const totalPages: number = count.status === 'done' ? Math.max(1, Math.ceil(count.total / pageSize)) : 0;
-    const pagesText: string = totalPages > 0 ? ` de ${NUMBER_FORMAT.format(totalPages)}` : count.status === 'counting' ? ' (calculando total)' : '';
+    const counted: boolean = count.status === 'done';
+    const totalPages: number = counted ? Math.max(1, Math.ceil(count.total / pageSize)) : 0;
+    const pagesText: string = `Página ${NUMBER_FORMAT.format(paged.page)}${
+      totalPages > 0 ? ` de ${NUMBER_FORMAT.format(totalPages)}` : count.status === 'counting' ? ' (calculando total)' : ''
+    }`;
+    // Faixa de registros primeiro ("1–50 de 277"): é o que o usuário procura ao paginar.
     const range: string =
-      paged.firstRow > 0 && paged.lastRow >= paged.firstRow ? ` · registros ${paged.firstRow} a ${paged.lastRow}` : '';
+      paged.firstRow > 0 && paged.lastRow >= paged.firstRow
+        ? `${NUMBER_FORMAT.format(paged.firstRow)}–${NUMBER_FORMAT.format(paged.lastRow)}${counted ? ` de ${NUMBER_FORMAT.format(count.total)}` : ''} · `
+        : '';
     results = (
       <>
-        <ResultsTable columns={columns} rows={paged.rows} onOpenItem={linkToItem ? setOpenItemId : undefined} caption={`Registros de ${contextLabel}`} />
+        <ResultsTable
+          columns={columns}
+          rows={paged.rows}
+          onOpenItem={linkToItem ? setOpenItemId : undefined}
+          caption={`Registros de ${contextLabel}`}
+          sort={sort}
+          getSortAvailability={getSortAvailability}
+          onSort={changeSort}
+          busy={paged.loading}
+        />
         <nav className={styles.pager} aria-label="Paginação">
           <span className={styles.pagerInfo} role="status" aria-live="polite">
-            Página {paged.page}
-            {pagesText}
             {range}
+            {pagesText}
           </span>
           <div className={styles.pagerButtons}>
             <IconButton
@@ -384,6 +493,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
               title="Página anterior"
               disabled={!paged.hasPrevious || paged.loading}
               onClick={paged.previous}
+              styles={iconButtonStyles}
             />
             <IconButton
               iconProps={{ iconName: 'ChevronRight' }}
@@ -391,6 +501,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
               title="Próxima página"
               disabled={!paged.hasNext || paged.loading}
               onClick={paged.next}
+              styles={iconButtonStyles}
             />
           </div>
         </nav>
@@ -405,6 +516,19 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
     content = <div className={styles.message} role="alert">Não foi possível ler a lista. Confira a lista, o ambiente e o seu acesso.</div>;
   } else if (!list) {
     content = <div className={styles.skeleton} aria-busy="true" aria-label="Carregando" />;
+  } else if (view === 'painel') {
+    content = (
+      <DashboardView
+        service={service}
+        logger={logger}
+        listTitle={listTitle}
+        list={list}
+        dimensionNames={dashboardFields}
+        queryConditions={query?.conditions ?? NO_CONDITIONS}
+        contextLabel={contextLabel}
+        cache={dashboardCache.current}
+      />
+    );
   } else {
     content = (
       <>
@@ -436,6 +560,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
             conditions={query?.conditions ?? []}
             hasFilter={(query?.conditions.length ?? 0) > 0}
             contextLabel={contextLabel}
+            themeStyle={themeStyle}
           />
         )}
         {list && openItemId !== undefined && (
@@ -447,6 +572,7 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
             itemId={openItemId}
             itemCount={list.itemCount}
             contextLabel={contextLabel}
+            themeStyle={themeStyle}
             openUrl={itemUrlBase ? `${itemUrlBase}${openItemId}` : undefined}
             onDismiss={(): void => setOpenItemId(undefined)}
           />
@@ -455,23 +581,52 @@ const ListaFiltro: React.FC<IListaFiltroProps> = ({
     );
   }
 
+  const inDashboard: boolean = view === 'painel' && list !== undefined;
+
   return (
     <section className={styles.root} style={themeStyle} aria-label={contextLabel}>
       <header className={coreStyles.wpHeader}>
-        {title && (
-          <h2 className={coreStyles.wpTitle}>
-            <Icon iconName="Filter" className={coreStyles.wpIcon} aria-hidden="true" />
-            {title}
-          </h2>
+        {inDashboard ? (
+          <div className={styles.headerActions}>
+            <IconButton
+              iconProps={{ iconName: 'ChevronLeft' }}
+              ariaLabel="Voltar para a consulta"
+              title="Voltar para a consulta"
+              onClick={(): void => setView('consulta')}
+              styles={iconButtonStyles}
+            />
+            <h2 className={coreStyles.wpTitle}>
+              <Icon iconName="ViewDashboard" className={coreStyles.wpIcon} aria-hidden="true" />
+              Gestão à vista{title ? ` · ${title}` : ''}
+            </h2>
+          </div>
+        ) : (
+          title && (
+            <h2 className={coreStyles.wpTitle}>
+              <Icon iconName="Table" className={coreStyles.wpIcon} aria-hidden="true" />
+              {title}
+            </h2>
+          )
         )}
         {list && (
-          <div className={styles.headerInfo}>
-            <span>{NUMBER_FORMAT.format(list.itemCount)} na lista</span>
-            {isAdmin && (
-              <a href={`${origin}${list.rootFolderUrl}`} target="_blank" rel="noopener noreferrer">
-                Abrir lista
-              </a>
+          <div className={styles.headerActions}>
+            {!inDashboard && (
+              <IconButton
+                iconProps={{ iconName: 'ViewDashboard' }}
+                ariaLabel="Abrir gestão à vista"
+                title="Abrir gestão à vista"
+                onClick={(): void => setView('painel')}
+                styles={iconButtonStyles}
+              />
             )}
+            <div className={styles.headerInfo}>
+              <span>{NUMBER_FORMAT.format(list.itemCount)} na lista</span>
+              {isAdmin && (
+                <a href={`${origin}${list.rootFolderUrl}`} target="_blank" rel="noopener noreferrer">
+                  Abrir lista
+                </a>
+              )}
+            </div>
           </div>
         )}
       </header>

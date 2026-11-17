@@ -9,13 +9,15 @@ import ListaFiltro from './components/ListaFiltro';
 const DEFAULT_PAGE_SIZE: number = 30;
 const DEFAULT_TEXT_MATCH: TextMatch = 'inicio';
 
-type FieldListProperty = 'filterFields' | 'displayFields';
+type FieldListProperty = 'filterFields' | 'displayFields' | 'dashboardFields';
 
 export interface IListaFiltroWebPartProps extends IBaseWebPartProps {
   /** Nomes internos dos campos usados como filtro, na ordem de exibição. */
   filterFields?: string[];
   /** Nomes internos das colunas exibidas, na ordem de exibição. */
   displayFields?: string[];
+  /** Nomes internos dos campos de agrupamento da gestão à vista, na ordem de exibição. */
+  dashboardFields?: string[];
   pageSize?: number;
   textMatch?: TextMatch;
   /** Carrega a primeira página ao abrir, antes de qualquer filtro. */
@@ -38,6 +40,7 @@ export default class ListaFiltroWebPart extends BaseWebPart<IListaFiltroWebPartP
       listName: props.listName ?? '',
       filterFields: props.filterFields ?? [],
       displayFields: props.displayFields ?? [],
+      dashboardFields: props.dashboardFields ?? [],
       pageSize: props.pageSize ?? DEFAULT_PAGE_SIZE,
       textMatch: props.textMatch ?? DEFAULT_TEXT_MATCH,
       loadOnOpen: props.loadOnOpen ?? false,
@@ -50,9 +53,10 @@ export default class ListaFiltroWebPart extends BaseWebPart<IListaFiltroWebPartP
   protected onListChanged(): void {
     this.properties.filterFields = [];
     this.properties.displayFields = [];
+    this.properties.dashboardFields = [];
   }
 
-  /** Depois da lista: campos de filtro e, em seguida, campos de exibição. */
+  /** Depois da lista: campos de filtro, campos de exibição e campos da gestão à vista. */
   protected getSourceFields(): IPropertyPaneField<unknown>[] {
     return [
       this.reactField('wpFilterFields', (notify: NotifyChange) =>
@@ -66,6 +70,15 @@ export default class ListaFiltroWebPart extends BaseWebPart<IListaFiltroWebPartP
       ),
       this.reactField('wpDisplayFields', (notify: NotifyChange) =>
         this._fieldPicker('displayFields', 'display', 'Campos de exibição', 'Colunas do resultado, na ordem escolhida.', notify)
+      ),
+      this.reactField('wpDashboardFields', (notify: NotifyChange) =>
+        this._fieldPicker(
+          'dashboardFields',
+          'display',
+          'Campos da gestão à vista',
+          'Cada campo vira um quadro com os registros por valor. Texto longo, data e link não são agrupados.',
+          notify
+        )
       )
     ];
   }

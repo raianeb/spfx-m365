@@ -51,6 +51,8 @@ export interface IViewOptions {
   /** Total de itens da lista, para escolher a estratégia de ordenação. */
   itemCount: number;
   newestFirst: boolean;
+  /** Ordenação pedida no cabeçalho da grade. Ausente = ordem padrão, segura para o volume. */
+  sort?: { field: string; ascending: boolean };
 }
 
 const DATE_PATTERN: RegExp = /^\d{4}-\d{2}-\d{2}$/;
@@ -253,6 +255,10 @@ export const needsIndexedFilter = (conditions: ICondition[], itemCount: number):
  * - lista grande com filtro: percorre pelo índice do campo filtrado, sem ordenar o resultado inteiro.
  */
 const buildOrderBy = (options: IViewOptions): string => {
+  // Ordenação explícita: quem chama já validou que é segura para o volume (ver sortRules.ts).
+  if (options.sort) {
+    return `<OrderBy Override="TRUE"><FieldRef Name="${escapeXml(options.sort.field)}" Ascending="${options.sort.ascending ? 'TRUE' : 'FALSE'}"/></OrderBy>`;
+  }
   // Filtro só por ID: o ID é a chave primária, não um índice de coluna. UseIndexForOrderBy
   // nesse caso devolve "Invalid index" (0x80070585, HTTP 500); a ordenação explícita por ID resolve.
   const onlyById: boolean = options.conditions.every((condition: ICondition) => condition.field === 'ID');
