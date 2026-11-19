@@ -13,6 +13,7 @@ Antes de gerar o pacote `.sppkg` ou publicar uma versão.
 - Versione a cada entrega e registre as mudanças.
 - Verifique a prontidão do catálogo de aplicativos antes de publicar.
 - Rode as verificações de regressão antes de liberar.
+- Confira se o projeto está nas versões de `docs/versoes-referencia.md` (seção "Conferência de um projeto"). Versão diferente só com exceção registrada no `escopo.md`.
 
 ## Padrões internos da equipe
 A definir.

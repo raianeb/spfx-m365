@@ -11,6 +11,7 @@ Construção incremental. Cada etapa adiciona uma camada e é validada antes da 
 | 4 | Provisionamento por Console (`sharepoint-provisionamento`, `/provisionar-estrutura`) | Skill e template criados; geração de projeto real pendente de teste em HML |
 | 4b | Skill de dados de listas (`sharepoint-dados-listas`): modelagem, índices e consultas | Criada; integração com as skills de código e provisionamento em revisão |
 | 4c | Skills de Power Automate e Microsoft Graph | Pendente |
+| 4d | Versões de referência e verificação do ambiente local (`docs/versoes-referencia.md`, `scripts/verificar-ambiente.ps1`) | Criada; testada com comandos simulados, pendente de validação em Windows real e em máquina limpa |
 | 5 | Checklist de entrega e critérios de qualidade | Pendente |
 
 ## Regras de uso das skills
