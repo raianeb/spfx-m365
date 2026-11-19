@@ -22,6 +22,7 @@ Cada skill fica em sua própria pasta, com um `SKILL.md` (frontmatter com `name`
 | `spfx-implementacao-base` | Arquitetura de implementação |
 | `spfx-property-pane-reatividade` | Painel de propriedades |
 | `spfx-extensoes-padroes` | Application Customizer, Field Customizer e Command Set |
+| `spfx-skin-layout` | Skin de layout (barra superior e menu) por Application Customizer, ativada por `?env=webview` |
 | `spfx-imagens-midia` | Imagens e mídia |
 | `spfx-release-qualidade-pacote` | Release e qualidade do pacote |
 | `spfx-heft-toolchain` | Ferramental Heft |
