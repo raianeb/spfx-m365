@@ -20,7 +20,7 @@ Qualquer integrante da equipe pode iniciar um projeto novo pelo Claude Code, usa
 
 1. Abra a pasta `spfx-skills` no Claude Code.
 2. Execute `/iniciar-projeto <nome-do-projeto>`.
-3. Responda às perguntas do brainstorming. O resultado é `<nome-do-projeto>/escopo.md`, na raiz do repositório. Ele precisa ser aprovado antes de qualquer código.
+3. Escolha o modo de descoberta: brainstorming guiado (perguntas uma etapa por vez) ou descrição livre (você envia uma mensagem geral com escopo e requisitos, e o Claude pergunta só o que faltar). O resultado é `<nome-do-projeto>/escopo.md`, na raiz do repositório. Ele precisa ser aprovado antes de qualquer código.
 4. Com o escopo aprovado, execute `/provisionar-estrutura <nome-do-projeto>`.
 
 ## Status
