@@ -20,7 +20,7 @@ Qualquer integrante da equipe pode iniciar um projeto novo pelo Claude Code, usa
 
 1. Abra a pasta `spfx-skills` no Claude Code.
 2. Execute `/iniciar-projeto <nome-do-projeto>`.
-3. Escolha o modo de descoberta: brainstorming guiado (perguntas uma etapa por vez) ou descrição livre (você envia uma mensagem geral com escopo e requisitos, e o Claude pergunta só o que faltar). O resultado é `<nome-do-projeto>/escopo.md`, na raiz do repositório. Ele precisa ser aprovado antes de qualquer código.
+3. Responda se deseja gerar a skin padrão. Se sim, informe a configuração (opcional) e a extensão é gerada pela skill `spfx-skin-layout`. Se não, escolha o modo de descoberta: brainstorming guiado (perguntas uma etapa por vez) ou descrição livre (você envia uma mensagem geral com escopo e requisitos, e o Claude pergunta só o que faltar). O resultado é `<nome-do-projeto>/escopo.md`, na raiz do repositório. Ele precisa ser aprovado antes de qualquer código.
 4. Com o escopo aprovado, execute `/provisionar-estrutura <nome-do-projeto>`.
 
 ## Status
