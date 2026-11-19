@@ -1,5 +1,5 @@
 ---
-description: Inicia um projeto novo (brainstorming guiado ou descrição livre) e gera o escopo para aprovação
+description: Inicia um projeto novo — skin padrão (spfx-skin-layout) ou descoberta (brainstorming guiado ou descrição livre) com escopo para aprovação
 argument-hint: <nome-do-projeto>
 ---
 
@@ -12,6 +12,26 @@ O projeto fica na raiz do repositório (a pasta que contém `spfx-skills`), na p
 - Se `$ARGUMENTS` estiver vazio, pergunte o nome do projeto e pare.
 - Use nome em minúsculas, com hífens, sem acentos (ex.: `painel-vagas`). Se o nome não estiver nesse formato, proponha uma versão e confirme com o usuário.
 - Se `$ARGUMENTS/escopo.md` já existir, informe e pergunte se é para revisar o escopo existente ou criar outro nome.
+
+## Passo S — Skin padrão
+Antes de qualquer outra pergunta, pergunte ao usuário (use `AskUserQuestion` quando disponível):
+
+> **Deseja gerar a skin padrão?**
+> - **Sim** — gero a extensão de skin de layout pela skill `spfx-skin-layout`, sem brainstorming.
+> - **Não** — sigo o fluxo normal de descoberta e escopo.
+
+Aguarde a resposta. Não avance nem presuma.
+
+### Resposta "Sim"
+1. Carregue **somente** `spfx-skills/skills/spfx-skin-layout/SKILL.md` e as skills que ela indica em "Quando usar" (`spfx-extensoes-padroes`, `spfx-tema-marca`, `spfx-design-base`, `spfx-acessibilidade-conteudo`, `spfx-codigo-performance`). Não carregue outras skills nem o roteiro de brainstorming. Este conjunto é a rota de skin definida em `spfx-hub-ux`, então o roteamento do hub já está atendido.
+2. Pergunte, em uma única rodada, os valores da seção "Configuração" da skill. Todos são opcionais; o que não for informado usa o padrão da skill.
+3. Mostre um resumo curto da configuração e peça confirmação.
+4. Após a confirmação, crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin padrão (spfx-skin-layout)`, configuração escolhida, pontos "Em aberto" da skill (ex.: validação do modo de navegação no tenant) e status `Aprovado`.
+5. Gere a extensão em `$ARGUMENTS/`, seguindo a skill. Ao final, informe o que foi gerado e o checklist de validação da skill.
+6. Encerre aqui: os Passos 1 a 3 não se aplicam.
+
+### Resposta "Não"
+Siga para o Passo 1.
 
 ## Passo 1 — Escolher o modo de descoberta
 Antes de qualquer pergunta do roteiro, pergunte ao usuário (use `AskUserQuestion` quando disponível):
