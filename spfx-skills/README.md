@@ -9,17 +9,20 @@ Qualquer integrante da equipe pode iniciar um projeto novo pelo Claude Code, usa
 | Caminho | Função |
 |---|---|
 | `CLAUDE.md` | Regras que o Claude Code segue ao trabalhar neste framework |
-| `.claude/commands/iniciar-projeto.md` | Comando de entrada: brainstorming e definição de escopo |
+| `.claude/commands/iniciar-projeto.md` | Comando de entrada: verificação do ambiente, skin padrão ou brainstorming e definição de escopo |
 | `.claude/commands/provisionar-estrutura.md` | Gera `definicao.json` e as pastas `provisionamento` de cada web part |
 | `docs/01-brainstorming.md` | Roteiro de perguntas objetivas da fase de descoberta |
 | `docs/02-escopo.md` | Modelo do documento de escopo aprovado |
+| `docs/versoes-referencia.md` | Versões de SPFx, Node e ferramentas que todo projeto novo usa |
+| `docs/configurar-ambiente.md` | Passo a passo para instalar ou corrigir as ferramentas locais |
+| `scripts/verificar-ambiente.ps1` | Verifica as ferramentas da máquina contra as versões de referência (testes em `scripts/testes/`) |
 | `docs/framework.md` | Definição do framework (próxima etapa) |
 | `skills/` | Skills reutilizáveis (SPFx e provisionamento SharePoint) |
 
 ## Como usar (estado atual)
 
 1. Abra a pasta `spfx-skills` no Claude Code.
-2. Execute `/iniciar-projeto <nome-do-projeto>`.
+2. Execute `/iniciar-projeto <nome-do-projeto>`. O comando verifica primeiro as ferramentas da máquina (Node, Git, Yeoman, gerador SPFx, Heft) contra `docs/versoes-referencia.md`; se algo estiver ausente ou fora da versão, mostra o passo a passo de `docs/configurar-ambiente.md`. Para verificar manualmente: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\verificar-ambiente.ps1`.
 3. Responda se deseja gerar a skin padrão. Se sim, informe a configuração (opcional) e a extensão é gerada pela skill `spfx-skin-layout`. Se não, escolha o modo de descoberta: brainstorming guiado (perguntas uma etapa por vez) ou descrição livre (você envia uma mensagem geral com escopo e requisitos, e o Claude pergunta só o que faltar). O resultado é `<nome-do-projeto>/escopo.md`, na raiz do repositório. Ele precisa ser aprovado antes de qualquer código.
 4. Com o escopo aprovado, execute `/provisionar-estrutura <nome-do-projeto>`.
 

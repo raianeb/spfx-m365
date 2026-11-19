@@ -22,6 +22,7 @@ Exceção: a **skin padrão** escolhida no `/iniciar-projeto` já é um padrão 
 
 ## Padrões técnicos mínimos
 - Em qualquer tarefa de SPFx, carregar primeiro `skills/spfx-hub-ux` e, a partir dele, só as skills necessárias.
+- Versões: todo projeto novo usa as versões de `docs/versoes-referencia.md`. Antes de gerar código ou fazer upgrade, verificar a máquina com `scripts/verificar-ambiente.ps1` (passo a passo de correção em `docs/configurar-ambiente.md`). Nunca instalar ferramentas na máquina do usuário sem pedido explícito.
 - Preferir SharePoint Online; quando houver SharePoint 2013/2019 on-premises, destacar diferenças de API, limites e recursos.
 - Sem valores fixos de site, tenant, grupo ou prefixo de lista em código: parametrizar e perguntar em tempo de execução quando for script de provisionamento.
 - Prefixos de listas (PROD e HML) são configuráveis por instância da Web Part e perguntados pelo script; nunca fixar `HML_` ou outro prefixo no código.

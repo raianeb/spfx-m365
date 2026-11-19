@@ -85,4 +85,4 @@ Cada configuração precisa ter efeito na execução. Um campo sem efeito não a
 - Diferencie o que foi validado no código do que depende de teste no SharePoint.
 
 ## Padrões internos da equipe
-Consolidados desta skill. Versão de referência do React: a do `package.json` do projeto (o repositório atual usa React 18.3).
+Consolidados desta skill. Versões de referência (React, SPFx, TypeScript): `docs/versoes-referencia.md`.

@@ -1,0 +1,2 @@
+# Scripts PowerShell: CRLF no Windows; o BOM UTF-8 fica no arquivo para o Windows PowerShell 5.1 ler os acentos.
+*.ps1 text eol=crlf
