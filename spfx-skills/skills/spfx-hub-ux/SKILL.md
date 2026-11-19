@@ -24,6 +24,7 @@ Use esta skill primeiro em qualquer tarefa de SPFx: web parts, extensions, layou
 | Provisionamento de listas por Console | sharepoint-provisionamento |
 | Painel de propriedades | spfx-property-pane-reatividade |
 | Application Customizer, Field Customizer, Command Set | spfx-extensoes-padroes, sharepoint-dados-listas (se houver consulta a lista) |
+| Skin ou layout da página (barra superior, menu lateral ou superior) | spfx-skin-layout, spfx-extensoes-padroes, spfx-tema-marca, spfx-design-base, spfx-acessibilidade-conteudo |
 | Imagens e mídia | spfx-imagens-midia |
 | Versão, pacote e publicação | spfx-release-qualidade-pacote |
 | Build, Heft e webpack | spfx-heft-toolchain, spfx-heft-webpack |
