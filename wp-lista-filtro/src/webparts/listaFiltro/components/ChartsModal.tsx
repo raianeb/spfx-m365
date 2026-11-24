@@ -22,16 +22,12 @@ import { IPdfKpi, exportChartPdf, svgToPng } from '../../../services/exportPdf';
 
 /** Teto de linhas lidas para o gráfico. Acima disso a tela avisa que o resultado é parcial. */
 const CHART_MAX_ROWS: number = 200000;
-const DIMENSION_TYPES: ReadonlySet<string> = new Set<string>([
-  'Text',
-  'Choice',
-  'Boolean',
-  'DateTime',
-  'Number',
-  'Currency',
-  'Integer',
-  'Counter'
-]);
+/**
+ * Tipos que não servem de agrupamento: texto longo (cada registro vira um grupo) e link.
+ * Todos os demais entram, inclusive consulta (lookup), pessoa, calculado, metadados e escolha múltipla:
+ * o agrupamento usa o texto de exibição do valor, o mesmo mostrado na grade.
+ */
+const NON_DIMENSION_TYPES: ReadonlySet<string> = new Set<string>(['Note', 'URL']);
 const NUMERIC_TYPES: ReadonlySet<string> = new Set<string>(['Number', 'Currency', 'Integer', 'Counter']);
 const INT_FORMAT: Intl.NumberFormat = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
 const DEC_FORMAT: Intl.NumberFormat = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
@@ -76,6 +72,8 @@ export interface IChartsModalProps {
   contextLabel: string;
   /** Valores preenchidos na tela no momento da abertura: vazio = lista inteira. */
   hasFilter: boolean;
+  /** Variáveis de tema: a modal é renderizada em portal e não herda as da Web Part. */
+  themeStyle: React.CSSProperties;
 }
 
 interface IScanState {
@@ -100,10 +98,11 @@ const ChartsModal: React.FC<IChartsModalProps> = ({
   fields,
   conditions,
   contextLabel,
-  hasFilter
+  hasFilter,
+  themeStyle
 }) => {
   const dimensions: IListField[] = React.useMemo(
-    (): IListField[] => fields.filter((field: IListField) => DIMENSION_TYPES.has(field.type)),
+    (): IListField[] => fields.filter((field: IListField) => !NON_DIMENSION_TYPES.has(field.type)),
     [fields]
   );
   const numbers: IListField[] = React.useMemo(
@@ -272,6 +271,7 @@ const ChartsModal: React.FC<IChartsModalProps> = ({
       styles={MODAL_STYLES}
       titleAriaId="lista-filtro-graficos-titulo"
     >
+      <div className={styles.modalTheme} style={themeStyle}>
       <div className={styles.chartsHeader}>
         <h2 id="lista-filtro-graficos-titulo" className={styles.chartsTitle}>
           Visualização · {contextLabel}
@@ -420,6 +420,7 @@ const ChartsModal: React.FC<IChartsModalProps> = ({
           )}
         </>
       )}
+      </div>
     </Modal>
   );
 };

@@ -5,7 +5,8 @@ import { TextField } from '@fluentui/react/lib/TextField';
 import styles from './ListaFiltro.module.scss';
 import { DateMode, FilterValues, IFilterValue, TextMatch } from '../../../services/camlBuilder';
 import { IListField } from '../../../services/fieldSchema';
-import { buttonStyles, dropdownStyles, textFieldStyles } from './controlStyles';
+import { IDateShortcut, getDateShortcuts, isShortcutActive } from '../../../services/filterSummary';
+import { activeButtonStyles, buttonStyles, dropdownStyles, primaryButtonStyles, subtleButtonStyles, textFieldStyles } from './controlStyles';
 
 export interface IFilterBarProps {
   fields: IListField[];
@@ -33,8 +34,19 @@ const DATE_MODE_OPTIONS: IDropdownOption[] = [
 
 const isRange = (type: string): boolean => type === 'Number' || type === 'Currency' || type === 'Counter' || type === 'Integer';
 
-/** Filtros gerados a partir do tipo de cada campo. A consulta só roda em "Filtrar" ou Enter. */
+/** Data e faixa numérica têm mais de um controle e ocupam a largura do próprio conteúdo. */
+const isWide = (type: string): boolean => type === 'DateTime' || isRange(type);
+
+/**
+ * Filtros gerados a partir do tipo de cada campo. A consulta só roda em "Filtrar" ou Enter
+ * (skill sharepoint-dados-listas: aplicação explícita, sem consulta a cada tecla).
+ */
 const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatch, busy, onChange, onApply, onClear }) => {
+  // Prefixo único por instância: associa rótulo e campo sem colidir com outra Web Part na página.
+  const baseId: string = React.useId();
+  const shortcuts: IDateShortcut[] = React.useMemo((): IDateShortcut[] => getDateShortcuts(), []);
+  const textHint: string = textMatch === 'contem' ? 'contém' : 'começa com';
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     onApply();
@@ -47,6 +59,7 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
     if (mode === 'dia') {
       return (
         <TextField
+          className={styles.dateSingle}
           type="date"
           ariaLabel={`${field.title}: dia`}
           value={value.from ?? ''}
@@ -58,6 +71,7 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
     if (mode === 'mes') {
       return (
         <TextField
+          className={styles.dateSingle}
           type="month"
           ariaLabel={`${field.title}: mês e ano`}
           value={value.from ?? ''}
@@ -69,6 +83,7 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
     if (mode === 'ano') {
       return (
         <TextField
+          className={styles.dateSingle}
           type="number"
           ariaLabel={`${field.title}: ano`}
           placeholder="Ano (ex.: 2026)"
@@ -79,19 +94,22 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
       );
     }
     return (
-      <div className={styles.dateStack}>
+      <div className={styles.rangeInputs}>
         <TextField
+          className={styles.rangeInput}
           type="date"
-          ariaLabel={`${field.title}: de`}
-          placeholder="de"
+          ariaLabel={`${field.title}: data inicial`}
           value={value.from ?? ''}
           styles={textFieldStyles}
           onChange={(_event, text) => change({ from: text ?? '' })}
         />
+        <span className={styles.rangeSeparator} aria-hidden="true">
+          até
+        </span>
         <TextField
+          className={styles.rangeInput}
           type="date"
-          ariaLabel={`${field.title}: até`}
-          placeholder="até"
+          ariaLabel={`${field.title}: data final`}
           value={value.to ?? ''}
           styles={textFieldStyles}
           onChange={(_event, text) => change({ to: text ?? '' })}
@@ -150,6 +168,20 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
               />
             </div>
             <div className={styles.dateInputs}>{renderDateInputs(field, value, mode)}</div>
+            <div className={styles.shortcuts} role="group" aria-label={`Atalhos de período: ${field.title}`}>
+              {shortcuts.map((shortcut: IDateShortcut) => {
+                const active: boolean = isShortcutActive(value, shortcut);
+                return (
+                  <DefaultButton
+                    key={shortcut.key}
+                    text={shortcut.text}
+                    aria-pressed={active}
+                    styles={active ? activeButtonStyles : buttonStyles}
+                    onClick={(): void => onChange(field.name, shortcut.value)}
+                  />
+                );
+              })}
+            </div>
           </div>
           {error && (
             <span className={styles.fieldError} role="alert">
@@ -165,6 +197,7 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
           <legend className={styles.rangeLegend}>{field.title}</legend>
           <div className={styles.rangeInputs}>
             <TextField
+              className={styles.rangeInput}
               type="number"
               ariaLabel={`${field.title}: mínimo`}
               placeholder="mínimo"
@@ -172,7 +205,11 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
               styles={textFieldStyles}
               onChange={(_event, text) => onChange(field.name, { ...value, from: text ?? '' })}
             />
+            <span className={styles.rangeSeparator} aria-hidden="true">
+              até
+            </span>
             <TextField
+              className={styles.rangeInput}
               type="number"
               ariaLabel={`${field.title}: máximo`}
               placeholder="máximo"
@@ -189,10 +226,17 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
         </fieldset>
       );
     }
+    const inputId: string = `${baseId}-${field.name}`;
     return (
       <TextField
+        id={inputId}
         label={field.title}
-        placeholder={textMatch === 'contem' ? 'Contém' : 'Começa com'}
+        // O operador fica no rótulo: continua visível depois que o usuário digita.
+        onRenderLabel={(): JSX.Element => (
+          <label htmlFor={inputId} className={styles.fieldLabel}>
+            {field.title} <span className={styles.labelHint}>({textHint})</span>
+          </label>
+        )}
         value={value.text ?? ''}
         errorMessage={error}
         styles={textFieldStyles}
@@ -206,17 +250,15 @@ const FilterBar: React.FC<IFilterBarProps> = ({ fields, values, errors, textMatc
       {fields.length > 0 && (
         <div className={styles.filterGrid}>
           {fields.map((field: IListField) => (
-            <div key={field.name} className={styles.filterCell}>
+            <div key={field.name} className={isWide(field.type) ? `${styles.filterCell} ${styles.filterCellWide}` : styles.filterCell}>
               {renderField(field)}
             </div>
           ))}
         </div>
       )}
       <div className={styles.filterActions}>
-        <PrimaryButton type="submit" text="Filtrar" iconProps={{ iconName: 'Filter' }} disabled={busy} styles={buttonStyles} />
-        {fields.length > 0 && (
-          <DefaultButton text="Limpar" iconProps={{ iconName: 'ClearFilter' }} disabled={busy} onClick={onClear} styles={buttonStyles} />
-        )}
+        {fields.length > 0 && <DefaultButton text="Limpar filtros" disabled={busy} onClick={onClear} styles={subtleButtonStyles} />}
+        <PrimaryButton type="submit" text="Filtrar" iconProps={{ iconName: 'Filter' }} disabled={busy} styles={primaryButtonStyles} />
       </div>
     </form>
   );
