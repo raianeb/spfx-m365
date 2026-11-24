@@ -10,7 +10,7 @@ Português do Brasil em toda documentação, comentários e mensagens ao usuári
 
 ## Regra de ouro: brainstorming antes de código
 Nenhum projeto recebe código, scaffold ou arquivos de implementação antes de existir `projetos/<nome>/escopo.md` aprovado pelo usuário. Se o usuário pedir código de um projeto sem escopo aprovado, direcione-o para `/iniciar-projeto`.
-Exceção: a **skin padrão** escolhida no `/iniciar-projeto` já é um padrão aprovado (`skills/spfx-skin-layout`); basta a confirmação da configuração, registrada em escopo simplificado.
+Exceção: a **skin de layout** escolhida no `/iniciar-projeto` já é um padrão aprovado (`skills/spfx-skin-layout`). Com a extensão padrão, só se copia o pacote pronto (`ex-layout-sharepoint.sppkg`); com nova extensão, basta confirmar a configuração. Nos dois casos, o escopo é simplificado.
 
 ## Fases de um projeto
 1. **Descoberta (brainstorming):** seguir `docs/01-brainstorming.md`. Perguntas objetivas, uma etapa por vez, com opções quando possível. Registrar respostas; não assumir o que não foi dito.
