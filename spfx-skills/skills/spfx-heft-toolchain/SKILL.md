@@ -11,7 +11,7 @@ Ao alterar o processo de build, adicionar plugins ou diagnosticar falhas de comp
 ## Regras-base
 - Use os plugins incluídos antes de criar customizações.
 - Script plugins só quando houver necessidade real e documentada.
-- Mantenha a versão do Node compatível com a do projeto.
+- Mantenha a versão do Node compatível com a do projeto: as versões aceitas estão em `docs/versoes-referencia.md` e a verificação da máquina em `scripts/verificar-ambiente.ps1`.
 
 ## Padrões internos da equipe
 A definir.

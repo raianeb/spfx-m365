@@ -8,6 +8,23 @@ Você vai iniciar o projeto **$ARGUMENTS** dentro do framework spfx-skills.
 ## Local
 O projeto fica na raiz do repositório (a pasta que contém `spfx-skills`), na pasta `$ARGUMENTS/`. Não crie o projeto dentro de `spfx-skills`.
 
+## Passo A — Verificar o ambiente
+Antes de qualquer pergunta:
+1. Leia `spfx-skills/docs/versoes-referencia.md` (versões que todo projeto novo usa).
+2. Rode, a partir de `spfx-skills`:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verificar-ambiente.ps1 -Json`
+3. Mostre ao usuário uma tabela curta: item, versão encontrada, esperada e status.
+4. Interprete o resultado:
+   - **Código 0** (todos `OK`, `ACEITA` ou `AVISO`): cite os avisos em uma linha e siga para o Passo 0.
+   - **Código 1** (algum `AUSENTE`, `DIVERGENTE` ou `ERRO`): para cada item bloqueante, mostre o passo a passo da seção indicada em `guia` (arquivo `spfx-skills/docs/configurar-ambiente.md`), na ordem Node.js → Git → Yeoman e gerador → Heft.
+     - **Não execute comandos de instalação.** O usuário executa.
+     - Quando o usuário disser que concluiu, peça para reabrir o terminal se a seção pedir, e rode a verificação de novo.
+   - **Código 2** (erro na referência): informe a mensagem e pare. O arquivo de referência precisa ser corrigido por PR.
+5. Bloqueio por caminho:
+   - **Skin padrão:** não gera nada enquanto o código for diferente de 0.
+   - **Brainstorming e descrição livre:** podem seguir com a pendência registrada, porque não geram código. Repita a verificação antes de qualquer geração de código do projeto.
+6. Se o PowerShell não estiver disponível (fora do Windows sem `pwsh`), informe e peça ao usuário para conferir manualmente as versões de `versoes-referencia.md`.
+
 ## Passo 0 — Validar o nome
 - Se `$ARGUMENTS` estiver vazio, pergunte o nome do projeto e pare.
 - Use nome em minúsculas, com hífens, sem acentos (ex.: `painel-vagas`). Se o nome não estiver nesse formato, proponha uma versão e confirme com o usuário.
@@ -27,7 +44,7 @@ Aguarde a resposta. Não avance nem presuma.
 2. Pergunte, em uma única rodada, os valores da seção "Configuração" da skill. Todos são opcionais; o que não for informado usa o padrão da skill.
 3. Mostre um resumo curto da configuração e peça confirmação.
 4. Após a confirmação, crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin padrão (spfx-skin-layout)`, configuração escolhida, pontos "Em aberto" da skill (ex.: validação do modo de navegação no tenant) e status `Aprovado`.
-5. Gere a extensão em `$ARGUMENTS/`, seguindo a skill. Ao final, informe o que foi gerado e o checklist de validação da skill.
+5. Confirme que a verificação do Passo A terminou com código 0. Gere a extensão em `$ARGUMENTS/`, seguindo a skill e usando as versões de `docs/versoes-referencia.md` (SPFx, React, TypeScript, Node em `engines`). Ao final, informe o que foi gerado e o checklist de validação da skill.
 6. Encerre aqui: os Passos 1 a 3 não se aplicam.
 
 ### Resposta "Não"
