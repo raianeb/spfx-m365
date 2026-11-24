@@ -22,7 +22,7 @@ Cada skill fica em sua própria pasta, com um `SKILL.md` (frontmatter com `name`
 | `spfx-implementacao-base` | Arquitetura de implementação |
 | `spfx-property-pane-reatividade` | Painel de propriedades |
 | `spfx-extensoes-padroes` | Application Customizer, Field Customizer e Command Set |
-| `spfx-skin-layout` | Skin de layout (barra superior e menu até 3 níveis com ícones) por Application Customizer, ativada por `?env=webview`, sem skin em telas nativas e edição; referência técnica em `templates/referencia-tecnica.md` |
+| `spfx-skin-layout` | Skin de layout por Application Customizer, ativada por `?env=webview`: extensão padrão (`pacote/ex-layout-sharepoint.sppkg`) ou nova extensão; barra superior fixa e menu lateral recolhível ou horizontal (cascata, megamenu, Mais) pela navegação nativa, com segmentação por público; sem skin em telas nativas (`_layouts`, `Lists`, `Forms`) e na edição; implantação em todos os sites; referência técnica em `templates/referencia-tecnica.md` |
 | `spfx-imagens-midia` | Imagens e mídia |
 | `spfx-release-qualidade-pacote` | Release e qualidade do pacote |
 | `spfx-heft-toolchain` | Ferramental Heft |

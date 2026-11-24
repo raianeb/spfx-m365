@@ -1,5 +1,5 @@
 ---
-description: Inicia um projeto novo — skin padrão (spfx-skin-layout) ou descoberta (brainstorming guiado ou descrição livre) com escopo para aprovação
+description: Inicia um projeto novo — skin de layout (extensão padrão ou nova extensão, spfx-skin-layout) ou descoberta (brainstorming guiado ou descrição livre) com escopo para aprovação
 argument-hint: <nome-do-projeto>
 ---
 
@@ -21,7 +21,8 @@ Antes de qualquer pergunta:
      - Quando o usuário disser que concluiu, peça para reabrir o terminal se a seção pedir, e rode a verificação de novo.
    - **Código 2** (erro na referência): informe a mensagem e pare. O arquivo de referência precisa ser corrigido por PR.
 5. Bloqueio por caminho:
-   - **Skin padrão:** não gera nada enquanto o código for diferente de 0.
+   - **Skin com extensão padrão:** não bloqueia, porque só copia um pacote pronto (nada é compilado).
+   - **Skin com nova extensão:** não gera nada enquanto o código for diferente de 0.
    - **Brainstorming e descrição livre:** podem seguir com a pendência registrada, porque não geram código. Repita a verificação antes de qualquer geração de código do projeto.
 6. Se o PowerShell não estiver disponível (fora do Windows sem `pwsh`), informe e peça ao usuário para conferir manualmente as versões de `versoes-referencia.md`.
 
@@ -30,20 +31,36 @@ Antes de qualquer pergunta:
 - Use nome em minúsculas, com hífens, sem acentos (ex.: `painel-vagas`). Se o nome não estiver nesse formato, proponha uma versão e confirme com o usuário.
 - Se `$ARGUMENTS/escopo.md` já existir, informe e pergunte se é para revisar o escopo existente ou criar outro nome.
 
-## Passo S — Skin padrão
+## Passo S — Skin de layout
 Antes de qualquer outra pergunta, pergunte ao usuário (use `AskUserQuestion` quando disponível):
 
-> **Deseja gerar a skin padrão?**
-> - **Sim** — gero a extensão de skin de layout pela skill `spfx-skin-layout`, sem brainstorming.
+> **O projeto é a skin de layout (barra superior e menu da página, montados pela navegação do site)?**
+> - **Sim** — sigo a skill `spfx-skin-layout`, sem brainstorming.
 > - **Não** — sigo o fluxo normal de descoberta e escopo.
 
 Aguarde a resposta. Não avance nem presuma.
 
 ### Resposta "Sim"
-1. Carregue **somente** `spfx-skills/skills/spfx-skin-layout/SKILL.md` e as skills que ela indica em "Quando usar" (`spfx-extensoes-padroes`, `spfx-tema-marca`, `spfx-design-base`, `spfx-acessibilidade-conteudo`, `spfx-codigo-performance`). Não carregue outras skills nem o roteiro de brainstorming. Este conjunto é a rota de skin definida em `spfx-hub-ux`, então o roteamento do hub já está atendido.
-2. Pergunte, em uma única rodada, os valores da seção "Configuração" da skill. Todos são opcionais; o que não for informado usa o padrão da skill.
+Carregue **somente** `spfx-skills/skills/spfx-skin-layout/SKILL.md`. Não carregue o roteiro de brainstorming. Em seguida, faça a pergunta da seção 0 da skill:
+
+> **Utilizar a extensão padrão?**
+> - **Sim** — copio o pacote pronto `ex-layout-sharepoint.sppkg` para a pasta do projeto. Menu sem ícones.
+> - **Não** — gero uma nova extensão seguindo a skill.
+
+Aguarde a resposta. Não presuma.
+
+#### S1 — Extensão padrão (resposta "Sim")
+1. Siga a seção 0.1 da skill: confira `spfx-skills/skills/spfx-skin-layout/pacote/ex-layout-sharepoint.sppkg` e o SHA-256 de `pacote/README.md`. Arquivo ausente ou SHA-256 diferente: informe e pare.
+2. Copie o pacote para `$ARGUMENTS/ex-layout-sharepoint.sppkg`, sem renomear e sem gerar código, scaffold ou build. A cópia não é versionada (`*.sppkg` no `.gitignore`).
+3. Crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin — extensão padrão (ex-layout-sharepoint)`, versão e SHA-256 do pacote copiado, propriedades a configurar na lista Tenant Wide Extensions (se houver), pontos "Em aberto" da skill (seção 17) e status `Aprovado`.
+4. Mostre a orientação de implantação da seção 13 da skill, começando pela conferência do catálogo (mesma versão já instalada → não implantar de novo; atualização → **sem** marcar "adicionar a todos os sites") e o checklist da seção 16 que se aplica.
+5. Encerre aqui: os Passos 1 a 3 não se aplicam.
+
+#### S2 — Nova extensão (resposta "Não")
+1. Carregue também as skills indicadas em "Quando usar" da skill (`spfx-extensoes-padroes`, `spfx-tema-marca`, `spfx-design-base`, `spfx-acessibilidade-conteudo`, `spfx-codigo-performance`). Não carregue outras skills. Este conjunto é a rota de skin definida em `spfx-hub-ux`, então o roteamento do hub já está atendido.
+2. Pergunte, em uma única rodada, os valores da seção "Configuração" da skill (inclusive `navIcons`). Todos são opcionais; o que não for informado usa o padrão da skill.
 3. Mostre um resumo curto da configuração e peça confirmação.
-4. Após a confirmação, crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin padrão (spfx-skin-layout)`, configuração escolhida, pontos "Em aberto" da skill (ex.: validação do modo de navegação no tenant) e status `Aprovado`.
+4. Após a confirmação, crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin — nova extensão (spfx-skin-layout)`, configuração escolhida, pontos "Em aberto" da skill (seção 17) e status `Aprovado`.
 5. Confirme que a verificação do Passo A terminou com código 0. Gere a extensão em `$ARGUMENTS/`, seguindo a skill e usando as versões de `docs/versoes-referencia.md` (SPFx, React, TypeScript, Node em `engines`). Ao final, informe o que foi gerado e o checklist de validação da skill.
 6. Encerre aqui: os Passos 1 a 3 não se aplicam.
 
