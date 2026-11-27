@@ -2,7 +2,7 @@
 
 Use somente após validar `arquitetura-aprovada.md`.
 
-O script desta pasta cria **apenas a lista central** `JornadaAreas`, em HML e PROD. Grupos, permissões (só níveis padrão do SharePoint) e as listas de cada área são criados pela própria web part, na aba **Administração** (exceção aprovada no `jornada-conhecimento/escopo.md`).
+O script desta pasta cria **apenas a lista central** `JornadaAreas`, em HML e PROD. Grupos, permissões (só níveis padrão do SharePoint) e as listas de cada área são criados pela própria web part, na aba **Administração** (exceção aprovada no `jornada-de-conhecimento/escopo.md`).
 
 ## Pré-requisitos
 - Sessão logada no site de destino, com permissão de Controle Total.
@@ -32,7 +32,7 @@ O script é idempotente: rodar de novo não duplica lista ou campo. Nada existen
 - `erro`: falha; veja a mensagem.
 
 ## Depois da criação
-1. Implante o `wp-jornada-conhecimento.sppkg` no catálogo e adicione a web part a uma página do site.
+1. Implante o `wp-jornada-de-conhecimento.sppkg` no catálogo e adicione a web part a uma página do site.
 2. Nas propriedades da web part, escolha o **Ambiente** (PROD ou HML) e o grupo de Administradores. Os prefixos já vêm preenchidos (`HML_` e vazio); só altere se o script tiver usado outros valores.
 3. Com um usuário de Controle Total, abra a aba **Administração** e execute **Preparar o site**: cria o grupo de Administradores do ambiente (`Jornadas – Administradores` ou `HML_Jornadas – Administradores`), se ainda não existir. Nenhum nível de permissão é criado.
 4. Crie as áreas pela aba **Administração**. Cada área recebe os três grupos, as listas e a biblioteca, com as permissões de `arquitetura-aprovada.md`.

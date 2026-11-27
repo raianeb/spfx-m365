@@ -1,5 +1,5 @@
 /*
- * Equipe M365 — provisionamento de estrutura do projeto jornada-conhecimento (schema v1)
+ * Equipe M365 — provisionamento de estrutura do projeto jornada-de-conhecimento (schema v1)
  * GERADO a partir de definicao.json. Não edite à mão: altere a definição e gere novamente.
  *
  * Cole no Console do navegador com o site de destino aberto e a sessão logada.

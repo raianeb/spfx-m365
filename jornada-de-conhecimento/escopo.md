@@ -1,4 +1,4 @@
-# Escopo — jornada-conhecimento
+# Escopo — jornada-de-conhecimento
 
 **Status:** Aprovado
 **Responsável:** raianeb
@@ -79,7 +79,7 @@ A entrega cobre as fases 1 a 3 do roteiro do documento inicial (provisionamento 
 
 ## 5. Plataforma e solução técnica
 - **Onde será usada:** SharePoint Online, páginas modernas.
-- **Solução:** web part SPFx 1.24.1, React 18.3.1, Fluent UI 8 e PnPjs, nas versões de `spfx-skills/docs/versoes-referencia.md`, na pasta `wp-jornada-conhecimento/`. Serviços do documento inicial: PerfilService, AreaService, JornadaService, EtapaService, MatriculaService (gravação com debounce), EngajamentoService (atualização otimista) e PlayerAdapters (YouTube, Biblioteca, Documento, Link).
+- **Solução:** web part SPFx 1.24.1, React 18.3.1, Fluent UI 8 e PnPjs, nas versões de `spfx-skills/docs/versoes-referencia.md`, na pasta `wp-jornada-de-conhecimento/`. Serviços do documento inicial: PerfilService, AreaService, JornadaService, EtapaService, MatriculaService (gravação com debounce), EngajamentoService (atualização otimista) e PlayerAdapters (YouTube, Biblioteca, Documento, Link).
 - **Princípios mantidos:** recursos nativos primeiro; uma web part com quatro visões; progresso salvo sempre; simples na frente, completo por trás; segurança aplicada pelo SharePoint (a web part só filtra por conveniência).
 
 ### Ajustes em relação ao documento inicial
@@ -129,7 +129,7 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 ## 6. Operação
 - **Manutenção:** equipe M365.
 - **Ambientes:** HML e PROD no mesmo site. Padrão de nomes: HML = `HML_<Nome>`, PROD = `<Nome>`, para listas, bibliotecas e grupos (ex.: `HML_FIN_Jornadas`, `HML_Jornadas – FIN – Gestores`). Os prefixos continuam configuráveis na web part e no script (regra do `spfx-skills`), com esse padrão já preenchido na web part. A propriedade Ambiente define se a web part consome PROD ou HML.
-- **Implantação:** pacote `.sppkg` no catálogo; estrutura central pelo script de Console em `wp-jornada-conhecimento/provisionamento/`; estrutura de cada área pela aba Administração.
+- **Implantação:** pacote `.sppkg` no catálogo; estrutura central pelo script de Console em `wp-jornada-de-conhecimento/provisionamento/`; estrutura de cada área pela aba Administração.
 - **Conta de serviço:** já existe; só será usada se algum fluxo se tornar necessário.
 - **Riscos e forma de validação:**
   - Número de listas no site (~6 por área; ~600 com 50 áreas em HML e PROD): monitorar a página Conteúdo do site e, se preciso, mover o HML para outro site.

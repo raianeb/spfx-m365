@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "projeto": "jornada-conhecimento",
+  "projeto": "jornada-de-conhecimento",
   "observacoes": [
     "listas: estrutura central, criada pelo script de Console (criar-estrutura.console.js), uma vez por ambiente.",
     "listasPorArea: modelo das listas de cada área, criadas pela web part (aba Administração) ao criar a área. Nome final: <prefixo do ambiente><SIGLA>_<base>. Não entra no script de Console.",
