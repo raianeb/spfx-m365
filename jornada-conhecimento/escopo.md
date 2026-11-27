@@ -1,9 +1,9 @@
-# Escopo — hub-aprendizagem
+# Escopo — jornada-conhecimento
 
 **Status:** Aprovado
 **Responsável:** raianeb
 **Data:** 2026-11-27
-**Base:** "Hub de Aprendizagem – Especificação da Web Part SPFx" (documento inicial). Este escopo mantém o que foi pedido e definido lá e registra, na seção 5, os ajustes decididos na descoberta (volume, ambientes e uso mínimo de Power Automate).
+**Base:** "Hub de Aprendizagem – Especificação da Web Part SPFx" (documento inicial; o projeto passou a se chamar **Jornada de Conhecimento**). Este escopo mantém o que foi pedido e definido lá e registra, na seção 5, os ajustes decididos na descoberta (volume, ambientes e uso mínimo de Power Automate).
 
 ## 1. Problema e resultado esperado
 **O que foi pedido**
@@ -15,7 +15,7 @@
 - Curtir materiais, avaliar e comentar jornadas.
 - Certificado ao concluir, integrado à solução existente, numa fase posterior.
 
-**Nome e navegação:** "Hub de Aprendizagem" é o título da web part. Abas: Minhas Jornadas, Gestão da Área, Estúdio e Administração. Cada pessoa vê só as abas do seu perfil, sem aba vazia ou bloqueada.
+**Nome e navegação:** "Jornada de Conhecimento" é o título da web part. Abas: Minhas Jornadas, Gestão da Área, Estúdio e Administração. Cada pessoa vê só as abas do seu perfil, sem aba vazia ou bloqueada.
 
 **Situação atual e métrica de sucesso:** não informadas (seção 7).
 
@@ -79,7 +79,7 @@ A entrega cobre as fases 1 a 3 do roteiro do documento inicial (provisionamento 
 
 ## 5. Plataforma e solução técnica
 - **Onde será usada:** SharePoint Online, páginas modernas.
-- **Solução:** web part SPFx 1.24.1, React 18.3.1, Fluent UI 8 e PnPjs, nas versões de `spfx-skills/docs/versoes-referencia.md`, na pasta `wp-hub-aprendizagem/`. Serviços do documento inicial: PerfilService, AreaService, JornadaService, EtapaService, MatriculaService (gravação com debounce), EngajamentoService (atualização otimista) e PlayerAdapters (YouTube, Biblioteca, Documento, Link).
+- **Solução:** web part SPFx 1.24.1, React 18.3.1, Fluent UI 8 e PnPjs, nas versões de `spfx-skills/docs/versoes-referencia.md`, na pasta `wp-jornada-conhecimento/`. Serviços do documento inicial: PerfilService, AreaService, JornadaService, EtapaService, MatriculaService (gravação com debounce), EngajamentoService (atualização otimista) e PlayerAdapters (YouTube, Biblioteca, Documento, Link).
 - **Princípios mantidos:** recursos nativos primeiro; uma web part com quatro visões; progresso salvo sempre; simples na frente, completo por trás; segurança aplicada pelo SharePoint (a web part só filtra por conveniência).
 
 ### Ajustes em relação ao documento inicial
@@ -126,7 +126,7 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 ## 6. Operação
 - **Manutenção:** equipe M365.
 - **Ambientes:** HML e PROD no mesmo site, separados por prefixo nas listas e nos grupos.
-- **Implantação:** pacote `.sppkg` no catálogo; estrutura central pelo script de Console em `wp-hub-aprendizagem/provisionamento/`; estrutura de cada área pela aba Administração.
+- **Implantação:** pacote `.sppkg` no catálogo; estrutura central pelo script de Console em `wp-jornada-conhecimento/provisionamento/`; estrutura de cada área pela aba Administração.
 - **Conta de serviço:** já existe; só será usada se algum fluxo se tornar necessário.
 - **Riscos e forma de validação:**
   - Número de listas no site (~6 por área; ~600 com 50 áreas em HML e PROD): monitorar a página Conteúdo do site e, se preciso, mover o HML para outro site.

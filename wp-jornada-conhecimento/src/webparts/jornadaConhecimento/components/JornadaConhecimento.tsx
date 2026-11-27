@@ -2,10 +2,10 @@
 import * as React from 'react';
 import { IWebPartCommonProps } from '../../../core/config';
 
-const HubAprendizagem: React.FC<IWebPartCommonProps> = (props: IWebPartCommonProps) => (
-  <section style={props.themeStyle} aria-label={props.title || 'Hub de Aprendizagem'}>
+const JornadaConhecimento: React.FC<IWebPartCommonProps> = (props: IWebPartCommonProps) => (
+  <section style={props.themeStyle} aria-label={props.title || 'Jornada de Conhecimento'}>
     {props.title && <h2>{props.title}</h2>}
   </section>
 );
 
-export default HubAprendizagem;
+export default JornadaConhecimento;

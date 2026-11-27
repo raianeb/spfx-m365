@@ -1,4 +1,4 @@
-declare interface IHubAprendizagemWebPartStrings {
+declare interface IJornadaConhecimentoWebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
   DescriptionFieldLabel: string;
@@ -13,7 +13,7 @@ declare interface IHubAprendizagemWebPartStrings {
   UnknownEnvironment: string;
 }
 
-declare module 'HubAprendizagemWebPartStrings' {
-  const strings: IHubAprendizagemWebPartStrings;
+declare module 'JornadaConhecimentoWebPartStrings' {
+  const strings: IJornadaConhecimentoWebPartStrings;
   export = strings;
 }

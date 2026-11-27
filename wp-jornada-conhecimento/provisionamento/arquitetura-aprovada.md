@@ -1,13 +1,13 @@
-# Hub de Aprendizagem — arquitetura de dados (schema v1)
+# Jornada de Conhecimento — arquitetura de dados (schema v1)
 
 Site: https://<tenant>.sharepoint.com/sites/<nome-do-site> (HML e PROD no mesmo site, separados por prefixo).
-Fonte: `hub-aprendizagem/definicao.json` (cópia em `definicao.json` nesta pasta). Escopo: `hub-aprendizagem/escopo.md`.
+Fonte: `jornada-conhecimento/definicao.json` (cópia em `definicao.json` nesta pasta). Escopo: `jornada-conhecimento/escopo.md`.
 
 ## Estruturas
 
 | Nome PROD | Nome HML | Tipo | Criada por | Finalidade |
 |---|---|---|---|---|
-| `[prefixo PROD]HubAreas` | `[prefixo HML]HubAreas` | Lista (100, versionamento) | Script de Console | Cadastro das áreas e IDs dos grupos |
+| `[prefixo PROD]JornadaAreas` | `[prefixo HML]JornadaAreas` | Lista (100, versionamento) | Script de Console | Cadastro das áreas e IDs dos grupos |
 | `[prefixo PROD]<SIGLA>_Jornadas` | `[prefixo HML]<SIGLA>_Jornadas` | Lista (100, versionamento, aprovação de conteúdo) | Web part (aba Administração) | Jornadas da área |
 | `[prefixo]<SIGLA>_Etapas` | idem | Lista (100, versionamento) | Web part | Etapas de cada jornada |
 | `[prefixo]<SIGLA>_Matriculas` | idem | Lista (100, versionamento, lê e edita só os próprios) | Web part | Progresso individual |
@@ -17,7 +17,7 @@ Fonte: `hub-aprendizagem/definicao.json` (cópia em `definicao.json` nesta pasta
 
 ## Campos
 
-### HubAreas
+### JornadaAreas
 | Nome interno | Rótulo | Tipo | Índice | Regra |
 |---|---|---|---|---|
 | Title (nativo) | Nome da área | Texto | Não | Obrigatório na WP |
@@ -89,7 +89,7 @@ Fonte: `hub-aprendizagem/definicao.json` (cópia em `definicao.json` nesta pasta
 
 | Tela | Lista | Filtro (índice) | Volume máximo por consulta |
 |---|---|---|---|
-| Detecção de perfil | HubAreas | Status (itens já restritos por área) | ~50 |
+| Detecção de perfil | JornadaAreas | Status (itens já restritos por área) | ~50 |
 | Minhas Jornadas | `_Jornadas` | Status | ~30 por área |
 | Minhas Jornadas, player | `_Matriculas` | Author = usuário atual | ~30 por área |
 | Player | `_Etapas` | JornadaId | ~50 |
@@ -103,7 +103,7 @@ Todas as consultas usam `select` explícito, `top` e paginação (skill `sharepo
 
 | Objeto | Administradores | Gestores | Apoio | Usuários |
 |---|---|---|---|---|
-| Item da área em HubAreas | Controle total | Leitura | Leitura | Leitura |
+| Item da área em JornadaAreas | Controle total | Leitura | Leitura | Leitura |
 | `_Jornadas` | Controle total | Contribuir e Aprovar | Contribuir | Leitura |
 | `_Etapas`, `_Conteudos` | Controle total | Contribuir | Contribuir | Leitura |
 | `_Matriculas` | Controle total | Gestor da área | Contribuir | Contribuir |
