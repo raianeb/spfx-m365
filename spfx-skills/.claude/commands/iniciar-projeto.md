@@ -53,7 +53,7 @@ Aguarde a resposta. Não presuma.
 1. Siga a seção 0.1 da skill: confira `spfx-skills/skills/spfx-skin-layout/pacote/ex-layout-sharepoint.sppkg` e o SHA-256 de `pacote/README.md`. Arquivo ausente ou SHA-256 diferente: informe e pare.
 2. Copie o pacote para `$ARGUMENTS/ex-layout-sharepoint.sppkg`, sem renomear e sem gerar código, scaffold ou build. A cópia não é versionada (`*.sppkg` no `.gitignore`).
 3. Crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin — extensão padrão (ex-layout-sharepoint)`, versão e SHA-256 do pacote copiado, propriedades a configurar na lista Tenant Wide Extensions (se houver), pontos "Em aberto" da skill (seção 17) e status `Aprovado`.
-4. Mostre a orientação de implantação da seção 13 da skill, começando pela conferência do catálogo (mesma versão já instalada → não implantar de novo; atualização → **sem** marcar "adicionar a todos os sites") e o checklist da seção 16 que se aplica.
+4. Mostre a orientação de implantação da seção 13.1 da skill: no catálogo, envio **sem** marcar "adicionar a todos os sites" (mesma versão já implantada → não enviar de novo); em cada site, executar no Console o `spfx-skills/skills/spfx-skin-layout/script/ativar-extensao-padrao.console.js`. Depois, o checklist da seção 16 que se aplica.
 5. Encerre aqui: os Passos 1 a 3 não se aplicam.
 
 #### S2 — Nova extensão (resposta "Não")
