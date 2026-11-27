@@ -1,0 +1,71 @@
+// Estilos do editor de texto rico (origem: wp-faq).
+.editor {
+  min-height: 160px;
+  max-height: 320px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #8a8886;
+  border-radius: 0 0 2px 2px;
+  background: #ffffff;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cc-text);
+  overflow-wrap: anywhere;
+
+  p {
+    margin: 0 0 6px;
+  }
+
+  ul,
+  ol {
+    margin: 4px 0;
+    padding-left: 22px;
+  }
+
+  a {
+    color: var(--cc-primary);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cc-primary);
+    outline-offset: 0;
+  }
+}
+
+.editorError {
+  font-size: 12px;
+  color: #a80000;
+}
+
+.editorField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.editorLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cc-text);
+}
+
+.editorToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid #8a8886;
+  border-bottom: none;
+  border-radius: 2px 2px 0 0;
+  background: #faf9f8;
+}
+
+.linkRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+

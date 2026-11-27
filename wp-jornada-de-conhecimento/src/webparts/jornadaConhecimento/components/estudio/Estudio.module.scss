@@ -1,0 +1,219 @@
+// Skills aplicadas: spfx-css-estilos, spfx-tema-marca, spfx-design-base.
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.barra {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ajuda {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--cc-muted, #616161);
+}
+
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.tabelaRolagem {
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--cc-border, #e0e0e0);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    font-size: 12px;
+    color: var(--cc-muted, #616161);
+  }
+}
+
+.legenda {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 8px;
+}
+
+.nomeJornada {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.situacao {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--cc-surface, #f5f5f5);
+}
+
+.publicada {
+  color: var(--cc-success, #107c10);
+}
+
+.devolvida {
+  color: var(--cc-danger, #a4262c);
+}
+
+.emAprovacao,
+.alteracoesPendentes {
+  color: var(--cc-warning, #8a5300);
+}
+
+.acoes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editorTopo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.editorTitulo {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.passos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--cc-border, #d1d1d1);
+  border-radius: 16px;
+  background: var(--cc-background, #ffffff);
+  color: var(--cc-text, #1f1f1f);
+  font: inherit;
+  cursor: pointer;
+
+  &[aria-current='step'] {
+    border-color: var(--cc-primary, #0f6cbd);
+    font-weight: 600;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cc-focus, #0f6cbd);
+    outline-offset: 2px;
+  }
+}
+
+.passoNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--cc-surface, #f5f5f5);
+  font-size: 12px;
+}
+
+.painelPasso {
+  padding: 16px;
+  border: 1px solid var(--cc-border, #e0e0e0);
+  border-radius: 8px;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.listaEtapas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itemEtapa {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--cc-border, #e0e0e0);
+  border-radius: 6px;
+}
+
+.ordem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--cc-surface, #f5f5f5);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.itemTexto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.editorRodape {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.navegacao {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

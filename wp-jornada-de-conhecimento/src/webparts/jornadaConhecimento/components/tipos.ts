@@ -6,6 +6,8 @@ import { IEtapa, IJornada, IMatricula } from '../../../jornada/progresso';
 import { EngajamentoService } from '../../../services/EngajamentoService';
 import { JornadaService } from '../../../services/JornadaService';
 import { MatriculaService } from '../../../services/MatriculaService';
+import { EstudioService } from '../../../services/EstudioService';
+import { GestaoService } from '../../../services/GestaoService';
 
 export interface IJornadaConhecimentoProps extends IWebPartCommonProps {
   sp: SPFI;
@@ -18,6 +20,8 @@ export interface IServicosJornada {
   jornadas: JornadaService;
   matriculas: MatriculaService;
   engajamento: EngajamentoService;
+  estudio: EstudioService;
+  gestao: GestaoService;
 }
 
 /** Jornada pronta para a tela: área, resumo das etapas, matrícula do usuário e situação de prazo. */

@@ -186,7 +186,8 @@ export class JornadaService {
       lote.web.lists
         .getByTitle(jornadas)
         .items.select(...CAMPOS_JORNADA)
-        .filter("Status eq 'Publicada'")
+        // Só versões aprovadas: quem aprova (Gestor) não vê como publicada uma jornada que ainda aguarda aprovação.
+        .filter("Status eq 'Publicada' and OData__ModerationStatus eq 0")
         .orderBy('DataPublicacao', false)
         .top(LIMITE_JORNADAS)<IJornadaItem[]>()
         .then((itens: IJornadaItem[]) => {

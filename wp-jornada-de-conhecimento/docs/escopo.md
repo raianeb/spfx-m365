@@ -97,6 +97,11 @@ O documento inicial usa listas únicas com pasta por área, matrículas com perm
 | Fila de Solicitações | Lista central | **Removida** | Nada da entrega exige privilégio fora do perfil |
 | Detecção de perfil | `currentuser/groups` comparado por ID | **Áreas visíveis** (item da área restrito aos seus grupos) **+ permissões efetivas** nas listas da área, em lote | Funciona com grupos do Entra ID dentro dos grupos do SharePoint (área Geral) |
 
+**Limites aceitos nesta entrega (sem fluxos):**
+- Alterações nas **etapas** de uma jornada já publicada valem na hora (a lista Etapas não tem aprovação); só os dados da jornada passam pela aprovação.
+- A **taxa de conclusão** por jornada aparece só para Gestores: o Apoio não lê matrículas de outras pessoas. O Apoio vê nota média e curtidas por etapa.
+- Salvar uma jornada já publicada deixa a nova versão aguardando aprovação; os Usuários continuam vendo a versão aprovada.
+
 **Power Automate:** nenhum fluxo na primeira entrega. Previsto para a fase 4 (certificados) e como plano B dos itens 1 e 4 da seção 7.
 
 ### Permissões por área
@@ -140,15 +145,17 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 | Item | Quem decide | Como validar |
 |---|---|---|
 | 1. O nível padrão Editar (com Gerenciar listas) permite ao Gestor ler todas as matrículas numa lista configurada para "ler só os próprios itens" | Equipe M365 | Teste em HML com dois usuários e um gestor. Plano B: matrículas protegidas por item via fluxo |
-| 2. **Publicação:** passa pelo Gestor (Aprovação de Conteúdo) ou o Apoio pode publicar sozinho. Pendente desde o documento inicial | Responsável | Decisão de negócio; o escopo considera aprovação pelo Gestor |
+| 2. **Publicação:** passa pelo Gestor (Aprovação de Conteúdo) ou o Apoio pode publicar sozinho. **Implementado com aprovação pelo Gestor**; para o Apoio publicar sozinho, basta dar Design ao Apoio na lista Jornadas | Responsável | Confirmar no teste |
 | 3. ~~Data de referência do prazo~~ **Decidido (27/11/2026):** data de publicação da jornada. Data limite = DataPublicacao + PrazoDias | Responsável | — |
 | 4. Contadores calculados na tela atendem a área Geral com bom tempo de resposta | Equipe M365 | Teste de carga em HML. Plano B: contadores por fluxo |
 | 5. Conteúdo no player: vídeo da biblioteca no player HTML5 (o do Stream não expõe a posição); YouTube pelo iframe `youtube-nocookie.com` com a API de mensagens (sem script externo na página); documentos Office embutidos com `?web=1` e PDF no visualizador do navegador | Equipe M365 | Teste em HML: MP4 grande, vídeo do YouTube (posição e retomada), DOCX/PPTX/PDF embutidos. Se o Office não abrir embutido, fica o link "Abrir em nova aba" |
 | 6. Lembretes por `SendEmail`: alcance para membros de grupos do Entra ID e limites de envio | Equipe M365 | Teste em HML |
-| 7. Exportação: CSV (sem biblioteca) ou Excel `.xlsx` (aumenta o pacote) | Responsável | Decisão de uso |
+| 7. Exportação: **adotado CSV** (separador `;`, abre no Excel, sem biblioteca extra). Trocar por `.xlsx` se preferir (aumenta o pacote) | Responsável | Confirmar no teste |
 | 8. Situação atual e métrica de sucesso | Responsável | Registrar antes da implantação em PROD |
 | 9. LGPD: retenção e anonimização do progresso e dos comentários | Responsável e jurídico | Segundo momento |
 | 10. Verificação do ambiente local (`verificar-ambiente.ps1`) | Desenvolvedora | Rodar antes da geração de código |
+| 12. Aprovação nativa pela API: Publicar, Devolver e Arquivar gravam `_ModerationStatus` com `validateUpdateListItem` usando a sessão do Gestor (nível Design) | Equipe M365 | Em HML: Apoio envia, Gestor publica e devolve; conferir o que o Usuário vê antes e depois |
+| 13. Lembretes por `SendEmail`: enviados com a conta do Gestor, um por pessoa; o SharePoint só entrega a quem tem acesso ao site | Equipe M365 | Em HML, com um atrasado de teste |
 | 11. Configurações de lista pela API REST com a sessão do Administrador: "ler e editar só os próprios itens" (`ReadSecurity`/`WriteSecurity`), aprovação de conteúdo e visibilidade de rascunho | Equipe M365 | Criar uma área em HML e conferir as configurações de cada lista. Se a API recusar, a área fica com Status Erro e a mensagem indica o passo |
 
 ## 8. Aprovação

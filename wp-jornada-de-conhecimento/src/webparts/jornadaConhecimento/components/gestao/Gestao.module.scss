@@ -1,0 +1,204 @@
+// Skills aplicadas: spfx-css-estilos, spfx-tema-marca, spfx-design-base. O mapa de calor usa cor e texto juntos.
+.root,
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.barra {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ajuda {
+  display: block;
+  margin: 0;
+  font-size: 12px;
+  color: var(--cc-muted, #616161);
+}
+
+.erro {
+  margin: 0;
+  color: var(--cc-danger, #a4262c);
+}
+
+.acoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.indicador {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--cc-surface, #f5f5f5);
+
+  dt {
+    font-size: 12px;
+    color: var(--cc-muted, #616161);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+}
+
+.mapaRolagem {
+  overflow-x: auto;
+  max-height: 70vh;
+}
+
+.mapa {
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: 13px;
+
+  th {
+    font-weight: 600;
+    text-align: left;
+    padding: 6px 8px;
+  }
+}
+
+.legenda {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 8px;
+}
+
+.colunaJornada {
+  min-width: 96px;
+  max-width: 160px;
+  overflow-wrap: anywhere;
+  vertical-align: bottom;
+}
+
+.colunaPessoa {
+  position: sticky;
+  left: 0;
+  min-width: 160px;
+  background: var(--cc-background, #ffffff);
+  overflow-wrap: anywhere;
+}
+
+.celula {
+  min-width: 72px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.celulaBotao {
+  width: 100%;
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--cc-focus, #0f6cbd);
+    outline-offset: -2px;
+  }
+}
+
+.faixa_na {
+  color: var(--cc-muted, #616161);
+}
+
+.faixa_zero {
+  background: var(--cc-surface, #f3f2f1);
+}
+
+.faixa_baixa {
+  background: #fde7e9;
+  color: #6e0811;
+}
+
+.faixa_media {
+  background: #fff4ce;
+  color: #4a3500;
+}
+
+.faixa_alta {
+  background: #dff6dd;
+  color: #0b3a0b;
+}
+
+.faixa_completa {
+  background: #107c10;
+  color: #ffffff;
+}
+
+.detalheEtapas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.detalheEtapa {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.listaAprovacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartaoAprovacao {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border: 1px solid var(--cc-border, #e0e0e0);
+  border-radius: 8px;
+
+  > div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+.seloOculto {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--cc-surface, #f5f5f5);
+  color: var(--cc-danger, #a4262c);
+}
+
+.comentarioTexto {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
