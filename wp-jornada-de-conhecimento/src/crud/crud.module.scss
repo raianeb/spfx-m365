@@ -1,0 +1,130 @@
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+/* Modais são renderizadas em portal: fonte e tokens da instância são definidos na casca. */
+.modalRoot {
+  --cc-primary: #E45900;
+  --cc-primary-alt: #F08C00;
+  --cc-text: #1F1F1F;
+  --cc-muted: #5F5F5F;
+  --cc-surface: #F1F1F1;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  background: #fff;
+  font-family: 'Instrument Sans', 'Segoe UI', sans-serif;
+  color: var(--cc-text);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+  padding: 12px 20px;
+  border-bottom: 1px solid #edebe9;
+}
+
+.modalContext {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--cc-muted);
+}
+
+/* Única área com rolagem vertical da modal. */
+.modalScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 40px 56px 32px;
+}
+
+.modalTitle {
+  margin: 0 0 24px;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 600;
+  color: var(--cc-text);
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modalText {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--cc-text);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #edebe9;
+}
+
+.footerActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.helper {
+  font-size: 12px;
+  color: var(--cc-muted);
+}
+
+.error {
+  color: #a4262c;
+  font-size: 14px;
+}
+
+.diagnosticsArea {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #edebe9;
+}
+
+/* Alvos do foco inicial, indicados à casca por classe. */
+.firstField,
+.focusFirst {
+  scroll-margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .modalScroll {
+    padding: 24px 20px;
+  }
+
+  .modalTitle {
+    font-size: 22px;
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "wp-jornada-de-conhecimento",
+    "environment": "spo",
+    "packageManager": "npm",
+    "skipFeatureDeployment": true,
+    "useGulp": false,
+    "componentType": "webpart",
+    "template": "react",
+    "componentName": "JornadaConhecimento",
+    "componentDescription": "Jornada de Conhecimento: jornadas de treinamento por área",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.23.5",
+    "sdksVersions": {},
+    "version": "1.24.1",
+    "libraryName": "wp-jornada-de-conhecimento",
+    "libraryId": "9835990e-69ca-4ed0-9ee5-8fa8d0b9fbc7",
+    "solutionShortDescription": "wp-jornada-de-conhecimento description"
+  }
+}

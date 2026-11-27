@@ -14,6 +14,7 @@ As Web Parts são genéricas: não estão vinculadas a um site específico. O si
 | `wp-documentos-view/` | Documentos | Navegação em pastas e abertura de documentos de uma biblioteca, com busca, grade ou lista e link direto por item. Segue a `REGRA_VOLUME.md`. |
 | `wp-faq/` | Perguntas Frequentes | FAQ em acordeão, com ordenação configurável, busca, link direto por pergunta e sugestão de novas perguntas via Power Automate. |
 | `wp-lista-filtro/` | Lista com filtros | Web Part genérica para filtrar e exibir qualquer lista do SharePoint, sem código. Filtro e paginação no servidor, preparada para listas com 100 mil itens ou mais. |
+| `wp-jornada-de-conhecimento/` | Jornada de Conhecimento | Jornadas de treinamento por área, com progresso individual, acompanhamento por gestor, estúdio com aprovação e administração das áreas. *Em desenvolvimento; escopo em `jornada-de-conhecimento/`.* |
 
 ## Status
 
