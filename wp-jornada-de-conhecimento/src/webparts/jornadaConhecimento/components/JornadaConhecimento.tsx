@@ -10,10 +10,15 @@ import { DiagnosticsPanel } from '../../../core/diagnostics';
 import { prefixosValidos } from '../../../core/prefixos';
 import { Aba } from '../../../jornada/modelo';
 import { IPerfil, PerfilService } from '../../../services/PerfilService';
+import { EngajamentoService } from '../../../services/EngajamentoService';
+import { JornadaService } from '../../../services/JornadaService';
+import { MatriculaService } from '../../../services/MatriculaService';
 import { mensagemDeErro } from '../../../services/sp';
-import { IJornadaConhecimentoProps, NOME_SOLUCAO } from './tipos';
+import { IJornadaConhecimentoProps, IJornadaVisivel, IServicosJornada, NOME_SOLUCAO } from './tipos';
 import AdministracaoTab from './administracao/AdministracaoTab';
 import EmBreve from './comum/EmBreve';
+import MinhasJornadas from './minhas/MinhasJornadas';
+import Player from './player/Player';
 import Estado from './comum/Estado';
 import styles from './JornadaConhecimento.module.scss';
 
@@ -31,6 +36,8 @@ const JornadaConhecimento: React.FC<IJornadaConhecimentoProps> = (props: IJornad
   const [carga, setCarga] = useState<Carga>({ tipo: 'carregando' });
   const [aba, setAba] = useState<Aba>('minhas');
   const [versao, setVersao] = useState<number>(0);
+  const [aberta, setAberta] = useState<IJornadaVisivel | undefined>(undefined);
+  const [versaoCatalogo, setVersaoCatalogo] = useState<number>(0);
 
   // Contexto de dados: trocar site, ambiente, prefixos ou grupos de Administradores recarrega o perfil.
   const chaveContexto: string = `${siteUrl}|${environment}|${prefixos.PROD}|${prefixos.HML}|${adminGroupIds.join(',')}`;
@@ -38,6 +45,17 @@ const JornadaConhecimento: React.FC<IJornadaConhecimentoProps> = (props: IJornad
     () => new PerfilService(sp, environment, prefixos, adminGroupIds, logger),
     [sp, chaveContexto]
   );
+  const servicos: IServicosJornada = useMemo(() => {
+    const jornadas: JornadaService = new JornadaService(sp, environment, prefixos, logger);
+    return {
+      jornadas,
+      matriculas: new MatriculaService(sp, jornadas, logger),
+      engajamento: new EngajamentoService(sp, jornadas, logger)
+    };
+  }, [sp, chaveContexto]);
+
+  // Trocar de contexto de dados fecha o player aberto.
+  useEffect(() => setAberta(undefined), [chaveContexto]);
 
   useEffect(() => {
     let ativo: boolean = true;
@@ -120,6 +138,29 @@ const JornadaConhecimento: React.FC<IJornadaConhecimentoProps> = (props: IJornad
           <div className={styles.conteudo}>
             {aba === 'administracao' ? (
               <AdministracaoTab {...props} perfil={carga.perfil} aoAlterar={recarregar} />
+            ) : aba === 'minhas' && carga.perfil.situacao === 'ok' ? (
+              aberta ? (
+                <Player
+                  item={aberta}
+                  servicos={servicos}
+                  usuarioId={carga.perfil.usuarioId}
+                  siteUrl={siteUrl}
+                  aoVoltar={() => {
+                    setAberta(undefined);
+                    setVersaoCatalogo((v: number) => v + 1);
+                  }}
+                />
+              ) : (
+                <MinhasJornadas
+                  perfil={carga.perfil}
+                  servicos={servicos}
+                  siteUrl={siteUrl}
+                  nomeUsuario={props.nomeUsuario}
+                  loginUsuario={props.loginUsuario}
+                  versao={versaoCatalogo}
+                  aoAbrir={setAberta}
+                />
+              )
             ) : (
               <EmBreve secao={ROTULO_ABA[aba]} semListaCentral={carga.perfil.situacao === 'semListaCentral'} />
             )}

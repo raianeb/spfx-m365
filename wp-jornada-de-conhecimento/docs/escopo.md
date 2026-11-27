@@ -51,7 +51,7 @@ A entrega cobre as fases 1 a 3 do roteiro do documento inicial (provisionamento 
 - **Pessoa removida da área:** o histórico de matrículas fica preservado e sai dos indicadores.
 - **Progresso:** concluir uma etapa atualiza o progresso, recalcula o percentual e avança a etapa atual; com 100%, a matrícula fica Concluída.
 - **Ordem:** com Ordem livre desmarcada, a próxima etapa só libera após a anterior.
-- **Prazo:** data limite = data de referência + PrazoDias; vencida sem conclusão, a jornada aparece como Atrasada (data de referência: seção 7).
+- **Prazo:** data limite = data de publicação da jornada + PrazoDias; vencida sem conclusão, a jornada aparece como Atrasada.
 - **Jornada alterada depois de publicada:** quem concluiu mantém a conclusão, e a etapa nova aparece como novidade opcional; quem está em andamento recebe a etapa normalmente.
 - **Curtir:** um clique curte, outro descurte; uma curtida por pessoa por etapa; contador visível para a área.
 - **Avaliar:** 1 a 5 estrelas, liberado após concluir ao menos metade das etapas; a nota pode ser alterada. A tela de conclusão abre o card de avaliação.
@@ -141,9 +141,9 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 |---|---|---|
 | 1. O nível padrão Editar (com Gerenciar listas) permite ao Gestor ler todas as matrículas numa lista configurada para "ler só os próprios itens" | Equipe M365 | Teste em HML com dois usuários e um gestor. Plano B: matrículas protegidas por item via fluxo |
 | 2. **Publicação:** passa pelo Gestor (Aprovação de Conteúdo) ou o Apoio pode publicar sozinho. Pendente desde o documento inicial | Responsável | Decisão de negócio; o escopo considera aprovação pelo Gestor |
-| 3. Data de referência do prazo: publicação da jornada ou entrada da pessoa na área | Responsável | Decisão de negócio |
+| 3. ~~Data de referência do prazo~~ **Decidido (27/11/2026):** data de publicação da jornada. Data limite = DataPublicacao + PrazoDias | Responsável | — |
 | 4. Contadores calculados na tela atendem a área Geral com bom tempo de resposta | Equipe M365 | Teste de carga em HML. Plano B: contadores por fluxo |
-| 5. Posição do vídeo da biblioteca: player HTML5 com o arquivo da biblioteca (o player do Stream não expõe a posição) | Equipe M365 | Teste em HML com MP4 grande |
+| 5. Conteúdo no player: vídeo da biblioteca no player HTML5 (o do Stream não expõe a posição); YouTube pelo iframe `youtube-nocookie.com` com a API de mensagens (sem script externo na página); documentos Office embutidos com `?web=1` e PDF no visualizador do navegador | Equipe M365 | Teste em HML: MP4 grande, vídeo do YouTube (posição e retomada), DOCX/PPTX/PDF embutidos. Se o Office não abrir embutido, fica o link "Abrir em nova aba" |
 | 6. Lembretes por `SendEmail`: alcance para membros de grupos do Entra ID e limites de envio | Equipe M365 | Teste em HML |
 | 7. Exportação: CSV (sem biblioteca) ou Excel `.xlsx` (aumenta o pacote) | Responsável | Decisão de uso |
 | 8. Situação atual e métrica de sucesso | Responsável | Registrar antes da implantação em PROD |

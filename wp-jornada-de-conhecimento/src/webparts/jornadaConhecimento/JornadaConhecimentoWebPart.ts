@@ -32,7 +32,8 @@ export default class JornadaConhecimentoWebPart extends WebPartBase<IJornadaConh
       ...common,
       sp: this._sp,
       siteUrl,
-      nomeUsuario: this.context.pageContext.user.displayName ?? ''
+      nomeUsuario: this.context.pageContext.user.displayName ?? '',
+      loginUsuario: this.context.pageContext.user.loginName ?? ''
     });
   }
 
