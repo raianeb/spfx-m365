@@ -41,7 +41,7 @@ A entrega cobre as fases 1 a 3 do roteiro do documento inicial (provisionamento 
 
 | Fase | Entrega |
 |---|---|
-| 1 – Fundação | Script de provisionamento da lista central (HML e PROD); aba **Administração**: preparar o site (grupo de Administradores e níveis de permissão personalizados, pelo proprietário do site), criar área (grupos, listas, biblioteca e permissões), trocar gestores, reprocessar, arquivar e visão geral |
+| 1 – Fundação | Script de provisionamento da lista central (HML e PROD); aba **Administração**: preparar o site (grupo de Administradores do ambiente, pelo proprietário do site), criar área (grupos, listas, biblioteca e permissões), trocar gestores, reprocessar, arquivar e visão geral |
 | 2 – Consumo | **Minhas Jornadas** (saudação, números rápidos, Continuar de onde parei, filtro por área em chips, abas Para mim, Em andamento e Concluídas, cards com capa, progresso, duração, nota, Obrigatória e prazo); **player** (linha do tempo, conteúdo embutido, curtir, Concluir etapa, Próxima etapa, aba Avaliações, salvamento a cada 15 s e ao sair); curtidas e avaliações |
 | 3 – Gestão | **Estúdio** (lista de jornadas com status, conclusão, nota e curtidas por etapa; editor em passos: Dados gerais, Etapas, Público, Regras, Enviar ou Publicar; pré-visualização); **Gestão da Área** (painel, mapa de calor pessoas × jornadas com detalhe por etapa, Pessoas, Aprovações com Publicar e Devolver com comentário, exportar e lembrete aos atrasados) |
 
@@ -93,7 +93,7 @@ O documento inicial usa listas únicas com pasta por área, matrículas com perm
 | Matrículas | Criadas pelo fluxo na publicação, com permissão exclusiva por item | **Criadas pelo usuário ao abrir a jornada**, sem permissão por item; lista configurada para cada um ler e editar só os próprios itens; Gestores leem todas | A área Geral chegaria a ~120 mil matrículas, acima do limite de 50 mil itens com permissão exclusiva por lista |
 | Quem nunca abriu, Atribuida, Atrasada | Matrículas pré-criadas e fluxo diário | **Calculados na tela:** membros do grupo × jornadas publicadas, menos as matrículas existentes; atraso pela data de referência + PrazoDias | Dispensa os fluxos Criar Matrículas e Rotina diária |
 | Contadores (curtidas, nota média, conclusões) | Desnormalizados por fluxo | **Calculados pela web part**, com consultas por coluna indexada e cache em sessionStorage | O usuário não edita Jornadas e Etapas; dispensa o fluxo Contadores |
-| Moderação | Pedido na Fila, fluxo marca Oculto | **Gestor marca Oculto direto** (nível Gestor da área na lista Avaliações) | Dispensa o fluxo Moderar |
+| Moderação | Pedido na Fila, fluxo marca Oculto | **Gestor marca Oculto direto** (nível padrão Editar na lista Avaliações) | Dispensa o fluxo Moderar |
 | Fila de Solicitações | Lista central | **Removida** | Nada da entrega exige privilégio fora do perfil |
 | Detecção de perfil | `currentuser/groups` comparado por ID | **Áreas visíveis** (item da área restrito aos seus grupos) **+ permissões efetivas** nas listas da área, em lote | Funciona com grupos do Entra ID dentro dos grupos do SharePoint (área Geral) |
 
@@ -103,13 +103,16 @@ O documento inicial usa listas únicas com pasta por área, matrículas com perm
 | Objeto | Administradores | Gestores | Apoio | Usuários |
 |---|---|---|---|---|
 | Item da área em Áreas | Controle total | Leitura | Leitura | Leitura |
-| `_Jornadas` (Aprovação de Conteúdo; rascunho visível a quem aprova e ao autor) | Controle total | Contribuir e Aprovar | Contribuir | Leitura (só aprovadas) |
+| `_Jornadas` (Aprovação de Conteúdo; rascunho visível a quem aprova e ao autor) | Controle total | Design (inclui Aprovar itens) | Contribuir | Leitura (só aprovadas) |
 | `_Etapas` e `_Conteudos` | Controle total | Contribuir | Contribuir | Leitura |
-| `_Matriculas` (lê e edita só os próprios) | Controle total | Gestor da área (lê todas) | Contribuir (só as próprias) | Contribuir (só as próprias) |
+| `_Matriculas` (lê e edita só os próprios) | Controle total | Editar (lê todas) | Contribuir (só as próprias) | Contribuir (só as próprias) |
 | `_Curtidas` (edita só as próprias) | Controle total | Contribuir | Contribuir | Contribuir |
-| `_Avaliacoes` (edita só as próprias) | Controle total | Gestor da área (modera) | Contribuir | Contribuir |
+| `_Avaliacoes` (edita só as próprias) | Controle total | Editar (modera) | Contribuir | Contribuir |
 
-- Níveis personalizados criados uma vez no site, pela aba Administração (o script de Console não cria grupos nem permissões): **Contribuir e Aprovar** (Contribuir + Aprovar itens) e **Gestor da área** (Contribuir + Gerenciar listas, aplicado só nas listas da área).
+- **Somente níveis de permissão padrão do SharePoint** (Controle Total, Design, Editar, Contribuir, Leitura). Nenhum nível personalizado é criado.
+  - **Design** na lista Jornadas, para o Gestor aprovar: é o menor nível padrão com *Aprovar itens* fora de sites de publicação.
+  - **Editar** em Matrículas e Avaliações, para o Gestor ler todas as matrículas e moderar: inclui *Gerenciar listas*, que libera a leitura e a edição de itens de outras pessoas nessas listas.
+  - Efeito colateral aceito: com Design e Editar, o Gestor também consegue alterar as configurações daquelas listas da própria área. A web part não oferece essa ação.
 - Grupos de HML e PROD levam o prefixo do ambiente no nome, para conviverem no mesmo site.
 
 ### Alternativas consideradas
@@ -118,14 +121,14 @@ O documento inicial usa listas únicas com pasta por área, matrículas com perm
 
 ### Exceção aprovada às regras do `spfx-skills`
 As skills não foram alteradas. Neste projeto, por decisão do responsável:
-- **Administrador:** pela web part, cria os grupos do SharePoint (Administradores e os grupos de cada área), os níveis de permissão personalizados e as listas e biblioteca da área, e gere as permissões delas.
+- **Administrador:** pela web part, cria os grupos do SharePoint (Administradores e os grupos de cada área) e as listas e biblioteca da área, e gere as permissões delas, sempre com níveis de permissão padrão do SharePoint.
 - **Gestor da área:** pela web part, inclui e remove membros dos grupos de Apoio e Usuários da própria área (grupos dos quais o grupo de Gestores é proprietário).
 - **Sempre com o usuário logado:** cada ação usa a sessão e as permissões de quem está na tela. Sem conta de serviço, fluxo ou elevação de privilégio. A web part confere o acesso antes de oferecer a ação, e o SharePoint recusa o que a pessoa não pode fazer.
 - O script de Console segue a regra do `sharepoint-provisionamento`: cria só a lista central, sem grupos nem permissões.
 
 ## 6. Operação
 - **Manutenção:** equipe M365.
-- **Ambientes:** HML e PROD no mesmo site, separados por prefixo nas listas e nos grupos.
+- **Ambientes:** HML e PROD no mesmo site. Padrão de nomes: HML = `HML_<Nome>`, PROD = `<Nome>`, para listas, bibliotecas e grupos (ex.: `HML_FIN_Jornadas`, `HML_Jornadas – FIN – Gestores`). Os prefixos continuam configuráveis na web part e no script (regra do `spfx-skills`), com esse padrão já preenchido na web part. A propriedade Ambiente define se a web part consome PROD ou HML.
 - **Implantação:** pacote `.sppkg` no catálogo; estrutura central pelo script de Console em `wp-jornada-conhecimento/provisionamento/`; estrutura de cada área pela aba Administração.
 - **Conta de serviço:** já existe; só será usada se algum fluxo se tornar necessário.
 - **Riscos e forma de validação:**
@@ -135,7 +138,7 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 ## 7. Em aberto
 | Item | Quem decide | Como validar |
 |---|---|---|
-| 1. O nível Gestor da área (com Gerenciar listas) permite ao Gestor ler todas as matrículas numa lista configurada para "ler só os próprios itens" | Equipe M365 | Teste em HML com dois usuários e um gestor. Plano B: matrículas protegidas por item via fluxo |
+| 1. O nível padrão Editar (com Gerenciar listas) permite ao Gestor ler todas as matrículas numa lista configurada para "ler só os próprios itens" | Equipe M365 | Teste em HML com dois usuários e um gestor. Plano B: matrículas protegidas por item via fluxo |
 | 2. **Publicação:** passa pelo Gestor (Aprovação de Conteúdo) ou o Apoio pode publicar sozinho. Pendente desde o documento inicial | Responsável | Decisão de negócio; o escopo considera aprovação pelo Gestor |
 | 3. Data de referência do prazo: publicação da jornada ou entrada da pessoa na área | Responsável | Decisão de negócio |
 | 4. Contadores calculados na tela atendem a área Geral com bom tempo de resposta | Equipe M365 | Teste de carga em HML. Plano B: contadores por fluxo |

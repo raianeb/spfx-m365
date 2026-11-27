@@ -103,6 +103,13 @@ export abstract class WebPartBase<TProps extends IWebPartBaseProps> extends Base
     if (properties.showLog === undefined) {
       properties.showLog = false;
     }
+    // Padrão de nomes da equipe (escopo, seção 6): HML_<Nome> em HML e <Nome> em PROD. Continua configurável.
+    if (properties.prefixoHml === undefined) {
+      properties.prefixoHml = 'HML_';
+    }
+    if (properties.prefixoProd === undefined) {
+      properties.prefixoProd = '';
+    }
     return Promise.resolve();
   }
 

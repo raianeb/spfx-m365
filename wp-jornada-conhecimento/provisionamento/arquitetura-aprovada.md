@@ -104,13 +104,14 @@ Todas as consultas usam `select` explícito, `top` e paginação (skill `sharepo
 | Objeto | Administradores | Gestores | Apoio | Usuários |
 |---|---|---|---|---|
 | Item da área em JornadaAreas | Controle total | Leitura | Leitura | Leitura |
-| `_Jornadas` | Controle total | Contribuir e Aprovar | Contribuir | Leitura |
+| `_Jornadas` | Controle total | Design | Contribuir | Leitura |
 | `_Etapas`, `_Conteudos` | Controle total | Contribuir | Contribuir | Leitura |
-| `_Matriculas` | Controle total | Gestor da área | Contribuir | Contribuir |
+| `_Matriculas` | Controle total | Editar | Contribuir | Contribuir |
 | `_Curtidas` | Controle total | Contribuir | Contribuir | Contribuir |
-| `_Avaliacoes` | Controle total | Gestor da área | Contribuir | Contribuir |
+| `_Avaliacoes` | Controle total | Editar | Contribuir | Contribuir |
 
-- Grupos: `[prefixo]Jornadas – Administradores` e, por área, `[prefixo]Jornadas – <SIGLA> – Gestores | Apoio | Usuários`.
+- Grupos: `[prefixo]Jornadas – Administradores` (PROD: `Jornadas – Administradores`; HML: `HML_Jornadas – Administradores`) e, por área, `[prefixo]Jornadas – <SIGLA> – Gestores | Apoio | Usuários`.
 - Proprietários: Gestores pertence aos Administradores; Apoio e Usuários pertencem aos Gestores.
-- Níveis personalizados: *Contribuir e Aprovar* (Contribuir + Aprovar itens) e *Gestor da área* (Contribuir + Gerenciar listas).
+- Somente níveis padrão do SharePoint; nenhum nível personalizado. Design (Gestor em `_Jornadas`) inclui Aprovar itens; Editar (Gestor em `_Matriculas` e `_Avaliacoes`) inclui Gerenciar listas, que libera ler e moderar itens de outras pessoas.
+- Padrão de nomes: HML = `HML_<Nome>`, PROD = `<Nome>` (listas, bibliotecas e grupos).
 - Validação pendente em HML: leitura de todas as matrículas pelo Gestor (escopo, seção 7, item 1).
