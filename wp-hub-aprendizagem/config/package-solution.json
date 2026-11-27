@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "wp-hub-aprendizagem-client-side-solution",
+    "id": "fefd2ba7-e476-4826-af15-f3d42e6eb134",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "wp-hub-aprendizagem: Hub de Aprendizagem da Equipe M365"
+      },
+      "longDescription": {
+        "default": "wp-hub-aprendizagem: jornadas de treinamento por área, com progresso individual, acompanhamento por gestor, estúdio de criação com aprovação e administração das áreas"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "wp-hub-aprendizagem Feature",
+        "description": "The feature that activates elements of the wp-hub-aprendizagem solution.",
+        "id": "3700370f-3ebd-4fa0-b51d-74e647e910ae",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/wp-hub-aprendizagem.sppkg"
+  }
+}

@@ -1,0 +1,140 @@
+.wpHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.wpIcon {
+  margin-right: 8px;
+  color: var(--cc-primary, #0b5cad);
+  font-size: 20px;
+  vertical-align: -3px;
+}
+
+.wpTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--cc-text, #1f1f1f);
+}
+
+.diagnostics {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--cc-muted, #5f5f5f);
+
+  summary {
+    cursor: pointer;
+    font-weight: 500;
+  }
+}
+
+.diagnosticsEmpty {
+  margin: 8px 0 0;
+}
+
+.diagnosticsList {
+  max-height: 240px;
+  overflow: auto;
+  margin: 8px 0 0;
+  padding-left: 0;
+  list-style: none;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.diagnosticsList li {
+  padding: 2px 0;
+  border-bottom: 1px solid #ececec;
+}
+
+.diagnosticsError {
+  color: #a4262c;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.pickerLabel {
+  font-weight: 600;
+}
+
+.pickerInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid #8a8886;
+  border-radius: 2px;
+}
+
+.pickerOptions {
+  max-height: 180px;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #edebe9;
+}
+
+.pickerOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.pickerOption:hover {
+  background: #f3f2f1;
+}
+
+.pickerSelected {
+  margin: 0;
+  color: var(--cc-muted, #5f5f5f);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px 2px 10px;
+  border-radius: 12px;
+  background: #f3f2f1;
+}
+
+.chip button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pickerStatus {
+  margin: 0;
+  color: var(--cc-muted, #5f5f5f);
+}
+
+.pickerError {
+  color: #a4262c;
+}
+
+.pickerButton {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border: 1px solid var(--cc-primary, #e45900);
+  border-radius: 2px;
+  background: #fff;
+  color: var(--cc-primary, #e45900);
+  cursor: pointer;
+}
