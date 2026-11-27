@@ -5,6 +5,7 @@ Web part **Jornada de Conhecimento** da Equipe M365: jornadas de treinamento por
 - Escopo aprovado: `docs/escopo.md`
 - Definição de dados: `provisionamento/definicao.json` (fonte única)
 - Provisionamento: `provisionamento/INSTRUCOES.md`
+- Roteiro de teste ponta a ponta: `docs/roteiro-teste.md`
 
 ## Compilar
 

@@ -1,0 +1,46 @@
+// Skills aplicadas: spfx-css-estilos, spfx-tema-marca.
+.estrelas {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--cc-warning, #8a5300);
+  font-size: 13px;
+}
+
+.notaTexto {
+  margin-left: 4px;
+  color: var(--cc-muted, #616161);
+}
+
+.semNota {
+  font-size: 12px;
+  color: var(--cc-muted, #616161);
+}
+
+.anel {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.anelFundo {
+  stroke: var(--cc-border, #e0e0e0);
+}
+
+.anelValor {
+  stroke: var(--cc-primary, #0f6cbd);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.anelTexto {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 600;
+}

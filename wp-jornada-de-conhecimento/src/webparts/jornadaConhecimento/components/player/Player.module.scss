@@ -1,0 +1,400 @@
+// Skills aplicadas: spfx-css-estilos, spfx-tema-marca, spfx-design-base (layout em colunas que vira uma coluna no
+// celular, foco visível, movimento reduzido).
+.player {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cabecalhoTexto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+}
+
+.area {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.jornadaTitulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--cc-muted, #616161);
+}
+
+.corpo {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.linhaTempo ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.etapa {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cc-text, #1f1f1f);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover:not([aria-disabled='true']) {
+    background: var(--cc-surface, #f5f5f5);
+  }
+
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    color: var(--cc-muted, #616161);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cc-focus, #0f6cbd);
+    outline-offset: 1px;
+  }
+}
+
+.etapaAtual {
+  border-color: var(--cc-primary, #0f6cbd);
+  background: var(--cc-surface, #f5f5f5);
+  font-weight: 600;
+}
+
+.etapaFeita .etapaIcone {
+  color: var(--cc-success, #107c10);
+}
+
+.etapaIcone {
+  margin-top: 2px;
+  font-size: 16px;
+}
+
+.etapaTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.etapaTitulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cc-focus, #0f6cbd);
+  }
+}
+
+.video {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000000;
+  border-radius: 8px;
+  overflow: hidden;
+
+  iframe,
+  video {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+.documento {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  iframe {
+    width: 100%;
+    height: 70vh;
+    min-height: 420px;
+    border: 1px solid var(--cc-border, #d1d1d1);
+    border-radius: 8px;
+  }
+}
+
+.abrirLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cc-link, #0f6cbd);
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 24px;
+  border-radius: 8px;
+  background: var(--cc-surface, #f5f5f5);
+}
+
+.linkIcone {
+  font-size: 28px;
+  color: var(--cc-primary, #0f6cbd);
+}
+
+.linkTexto {
+  margin: 0;
+}
+
+.engajamento {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.instrucoes {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid var(--cc-border, #e0e0e0);
+}
+
+.concluidaTexto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--cc-success, #107c10);
+}
+
+.aviso {
+  margin: 0;
+  font-size: 13px;
+  color: var(--cc-muted, #616161);
+}
+
+.erro {
+  margin: 0;
+  color: var(--cc-danger, #a4262c);
+}
+
+.sucesso {
+  margin: 0;
+  color: var(--cc-success, #107c10);
+}
+
+.painelAvaliacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.parabens {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--cc-surface, #f5f5f5);
+}
+
+.parabensIcone {
+  font-size: 32px;
+  color: var(--cc-warning, #8a5300);
+}
+
+.avaliacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resumoAvaliacoes {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.media {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mediaNumero {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.distribuicao {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex: 1;
+  min-width: 220px;
+}
+
+.barraNota {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.barraFundo {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--cc-border, #e0e0e0);
+  overflow: hidden;
+}
+
+.barraValor {
+  display: block;
+  height: 100%;
+  background: var(--cc-warning, #8a5300);
+}
+
+.minhaAvaliacao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--cc-border, #d1d1d1);
+}
+
+.destaque {
+  border-color: var(--cc-primary, #0f6cbd);
+  border-width: 2px;
+}
+
+.secaoTitulo {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.escolhaEstrelas {
+  display: flex;
+  gap: 4px;
+}
+
+.estrela {
+  min-width: 40px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cc-warning, #8a5300);
+  font-size: 24px;
+  cursor: pointer;
+
+  &[aria-checked='true'] {
+    background: var(--cc-surface, #f5f5f5);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cc-focus, #0f6cbd);
+  }
+}
+
+.acoesAvaliacao {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.barraComentarios {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.comentarios {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comentario {
+  display: flex;
+  gap: 12px;
+}
+
+.foto {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 32px;
+  object-fit: cover;
+}
+
+.comentarioCabecalho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.comentarioTexto {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
