@@ -2,7 +2,7 @@
 
 Use somente após validar `arquitetura-aprovada.md`.
 
-O script desta pasta cria **apenas a lista central** `JornadaAreas`, em HML e PROD. Grupos, permissões (só níveis padrão do SharePoint) e as listas de cada área são criados pela própria web part, na aba **Administração** (exceção aprovada no `jornada-de-conhecimento/escopo.md`).
+O script desta pasta cria **apenas a lista central** `JornadaAreas`, em HML e PROD. Grupos, permissões (só níveis padrão do SharePoint) e as listas de cada área são criados pela própria web part, na aba **Administração** (exceção aprovada no `../docs/escopo.md`).
 
 ## Pré-requisitos
 - Sessão logada no site de destino, com permissão de Controle Total.

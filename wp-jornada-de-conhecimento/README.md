@@ -2,8 +2,8 @@
 
 Web part **Jornada de Conhecimento** da Equipe M365: jornadas de treinamento por área (vídeos do YouTube, vídeos da biblioteca, documentos e links), com progresso individual, acompanhamento por gestor, estúdio com aprovação e administração das áreas.
 
-- Escopo aprovado: `../jornada-de-conhecimento/escopo.md`
-- Definição de dados: `../jornada-de-conhecimento/definicao.json`
+- Escopo aprovado: `docs/escopo.md`
+- Definição de dados: `provisionamento/definicao.json` (fonte única)
 - Provisionamento: `provisionamento/INSTRUCOES.md`
 
 ## Compilar
