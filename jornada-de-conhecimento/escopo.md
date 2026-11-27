@@ -148,6 +148,7 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 | 8. Situação atual e métrica de sucesso | Responsável | Registrar antes da implantação em PROD |
 | 9. LGPD: retenção e anonimização do progresso e dos comentários | Responsável e jurídico | Segundo momento |
 | 10. Verificação do ambiente local (`verificar-ambiente.ps1`) | Desenvolvedora | Rodar antes da geração de código |
+| 11. Configurações de lista pela API REST com a sessão do Administrador: "ler e editar só os próprios itens" (`ReadSecurity`/`WriteSecurity`), aprovação de conteúdo e visibilidade de rascunho | Equipe M365 | Criar uma área em HML e conferir as configurações de cada lista. Se a API recusar, a área fica com Status Erro e a mensagem indica o passo |
 
 ## 8. Aprovação
 - [x] Escopo revisado pelo responsável
