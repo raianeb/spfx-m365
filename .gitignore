@@ -7,9 +7,6 @@ temp/
 release/
 solution/
 *.sppkg
-# Exceção: pacote da extensão padrão da skin, versionado de propósito
-!spfx-skills/skills/spfx-skin-layout/pacote/ex-layout-sharepoint.sppkg
-
 # Logs e cobertura
 *.log
 coverage/

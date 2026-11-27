@@ -1,6 +1,6 @@
 ---
 name: "spfx-skin-layout"
-description: "Skin de layout por Application Customizer SPFx no SharePoint Online, ativada só com ?env=webview: pergunta se usa a extensão padrão (ex-layout-sharepoint.sppkg) ou gera uma nova; barra superior fixa (☰, logo, nome, busca, usuário, engrenagem só para quem edita), menu lateral recolhível ou horizontal (cascata, megamenu e Mais) conforme a navegação nativa do site, segmentação por público, edição pelo editor nativo, exclusão de telas nativas, implantação (extensão padrão ativada por site via script; nova extensão em todos os sites) e diagnóstico por ?skinDebug=1."
+description: "Skin de layout por Application Customizer SPFx no SharePoint Online, ativada só com ?env=webview: pergunta se usa a extensão padrão (aplicativo ex-layout-sharepoint, ativado por site via script) ou gera uma nova; barra superior fixa (☰, logo, nome, busca, usuário, engrenagem só para quem edita), menu lateral recolhível ou horizontal (cascata, megamenu e Mais) conforme a navegação nativa do site, segmentação por público, edição pelo editor nativo, exclusão de telas nativas, implantação (extensão padrão ativada por site via script; nova extensão em todos os sites) e diagnóstico por ?skinDebug=1."
 ---
 
 # Skin de layout (Application Customizer)
@@ -8,7 +8,7 @@ description: "Skin de layout por Application Customizer SPFx no SharePoint Onlin
 ## Quando usar
 Ao criar ou revisar uma extensão que substitui a moldura visual do site (cabeçalho e navegação) por um layout padronizado da equipe M365, montado a partir da **navegação nativa** do site.
 Carregue também: `spfx-extensoes-padroes`, `spfx-tema-marca`, `spfx-design-base` (modal e barras), `spfx-acessibilidade-conteudo`, `spfx-codigo-performance`.
-Detalhes que devem ser replicados exatamente (medidas, tokens, identificadores, seletores, consultas, ícones, diagnóstico): `templates/referencia-tecnica.md`. Pacote da extensão padrão: `pacote/`.
+Detalhes que devem ser replicados exatamente (medidas, tokens, identificadores, seletores, consultas, ícones, diagnóstico): `templates/referencia-tecnica.md`. Ativação da extensão padrão: `script/ativar-extensao-padrao.console.js`.
 
 Web part com módulos e rotas próprias (navegação personalizada) não usa esta skill: o menu fica dentro da web part. Navegação que vem do site usa esta skill, nunca um menu recriado na web part.
 
@@ -16,22 +16,19 @@ Web part com módulos e rotas próprias (navegação personalizada) não usa est
 Antes de qualquer configuração ou geração, pergunte (use `AskUserQuestion` quando disponível):
 
 > **Utilizar a extensão padrão?**
-> - **Sim** — copio o pacote pronto `ex-layout-sharepoint.sppkg` para a pasta do projeto. Menu sem ícones.
+> - **Sim** — ativo o aplicativo `ex-layout-sharepoint`, já disponível no catálogo do tenant, no site, pelo script `script/ativar-extensao-padrao.console.js`. Sem build. Menu sem ícones.
 > - **Não** — gero uma nova extensão seguindo esta skill.
 
 Aguarde a resposta. Não presuma.
 
 ### 0.1 Resposta "Sim" (extensão padrão)
-1. Confira `pacote/ex-layout-sharepoint.sppkg` e a tabela de versão de `pacote/README.md`. Se o arquivo não existir ou o SHA-256 não bater com a tabela, informe e pare. Não gere uma extensão nova no lugar sem nova confirmação.
-2. Copie o arquivo para `<projeto>/ex-layout-sharepoint.sppkg`, sem renomear. A cópia do projeto não é versionada (`*.sppkg` está no `.gitignore`); a versionada é a de `pacote/`.
-3. Registre no `escopo.md` a versão e o SHA-256 do pacote copiado.
-4. Não gere código, scaffold nem build. A verificação de ambiente não bloqueia este caminho.
-5. Oriente a implantação pela seção 13.1: a extensão padrão é **ativada site a site** pelo script `script/ativar-extensao-padrao.console.js`, nunca em todos os sites. Antes, confira no catálogo de aplicativos do tenant:
-   - mesma versão já implantada → não envie de novo; só execute o script no site;
-   - versão menor → envie a nova versão **sem** marcar "adicionar a todos os sites"; os sites já ativados passam a usar a nova versão;
-   - ausente → envie e implante **sem** marcar "adicionar a todos os sites"; depois execute o script no site.
-6. O pacote é pronto: logo, nome e demais propriedades ficam no registro da extensão no site (`ClientSideComponentProperties`, constante `PROPRIEDADES` do script), não no código. Propriedades aceitas: `pacote/README.md`. Logo e nome vêm do próprio site por padrão, então normalmente não há configuração por site.
-7. Ícones no menu: a extensão padrão não usa (seção 5.7).
+1. Não copie pacote nem gere código, scaffold ou build. A verificação de ambiente não bloqueia este caminho.
+2. Confira no catálogo de aplicativos do tenant se o `ex-layout-sharepoint` está implantado **sem** "adicionar a todos os sites". Se não estiver no catálogo, informe e pare: o pacote é mantido no projeto `ex-layout-sharepoint` e enviado ao catálogo pela equipe M365. Não gere uma extensão nova no lugar sem nova confirmação.
+3. Oriente a ativação pela seção 13.1: em cada site que vai receber a skin, executar no Console do navegador o `script/ativar-extensao-padrao.console.js`. Nunca ativar em todos os sites.
+4. Registre no `escopo.md` a versão do aplicativo no catálogo e os sites a ativar.
+5. Logo, nome e demais propriedades ficam no registro da extensão no site (`ClientSideComponentProperties`, constante `PROPRIEDADES` do script), não no código. Logo e nome vêm do próprio site por padrão, então normalmente não há configuração por site. As propriedades aceitas pela extensão padrão ainda precisam ser confirmadas (seção 17).
+6. Ícones no menu: a extensão padrão não usa (seção 5.7).
+7. Diferença conhecida: a extensão padrão reaproveita o menu vertical nativo quando ele existe, em vez do menu próprio da seção 5 (confirmar no tenant).
 
 ### 0.2 Resposta "Não" (nova extensão)
 Gere a extensão seguindo as seções 1 a 16. Pergunte, em uma única rodada, os valores da seção 12 (todos opcionais, inclusive `navIcons`).
@@ -281,7 +278,7 @@ A **nova extensão** é implantada em todos os sites, conforme esta seção. A *
   2. confere a lista **Tenant Wide Extensions**: se a extensão já estiver ativa em todos os sites, para, porque ativar no site duplicaria a skin;
   3. conforme o pacote, instala o aplicativo no site (`skipFeatureDeployment: false`) e/ou registra a extensão como *User Custom Action* (`ClientSideExtension.ApplicationCustomizer`, com o `ComponentId`), sem duplicar registro existente;
   4. mostra o plano e só aplica após confirmação. Reexecutar é seguro.
-- Antes do primeiro uso, preencha `COMPONENT_ID` no script com o valor de `pacote/README.md` (sem ele, o script pede o GUID).
+- `COMPONENT_ID` no script é o id do manifesto do Application Customizer do `ex-layout-sharepoint`. Enquanto não estiver preenchido, o script pede o GUID ao executar. Quando o ComponentId mudar, atualize a constante no mesmo PR da nova versão.
 - Escopo padrão: o site (`ESCOPO = 'web'`). Para o conjunto de sites inteiro, `ESCOPO = 'site'`, que exige Administrador do conjunto de sites.
 - **Desativar:** `ACAO = 'desativar'` remove o registro da extensão do site; o aplicativo continua instalado.
 - **Atualizar:** nova versão no catálogo, sem marcar a opção; não é preciso executar o script de novo nos sites já ativados.
@@ -311,7 +308,7 @@ A **nova extensão** é implantada em todos os sites, conforme esta seção. A *
 - `onDispose`: remover listeners (`navigatedEvent`, tema, URL, teclado, ponteiro), restaurar `history`, desconectar observers, cancelar temporizadores de abertura e fechamento, remover host, classes do `body` e a marca de instância.
 
 ## 16. Validação
-- [ ] Extensão padrão: pacote conferido pelo SHA-256 e copiado para o projeto; versão registrada no `escopo.md`; nada compilado.
+- [ ] Extensão padrão: aplicativo implantado no catálogo sem "adicionar a todos os sites"; script executado em cada site; versão e sites registrados no `escopo.md`; nada compilado.
 - [ ] Sem `env=webview`: interface padrão, nenhuma requisição, nenhum CSS, módulo da skin não carregado (aba Rede).
 - [ ] Com `env=webview`: skin aplicada; menu e busca mantêm o parâmetro.
 - [ ] Clicar em **Editar** da página: o parâmetro sai da URL **sem recarregar** e a edição nativa fica intacta.
@@ -339,6 +336,7 @@ Registre estes pontos no `escopo.md` do projeto até a validação, com o diagn�
 - Comportamento em site de comunicação com a navegação desligada (`QuickLaunchEnabled`).
 - Localização do botão **Editar** nativo no modo superior (cabeçalho do site); sem ele, vale o plano B.
 - Seletores nativos e data da última validação (referência técnica, seção 4).
+- Extensão padrão: ComponentId (constante `COMPONENT_ID` do script), propriedades aceitas e uso do menu vertical nativo.
 
 ## Padrões internos da equipe
-Consolidados nesta skill. Origem: padrão de navegação da GTI aplicado no `ex-layout-sharepoint` (extensão padrão, `pacote/`).
+Consolidados nesta skill. Origem: padrão de navegação da GTI aplicado no `ex-layout-sharepoint` (extensão padrão).

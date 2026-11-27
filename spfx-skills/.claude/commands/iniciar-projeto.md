@@ -21,7 +21,7 @@ Antes de qualquer pergunta:
      - Quando o usuário disser que concluiu, peça para reabrir o terminal se a seção pedir, e rode a verificação de novo.
    - **Código 2** (erro na referência): informe a mensagem e pare. O arquivo de referência precisa ser corrigido por PR.
 5. Bloqueio por caminho:
-   - **Skin com extensão padrão:** não bloqueia, porque só copia um pacote pronto (nada é compilado).
+   - **Skin com extensão padrão:** não bloqueia, porque só ativa um aplicativo já implantado (nada é compilado).
    - **Skin com nova extensão:** não gera nada enquanto o código for diferente de 0.
    - **Brainstorming e descrição livre:** podem seguir com a pendência registrada, porque não geram código. Repita a verificação antes de qualquer geração de código do projeto.
 6. Se o PowerShell não estiver disponível (fora do Windows sem `pwsh`), informe e peça ao usuário para conferir manualmente as versões de `versoes-referencia.md`.
@@ -44,16 +44,16 @@ Aguarde a resposta. Não avance nem presuma.
 Carregue **somente** `spfx-skills/skills/spfx-skin-layout/SKILL.md`. Não carregue o roteiro de brainstorming. Em seguida, faça a pergunta da seção 0 da skill:
 
 > **Utilizar a extensão padrão?**
-> - **Sim** — copio o pacote pronto `ex-layout-sharepoint.sppkg` para a pasta do projeto. Menu sem ícones.
+> - **Sim** — ativo o aplicativo `ex-layout-sharepoint`, já disponível no catálogo do tenant, no site, pelo script `script/ativar-extensao-padrao.console.js`. Sem build. Menu sem ícones.
 > - **Não** — gero uma nova extensão seguindo a skill.
 
 Aguarde a resposta. Não presuma.
 
 #### S1 — Extensão padrão (resposta "Sim")
-1. Siga a seção 0.1 da skill: confira `spfx-skills/skills/spfx-skin-layout/pacote/ex-layout-sharepoint.sppkg` e o SHA-256 de `pacote/README.md`. Arquivo ausente ou SHA-256 diferente: informe e pare.
-2. Copie o pacote para `$ARGUMENTS/ex-layout-sharepoint.sppkg`, sem renomear e sem gerar código, scaffold ou build. A cópia não é versionada (`*.sppkg` no `.gitignore`).
-3. Crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin — extensão padrão (ex-layout-sharepoint)`, versão e SHA-256 do pacote copiado, propriedades a configurar na lista Tenant Wide Extensions (se houver), pontos "Em aberto" da skill (seção 17) e status `Aprovado`.
-4. Mostre a orientação de implantação da seção 13.1 da skill: no catálogo, envio **sem** marcar "adicionar a todos os sites" (mesma versão já implantada → não enviar de novo); em cada site, executar no Console o `spfx-skills/skills/spfx-skin-layout/script/ativar-extensao-padrao.console.js`. Depois, o checklist da seção 16 que se aplica.
+1. Siga a seção 0.1 da skill: sem copiar pacote e sem gerar código, scaffold ou build.
+2. Pergunte em quais sites a skin será ativada.
+3. Crie `$ARGUMENTS/escopo.md` simplificado com: tipo `Skin — extensão padrão (ex-layout-sharepoint)`, sites a ativar, propriedades a configurar no script (se houver), pontos "Em aberto" da skill (seção 17) e status `Aprovado`.
+4. Mostre a orientação da seção 13.1 da skill: confirmar que o `ex-layout-sharepoint` está no catálogo do tenant **sem** "adicionar a todos os sites" e, em cada site, executar no Console do navegador o `spfx-skills/skills/spfx-skin-layout/script/ativar-extensao-padrao.console.js`. Depois, o checklist da seção 16 que se aplica.
 5. Encerre aqui: os Passos 1 a 3 não se aplicam.
 
 #### S2 — Nova extensão (resposta "Não")

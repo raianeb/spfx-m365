@@ -14,11 +14,11 @@
  *
  * Pré-requisitos:
  *   - pacote enviado ao catálogo do tenant e implantado SEM marcar "adicionar a todos os sites";
- *   - ComponentId preenchido (pacote/README.md, tabela "Versão atual").
+ *   - ComponentId do Application Customizer em COMPONENT_ID (se vazio, o script pede o GUID).
  * ACAO = 'desativar' remove o registro da extensão do site (não desinstala o aplicativo).
  */
 (async () => {
-  // ---- Dados do aplicativo (atualize quando o pacote mudar; ver pacote/README.md) ----
+  // ---- Dados do aplicativo (atualize quando o pacote do ex-layout-sharepoint mudar) ----
   const APP_TITULO = 'ex-layout-sharepoint';
   const COMPONENT_ID = ''; // id do manifesto do Application Customizer (GUID)
   const TITULO_REGISTRO = 'ex-layout-sharepoint'; // título da User Custom Action criada pelo script
@@ -49,7 +49,7 @@
   const pedirComponentId = () => {
     if (GUID.test(COMPONENT_ID)) return COMPONENT_ID.toLowerCase();
     for (;;) {
-      const digitado = window.prompt('ComponentId do Application Customizer (GUID do manifesto; ver pacote/README.md):', '');
+      const digitado = window.prompt('ComponentId do Application Customizer (GUID do manifesto da extensão):', '');
       if (digitado === null) throw new Error('Execução cancelada pelo usuário.');
       const valor = digitado.trim().replace(/[{}]/g, '');
       if (GUID.test(valor)) return valor.toLowerCase();
