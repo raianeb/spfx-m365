@@ -124,6 +124,7 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 - **Administrador:** pela web part, cria os grupos do SharePoint (Administradores e os grupos de cada área) e as listas e biblioteca da área, e gere as permissões delas, sempre com níveis de permissão padrão do SharePoint.
 - **Gestor da área:** pela web part, inclui e remove membros dos grupos de Apoio e Usuários da própria área (grupos dos quais o grupo de Gestores é proprietário).
 - **Sempre com o usuário logado:** cada ação usa a sessão e as permissões de quem está na tela. Sem conta de serviço, fluxo ou elevação de privilégio. A web part confere o acesso antes de oferecer a ação, e o SharePoint recusa o que a pessoa não pode fazer.
+- **Pasta única:** escopo e definição ficam dentro de `wp-jornada-de-conhecimento/` (`docs/escopo.md` e `provisionamento/definicao.json`, fonte única), e não na pasta `<nome>/` separada que o `/iniciar-projeto` cria.
 - O script de Console segue a regra do `sharepoint-provisionamento`: cria só a lista central, sem grupos nem permissões.
 
 ## 6. Operação

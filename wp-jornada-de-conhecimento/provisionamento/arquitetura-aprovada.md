@@ -1,7 +1,7 @@
 # Jornada de Conhecimento — arquitetura de dados (schema v1)
 
 Site: https://<tenant>.sharepoint.com/sites/<nome-do-site> (HML e PROD no mesmo site, separados por prefixo).
-Fonte: `jornada-de-conhecimento/definicao.json` (cópia em `definicao.json` nesta pasta). Escopo: `jornada-de-conhecimento/escopo.md`.
+Fonte: `definicao.json` nesta pasta (fonte única). Escopo: `../docs/escopo.md`.
 
 ## Estruturas
 
