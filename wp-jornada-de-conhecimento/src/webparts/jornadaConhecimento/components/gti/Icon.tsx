@@ -50,7 +50,18 @@ const caminhos = {
   lateral: 'M4 4h16v16H4zM9 4v16',
   desfazer: 'M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3',
   engrenagem: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7.4-3a7.4 7.4 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7.5 7.5 0 0 0-2-1.2L14.5 3h-5l-.4 2.6a7.5 7.5 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7.4 7.4 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7.5 7.5 0 0 0 2 1.2l.4 2.6h5l.4-2.6a7.5 7.5 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z',
-  menu: 'M3 6h18M3 12h18M3 18h18'
+  menu: 'M3 6h18M3 12h18M3 18h18',
+  imagem: 'M4 5h16v14H4zM4 16l5-5 4 4 2-2 5 5M15.5 9.5h.01',
+  pasta: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z',
+  texto: 'M5 5h14M5 10h14M5 15h9M5 20h6',
+  negrito: 'M7 5h6a3.5 3.5 0 0 1 0 7H7zM7 12h7a3.5 3.5 0 0 1 0 7H7z',
+  italico: 'M10 5h8M6 19h8M14 5l-4 14',
+  sublinhado: 'M7 4v7a5 5 0 0 0 10 0V4M5 20h14',
+  listaNumerada: 'M10 6h11M10 12h11M10 18h11M4 5l1-1v4M3.5 14.5a1.2 1.2 0 0 1 2.2.6c0 .8-2.2 1.9-2.2 2.9h2.4',
+  citacao: 'M5 11h4v6H4v-5c0-3 1-5 4-6M15 11h4v6h-5v-5c0-3 1-5 4-6',
+  divisor: 'M3 12h18M8 7h8M8 17h8',
+  limparFormato: 'M6 5h12M12 5l-3 14M4 20l16-16',
+  subir: 'M12 16V4M7 9l5-5 5 5M4 20h16'
 } as const;
 
 export type NomeIcone = keyof typeof caminhos;

@@ -221,9 +221,13 @@ const PlayerJornada: React.FC<IPlayerProps> = ({ ctx, item }: IPlayerProps) => {
     etapa.regra === 'PercentualAssistido'
       ? `Assista ${minimo}% para concluir · ${pctEtapa}% assistido`
       : etapa.regra === 'AbrirConteudo'
-        ? progressoEtapa
-          ? 'Conteúdo aberto'
-          : 'Abra o conteúdo para concluir'
+        ? etapa.tipo === 'Conteudo'
+          ? progressoEtapa
+            ? 'Conteúdo lido'
+            : 'Leia até o fim para concluir'
+          : progressoEtapa
+            ? 'Conteúdo aberto'
+            : 'Abra o conteúdo para concluir'
         : 'Marque quando terminar';
 
   const concluir = async (): Promise<void> => {

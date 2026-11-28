@@ -7,7 +7,6 @@ import { IArea } from '../../../../jornada/modelo';
 import { IEtapa, PERCENTUAL_MINIMO_PADRAO, ordenarEtapas } from '../../../../jornada/progresso';
 import { ErrosFormulario, IJornadaEstudio, IPessoaPublico, Moderacao, StatusJornada, moverEtapa, renumerar, validarJornada } from '../../../../jornada/estudio';
 import { IPessoa } from '../../../../services/AreaService';
-import { IArquivoBiblioteca } from '../../../../services/EstudioService';
 import { mensagemDeErro } from '../../../../services/sp';
 import { Empty, ErrorBox, Field, Icon, Loading, PageHeader, Panel } from '../gti';
 import { IContextoTela, IJornadaVisivel } from '../tipos';
@@ -16,6 +15,7 @@ import PessoasPicker from '../comum/PessoasPicker';
 import CardJornada from '../aprendizado/CardJornada';
 import EtapaForm from './EtapaForm';
 import PreviaJornada from './PreviaJornada';
+import SeletorCapa from './SeletorCapa';
 import styles from '../jc.module.scss';
 
 export interface IEditorJornadaProps {
@@ -60,14 +60,23 @@ const novaEtapa = (ordem: number, id: number): IEtapa => ({
   percentualMinimo: PERCENTUAL_MINIMO_PADRAO
 });
 
+const origemDe = (url: string): string => {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return window.location.origin;
+  }
+};
+
 const EditorJornada: React.FC<IEditorJornadaProps> = ({ ctx, area, gestor, jornadaId }: IEditorJornadaProps) => {
   const { servicos, roteador, props } = ctx;
+  // Origem do site de dados: as URLs dos arquivos escolhidos apontam para ele, não para a página atual.
+  const origem: string = origemDe(props.siteUrl);
   const idBase: string = ctx.idTitulo;
   const [jornada, setJornada] = useState<IJornadaEstudio | undefined>(jornadaId ? undefined : novaJornada(area.id));
   const [etapas, setEtapas] = useState<IEtapa[] | undefined>(jornadaId ? undefined : []);
   const [removidas, setRemovidas] = useState<number[]>([]);
   const [curtidas, setCurtidas] = useState<Map<number, number>>(new Map<number, number>());
-  const [arquivos, setArquivos] = useState<IArquivoBiblioteca[] | undefined>(undefined);
   const [passo, setPasso] = useState<number>(0);
   const [erros, setErros] = useState<ErrosFormulario>({});
   const [erroEtapas, setErroEtapas] = useState<string>('');
@@ -103,10 +112,6 @@ const EditorJornada: React.FC<IEditorJornadaProps> = ({ ctx, area, gestor, jorna
         .then((mapa: Map<number, number>) => ativo && setCurtidas(mapa))
         .catch(() => undefined);
     }
-    servicos.estudio
-      .arquivosDaBiblioteca(area, window.location.origin)
-      .then((lista: IArquivoBiblioteca[]) => ativo && setArquivos(lista))
-      .catch(() => ativo && setArquivos([]));
     return () => {
       ativo = false;
     };
@@ -284,9 +289,17 @@ const EditorJornada: React.FC<IEditorJornadaProps> = ({ ctx, area, gestor, jorna
                 <Field id={`${idBase}-cat`} rotulo="Categoria">
                   {(aria) => <input {...aria} maxLength={255} value={jornada.categoria} onChange={(e) => alterar({ categoria: e.target.value })} />}
                 </Field>
-                <Field id={`${idBase}-capa`} rotulo="Capa (endereço da imagem)" erro={erros.capa} dica="Opcional. Sem capa, o card usa a cor e o ícone da área.">
-                  {(aria) => <input {...aria} type="url" value={jornada.capa} onChange={(e) => alterar({ capa: e.target.value })} />}
-                </Field>
+                <SeletorCapa
+                  id={`${idBase}-capa`}
+                  area={area}
+                  titulo={jornada.titulo}
+                  capa={jornada.capa}
+                  erro={erros.capa}
+                  siteUrl={props.siteUrl}
+                  origem={origem}
+                  estudio={servicos.estudio}
+                  aoAlterar={(capa: string) => alterar({ capa })}
+                />
               </div>
             </>
           )}
@@ -537,8 +550,9 @@ const EditorJornada: React.FC<IEditorJornadaProps> = ({ ctx, area, gestor, jorna
           etapa={editando.etapa}
           nova={editando.nova}
           siteUrl={props.siteUrl}
-          arquivos={arquivos}
-          sufixoBiblioteca={area.sigla}
+          area={area}
+          estudio={servicos.estudio}
+          origem={origem}
           aoFechar={() => setEditando(undefined)}
           aoSalvar={aplicarEtapa}
         />

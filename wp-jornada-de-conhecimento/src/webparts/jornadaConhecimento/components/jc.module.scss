@@ -1405,6 +1405,325 @@ button[aria-current='step'] .passoNumero {
 }
 
 // ---------------------------------------------------------------- responsividade pela largura da WP
+// ---------------------------------------------------------------- Estúdio: navegador de biblioteca
+.erroInline {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 7px;
+  background: var(--pi-danger-bg);
+  color: var(--pi-danger);
+  font-size: 12px;
+}
+
+.navegador {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--pi-border);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.navegadorTopo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  :global(.pi-label) {
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  &.navegadorTopo.navegadorTopo select {
+    flex: 1 1 220px;
+    width: auto;
+    min-width: 0;
+  }
+}
+
+.trilha {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--pi-muted);
+
+  b {
+    color: var(--pi-navy);
+  }
+}
+
+.arquivos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--pi-border);
+  border-radius: 8px;
+  background: #fff;
+
+  li + li {
+    border-top: 1px solid #eef2f6;
+  }
+
+  &.arquivos button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    font-size: 13px;
+    color: var(--pi-ink);
+  }
+
+  &.arquivos button:hover {
+    background: var(--pi-hover);
+  }
+
+  &.arquivos button svg:first-child {
+    color: var(--pi-blue);
+    flex: none;
+  }
+}
+
+.arquivos.arquivos .arquivoEscolhido {
+  background: var(--pi-soft);
+  color: var(--pi-blue);
+  font-weight: 650;
+}
+
+.arquivoNome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------- Estúdio: editor de conteúdo (texto e imagens)
+.editorConteudo {
+  border: 1px solid #dce4ec;
+  border-radius: 8px;
+  background: var(--pi-surface);
+  overflow: hidden;
+}
+
+.editorBarra {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #e6ecf2;
+  background: #f8fafc;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.editorConteudo .editorBarra.editorBarra select {
+  width: auto;
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.editorConteudo .editorBarra.editorBarra :global(.pi-icon-btn) {
+  width: 32px;
+  height: 32px;
+}
+
+.editorSep {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: #dce4ec;
+}
+
+.editorPainel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #e6ecf2;
+  background: #fbfcfe;
+
+  > :global(.pi-label) {
+    font-size: 11px;
+    font-weight: 650;
+  }
+}
+
+.editorLinha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  > input {
+    flex: 1 1 240px;
+  }
+}
+
+.editorMiniatura {
+  max-width: 220px;
+  max-height: 130px;
+  border-radius: 6px;
+  border: 1px solid var(--pi-border);
+  object-fit: contain;
+  background: #fff;
+}
+
+.editorArea {
+  min-height: 280px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 16px 18px;
+  outline: none;
+
+  &:empty::before {
+    content: attr(data-placeholder);
+    color: #8a99a8;
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--pi-focus);
+  }
+}
+
+// Tipografia compartilhada pelo editor e pelo player.
+.conteudoRico {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--pi-ink);
+  overflow-wrap: anywhere;
+
+  h2,
+  h3,
+  h4 {
+    color: var(--pi-navy);
+    line-height: 1.3;
+    margin: 1.2em 0 0.5em;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 17px;
+  }
+
+  h4 {
+    font-size: 15px;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  p {
+    margin: 0 0 0.8em;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 0.8em;
+    padding-left: 22px;
+  }
+
+  a {
+    color: var(--pi-blue);
+    text-decoration: underline;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 14px 0;
+    border-radius: 8px;
+    border: 1px solid #e6ecf2;
+  }
+
+  blockquote {
+    margin: 14px 0;
+    padding: 10px 16px;
+    border-left: 3px solid var(--pi-accent);
+    background: var(--pi-soft);
+    border-radius: 0 8px 8px 0;
+    color: var(--pi-navy);
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--pi-border);
+    margin: 18px 0;
+  }
+}
+
+// Player: leitura do conteúdo.
+.leitura {
+  padding: 26px 30px 18px;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.leituraFim {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 22px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--pi-border);
+  font-size: 11px;
+  color: var(--pi-muted);
+}
+
+// ---------------------------------------------------------------- Estúdio: capa da jornada
+.seletorCapa {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.capa.capaPrevia {
+  height: 112px;
+  border-radius: 10px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.capaPreviaTitulo {
+  position: relative;
+  font-size: 13px;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px #0006;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.seletorCapaAcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 @container gti (max-width: 1250px) {
   .editor {
     grid-template-columns: 200px minmax(0, 1fr);
@@ -1447,6 +1766,14 @@ button[aria-current='step'] .passoNumero {
 }
 
 @container gti (max-width: 700px) {
+  .seletorCapa {
+    grid-template-columns: 1fr;
+  }
+
+  .leitura {
+    padding: 18px 16px;
+  }
+
   .resumoNotas,
   .sobre {
     grid-template-columns: minmax(0, 1fr);

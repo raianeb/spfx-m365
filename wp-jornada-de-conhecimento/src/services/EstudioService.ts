@@ -3,6 +3,7 @@
 import { SPFI } from '@pnp/sp';
 import { IItem } from '@pnp/sp/items';
 import { IListItemFormUpdateValue } from '@pnp/sp/lists';
+import { sanitizarConteudo } from '../comum/richText';
 import { DiagnosticsLogger } from '../core/diagnostics';
 import { IArea } from '../jornada/modelo';
 import { IEtapa } from '../jornada/progresso';
@@ -33,6 +34,59 @@ export interface IArquivoBiblioteca {
   nome: string;
   url: string;
 }
+
+/** Biblioteca de documentos do site que o usuário logado consegue ler. */
+export interface IBiblioteca {
+  titulo: string;
+  /** Caminho relativo ao servidor da pasta raiz. */
+  raiz: string;
+  /** Biblioteca de conteúdos da própria área. */
+  daArea: boolean;
+}
+
+/** Pasta ou arquivo dentro de uma biblioteca. */
+export interface IItemPasta {
+  nome: string;
+  caminho: string;
+  url: string;
+  pasta: boolean;
+  tamanho?: number;
+  modificado?: string;
+}
+
+interface IListaBibliotecaInfo {
+  Title: string;
+  RootFolder?: { ServerRelativeUrl?: string };
+}
+
+/** Pasta da biblioteca da área onde ficam capas e imagens dos conteúdos. */
+export const PASTA_IMAGENS: string = 'Imagens';
+
+/** Pastas de sistema que não aparecem na navegação. */
+const PASTAS_OCULTAS: string[] = ['Forms', '_t', '_w', '_cts'];
+
+/** URL absoluta de um caminho relativo ao servidor, com cada segmento codificado (nomes com #, ?, %). */
+export const urlAbsoluta = (origem: string, caminho: string): string =>
+  `${origem}${caminho
+    .split('/')
+    .map((segmento: string) => encodeURIComponent(segmento))
+    .join('/')}`;
+
+/** Nome de arquivo seguro para o SharePoint: sem caracteres proibidos, sem ponto no início/fim. */
+export const nomeArquivoSeguro = (nome: string): string => {
+  const limpo: string = nome
+    .replace(/["*:<>?/\\|#%~&{}]/g, '-')
+    .replace(/\s+/g, ' ')
+    .replace(/^[.\s]+|[.\s]+$/g, '')
+    .trim();
+  return limpo || 'arquivo';
+};
+
+/** Acrescenta um sufixo antes da extensão: aula.mp4 → aula-1712345678.mp4. */
+const comSufixo = (nome: string, sufixo: string): string => {
+  const ponto: number = nome.lastIndexOf('.');
+  return ponto > 0 ? `${nome.slice(0, ponto)}-${sufixo}${nome.slice(ponto)}` : `${nome}-${sufixo}`;
+};
 
 const CAMPOS: string[] = [
   'Id',
@@ -72,7 +126,8 @@ const paraEtapaItem = (etapa: IEtapa, jornadaId: number): Record<string, unknown
   JornadaId: jornadaId,
   Ordem: etapa.ordem,
   Tipo: etapa.tipo,
-  Url: etapa.url.trim(),
+  // Etapa de conteúdo: o HTML (já sanitizado pelo editor) vai na coluna Url, que é texto multilinha simples.
+  Url: etapa.tipo === 'Conteudo' ? sanitizarConteudo(etapa.conteudo ?? '') : etapa.url.trim(),
   DuracaoMin: etapa.duracaoMin,
   Instrucoes: etapa.instrucoes,
   RegraConclusao: etapa.regra,
@@ -178,16 +233,94 @@ export class EstudioService {
   }
 
   /** Arquivos da biblioteca da área, para escolher o conteúdo de uma etapa. */
-  public async arquivosDaBiblioteca(area: IArea, origem: string): Promise<IArquivoBiblioteca[]> {
-    const itens: { FileLeafRef?: string; FileRef?: string }[] = await this._sp.web.lists
+  /** Bibliotecas de documentos visíveis para o usuário; a da área vem primeiro. */
+  public async bibliotecas(area: IArea): Promise<IBiblioteca[]> {
+    const nomeDaArea: string = this._jornadas.lista(area, 'Conteudos');
+    const listas: IListaBibliotecaInfo[] = await this._sp.web.lists
+      .filter('BaseTemplate eq 101 and Hidden eq false')
+      .select('Title', 'RootFolder/ServerRelativeUrl')
+      .expand('RootFolder')
+      .orderBy('Title', true)<IListaBibliotecaInfo[]>();
+    return listas
+      .filter((lista: IListaBibliotecaInfo) => !!lista.RootFolder?.ServerRelativeUrl)
+      .map((lista: IListaBibliotecaInfo) => ({
+        titulo: lista.Title,
+        raiz: lista.RootFolder?.ServerRelativeUrl ?? '',
+        daArea: lista.Title === nomeDaArea
+      }))
+      .sort((a: IBiblioteca, b: IBiblioteca) => Number(b.daArea) - Number(a.daArea));
+  }
+
+  /** Subpastas e arquivos de uma pasta (sem as pastas de sistema), pastas primeiro. */
+  public async conteudoDaPasta(caminho: string, origem: string): Promise<IItemPasta[]> {
+    const pasta = this._sp.web.getFolderByServerRelativePath(caminho);
+    const [pastas, arquivos] = await Promise.all([
+      pasta.folders.select('Name', 'ServerRelativeUrl')<{ Name: string; ServerRelativeUrl: string }[]>(),
+      pasta.files.select('Name', 'ServerRelativeUrl', 'Length', 'TimeLastModified')<
+        { Name: string; ServerRelativeUrl: string; Length?: string | number; TimeLastModified?: string }[]
+      >()
+    ]);
+    const porNome = (a: IItemPasta, b: IItemPasta): number => a.nome.localeCompare(b.nome, 'pt-BR');
+    return [
+      ...pastas
+        .filter((p) => PASTAS_OCULTAS.indexOf(p.Name) === -1)
+        .map((p) => ({ nome: p.Name, caminho: p.ServerRelativeUrl, url: urlAbsoluta(origem, p.ServerRelativeUrl), pasta: true }))
+        .sort(porNome),
+      ...arquivos
+        .map((a) => ({
+          nome: a.Name,
+          caminho: a.ServerRelativeUrl,
+          url: urlAbsoluta(origem, a.ServerRelativeUrl),
+          pasta: false,
+          tamanho: Number(a.Length ?? 0),
+          modificado: a.TimeLastModified
+        }))
+        .sort(porNome)
+    ];
+  }
+
+  /**
+   * Envia um arquivo para a pasta (em partes, para vídeos grandes). Se já existir um arquivo com o mesmo
+   * nome, grava com um sufixo em vez de sobrescrever o que está em uso por outras etapas.
+   */
+  public async enviarArquivo(pasta: string, arquivo: File, origem: string, progresso?: (percentual: number) => void): Promise<IItemPasta> {
+    const destino = this._sp.web.getFolderByServerRelativePath(pasta);
+    const base: string = nomeArquivoSeguro(arquivo.name);
+    const existe: boolean = await this._sp.web
+      .getFileByServerRelativePath(`${pasta}/${base}`)
+      .select('Exists')<{ Exists?: boolean }>()
+      .then((info: { Exists?: boolean }) => info.Exists !== false)
+      .catch(() => false);
+    const nome: string = existe ? comSufixo(base, String(Date.now())) : base;
+    const info: { ServerRelativeUrl: string; Name: string; Length?: string | number } = await destino.files.addChunked(nome, arquivo, {
+      Overwrite: false,
+      progress: (dados: { offset: number }) => progresso?.(Math.min(100, Math.round((dados.offset / Math.max(arquivo.size, 1)) * 100)))
+    });
+    this._logger.log('info', 'Estúdio', `Arquivo enviado: ${info.Name}`);
+    return { nome: info.Name, caminho: info.ServerRelativeUrl, url: urlAbsoluta(origem, info.ServerRelativeUrl), pasta: false, tamanho: Number(info.Length ?? arquivo.size) };
+  }
+
+  /** Pasta de imagens da biblioteca da área (criada na primeira vez). */
+  public async pastaDeImagens(area: IArea): Promise<string> {
+    const raiz: { ServerRelativeUrl: string } = await this._sp.web.lists
       .getByTitle(this._jornadas.lista(area, 'Conteudos'))
-      .items.select('FileLeafRef', 'FileRef')
-      .filter('FSObjType eq 0')
-      .orderBy('FileLeafRef', true)
-      .top(1000)<{ FileLeafRef?: string; FileRef?: string }[]>();
-    return itens
-      .filter((item) => item.FileLeafRef && item.FileRef)
-      .map((item) => ({ nome: item.FileLeafRef ?? '', url: `${origem}${encodeURI(item.FileRef ?? '')}` }));
+      .rootFolder.select('ServerRelativeUrl')<{ ServerRelativeUrl: string }>();
+    const caminho: string = `${raiz.ServerRelativeUrl}/${PASTA_IMAGENS}`;
+    const existe: boolean = await this._sp.web
+      .getFolderByServerRelativePath(caminho)
+      .select('Exists')<{ Exists?: boolean }>()
+      .then((info: { Exists?: boolean }) => info.Exists !== false)
+      .catch(() => false);
+    if (!existe) {
+      await this._sp.web.getFolderByServerRelativePath(raiz.ServerRelativeUrl).folders.addUsingPath(PASTA_IMAGENS);
+    }
+    return caminho;
+  }
+
+  /** Envia uma imagem (capa ou conteúdo) para a pasta de imagens da área e devolve a URL absoluta. */
+  public async enviarImagem(area: IArea, arquivo: File, origem: string): Promise<string> {
+    const pasta: string = await this.pastaDeImagens(area);
+    return (await this.enviarArquivo(pasta, arquivo, origem)).url;
   }
 
   private _item(area: IArea, id: number): IItem {

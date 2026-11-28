@@ -74,7 +74,7 @@ export const areaDe = (item: IAreaItem): IArea => ({
 // ---- Papéis por permissão efetiva ----
 
 /** SP.PermissionKind usados na detecção de papel (bit = valor - 1 na parte Low). */
-const PERMISSAO = { ViewListItems: 1, EditListItems: 3, ApproveItems: 5 } as const;
+const PERMISSAO = { ViewListItems: 1, EditListItems: 3, ApproveItems: 5, ManagePermissions: 25 } as const;
 
 export interface IMascaraPermissao {
   High: number;
@@ -112,12 +112,34 @@ export const papeisPorPermissao = (jornadas: IMascaraPermissao | undefined): IPa
   };
 };
 
+/** Grupos da área de que o usuário é membro direto (currentUser.groups). */
+export interface IMembroArea {
+  gestores: boolean;
+  apoio: boolean;
+}
+
+/**
+ * Papel na área. Quem tem Controle Total na lista (ManagePermissions) recebeu isso como Administrador da
+ * Jornada ou por ser dono/administrador do site — não por ser Gestor ou Apoio da área. Nesse caso o papel
+ * vem do grupo de que a pessoa é membro; o Administrador da Jornada gere todas as áreas.
+ * Sem Controle Total, vale a permissão efetiva (cobre grupos do Entra ID dentro dos grupos da área).
+ */
+export const papeisDaArea = (jornadas: IMascaraPermissao | undefined, membro: IMembroArea, administrador: boolean): IPapeisArea => {
+  if (!temPermissao(jornadas, PERMISSAO.ManagePermissions)) {
+    return papeisPorPermissao(jornadas);
+  }
+  if (administrador || membro.gestores) {
+    return { gestor: true, apoio: false, usuario: true };
+  }
+  return { gestor: false, apoio: membro.apoio, usuario: true };
+};
+
 export type Aba = 'minhas' | 'gestao' | 'estudio' | 'administracao';
 
 /**
  * Abas visíveis: Minhas Jornadas para todos; as demais conforme o perfil (escopo, seção 2).
- * Quem tem Controle Total no site vê a Administração para executar "Preparar o site", mesmo antes de
- * estar no grupo de Administradores.
+ * Administração: só para o grupo de Administradores configurado. Enquanto nenhum grupo estiver configurado,
+ * quem tem Controle Total no site a vê para executar "Preparar o site" (donoDoSite).
  */
 export const abasVisiveis = (administrador: boolean, papeis: IPapeisArea[], donoDoSite: boolean = false): Aba[] => {
   const abas: Aba[] = ['minhas'];

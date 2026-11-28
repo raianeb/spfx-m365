@@ -24,19 +24,22 @@ export const iniciais = (nome: string): string =>
     .map((parte: string) => parte[0].toUpperCase())
     .join('');
 
-export const ICONE_TIPO: Record<TipoEtapa, NomeIcone> = { YouTube: 'video', Video: 'video', Documento: 'arquivo', Link: 'link' };
+export const ICONE_TIPO: Record<TipoEtapa, NomeIcone> = { YouTube: 'video', Video: 'video', Documento: 'arquivo', Conteudo: 'texto', Link: 'link' };
 export const ROTULO_TIPO: Record<TipoEtapa, string> = {
   YouTube: 'Vídeo do YouTube',
   Video: 'Vídeo da biblioteca',
   Documento: 'Documento',
+  Conteudo: 'Texto e imagens',
   Link: 'Link'
 };
 
-export const rotuloRegra = (etapa: Pick<IEtapa, 'regra' | 'percentualMinimo'>): string =>
+export const rotuloRegra = (etapa: Pick<IEtapa, 'regra' | 'percentualMinimo'> & { tipo?: IEtapa['tipo'] }): string =>
   etapa.regra === 'PercentualAssistido'
     ? `assistir ${etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO}%`
     : etapa.regra === 'AbrirConteudo'
-      ? 'abrir o conteúdo'
+      ? etapa.tipo === 'Conteudo'
+        ? 'ler até o fim'
+        : 'abrir o conteúdo'
       : 'conclusão manual';
 
 /** Fundo da capa: cor da área em gradiente até o azul-marinho do padrão. */

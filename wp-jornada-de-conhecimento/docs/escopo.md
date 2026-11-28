@@ -68,7 +68,7 @@ A entrega cobre as fases 1 a 3 do roteiro do documento inicial (provisionamento 
 - **Modelo de dados:** colunas do documento inicial (seção 4), com os ajustes da seção 5 deste escopo:
   - **Áreas** (central): Title, Sigla (única), GestoresIndicados, IDs dos três grupos, Cor, Icone, Status (Provisionando, Ativa, Erro, Arquivada), MensagemErro.
   - **Jornadas:** Title, Descricao, Capa, Categoria, PublicoEspecifico, Obrigatoria, PrazoDias, OrdemLivre, EmiteCertificado, ModeloCertificado, Status (Rascunho, Publicada, Arquivada), DataPublicacao.
-  - **Etapas:** Jornada, Ordem, Tipo, Url, DuracaoMin, Instrucoes, RegraConclusao, PercentualMinimo.
+  - **Etapas:** Jornada, Ordem, Tipo (YouTube, Video, Documento, Conteudo; Link só em etapas antigas), Url, DuracaoMin, Instrucoes, RegraConclusao, PercentualMinimo. Na etapa do tipo **Conteudo** ("Texto e imagens"), a coluna Url guarda o HTML sanitizado do conteúdo (texto multilinha simples, até 60.000 caracteres), sem mudança de esquema nas áreas já criadas.
   - **Matrículas:** Title (`IdJornada-IdUsuario`), Usuario, Jornada, EtapaAtual, ProgressoEtapas (JSON por etapa: status, posição em segundos, percentual assistido, conclusão), PercentualConcluido, Status (EmAndamento, Concluida, Inativa), DataInicio, ConcluidaEm, CertificadoEmitido. Histórico de versões ligado (auditoria).
   - **Curtidas:** Title (`IdEtapa-IdUsuario`), Etapa, Jornada, Usuario.
   - **Avaliações:** Title (`IdJornada-IdUsuario`), Jornada, Usuario, Nota, Comentario, Oculto.
@@ -146,6 +146,11 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 | Estúdio e editor | Lista + Editor | Gestores e Apoio | Nova jornada / Publicar ou Enviar |
 | Gestão da área | Gestão | Gestores | Lembrar atrasados / Publicar |
 | Administração | Administração | Administradores | Nova área |
+
+**Estúdio — conteúdo e capa (versão 1.2.0.0)**
+- **Escolha de arquivo:** navegador das bibliotecas de documentos do site que o usuário consegue ler (a `_Conteudos` da área vem primeiro), com pastas, trilha, filtro pela extensão do tipo da etapa e envio do computador para a pasta aberta (envio em partes, para vídeos grandes; nome repetido recebe sufixo, nunca sobrescreve).
+- **Tipo "Texto e imagens"** no lugar de "Link": conteúdo montado no próprio editor (estilos de título, negrito, itálico, sublinhado, listas, citação, divisor, links e imagens). Imagens enviadas, coladas ou arrastadas vão para a pasta `Imagens` da `_Conteudos` da área; texto alternativo obrigatório. Toda gravação e exibição passa por allowlist (sem script, estilo, iframe, atributos de evento ou imagens `data:`). No player, a regra "Abrir o conteúdo" conta quando a pessoa chega ao fim do texto.
+- **Capa da jornada:** prévia no formato do card, com Enviar imagem, Da biblioteca, Por endereço e Remover capa. A imagem enviada vai para a pasta `Imagens` da área.
 
 ## 6. Operação
 - **Manutenção:** equipe M365.
