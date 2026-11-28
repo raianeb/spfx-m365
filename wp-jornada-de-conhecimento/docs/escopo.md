@@ -132,6 +132,21 @@ As skills não foram alteradas. Neste projeto, por decisão do responsável:
 - **Pasta única:** escopo e definição ficam dentro de `wp-jornada-de-conhecimento/` (`docs/escopo.md` e `provisionamento/definicao.json`, fonte única), e não na pasta `<nome>/` separada que o `/iniciar-projeto` cria.
 - O script de Console segue a regra do `sharepoint-provisionamento`: cria só a lista central, sem grupos nem permissões.
 
+## 5A. Interface e navegação (27/11/2026)
+- Modo de navegação: **B — navegação interna compacta** (skill `spfx-padrao-visual-gti`). O site usa o `ex-layout-sharepoint`; a web part não tem cabeçalho próprio, só a barra de telas.
+- Referência visual: padrão GTI (Espaço PROINFRA). Protótipo aprovado em `prototipo/index.html`.
+
+| Tela | Receita | Perfis | Ação principal |
+|---|---|---|---|
+| Início | Início pessoal | Todos | Continuar de onde parou |
+| Catálogo | Catálogo / lista | Todos | Abrir jornada |
+| Meu aprendizado | Lista com abas | Todos | Continuar |
+| Detalhe da jornada | Detalhe | Todos | Começar / Continuar / Rever |
+| Player | Fluxo passo a passo | Todos | Concluir etapa |
+| Estúdio e editor | Lista + Editor | Gestores e Apoio | Nova jornada / Publicar ou Enviar |
+| Gestão da área | Gestão | Gestores | Lembrar atrasados / Publicar |
+| Administração | Administração | Administradores | Nova área |
+
 ## 6. Operação
 - **Manutenção:** equipe M365.
 - **Ambientes:** HML e PROD no mesmo site. Padrão de nomes: HML = `HML_<Nome>`, PROD = `<Nome>`, para listas, bibliotecas e grupos (ex.: `HML_FIN_Jornadas`, `HML_Jornadas – FIN – Gestores`). Os prefixos continuam configuráveis na web part e no script (regra do `spfx-skills`), com esse padrão já preenchido na web part. A propriedade Ambiente define se a web part consome PROD ou HML.

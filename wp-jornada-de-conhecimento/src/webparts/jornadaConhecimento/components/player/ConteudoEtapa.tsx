@@ -1,12 +1,11 @@
-// Skills aplicadas: spfx-acessibilidade-conteudo (título em iframes, legenda nativa do player, link alternativo),
+// Skills aplicadas: spfx-padrao-visual-gti (palco do conteúdo), spfx-acessibilidade-conteudo (título em iframes, legenda nativa do player, link alternativo),
 // spfx-implementacao-base (PlayerAdapters com interface comum). Endereços validados antes de exibir (conteudo.ts).
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { PrimaryButton } from '@fluentui/react/lib/Button';
-import { Icon } from '@fluentui/react/lib/Icon';
+import { Icon } from '../gti';
 import { IEtapa } from '../../../../jornada/progresso';
 import { ORIGENS_YOUTUBE, idDoYoutube, mesmoHost, urlEmbedDocumento, urlEmbedYoutube, urlSegura } from '../../../../jornada/conteudo';
-import styles from './Player.module.scss';
+import styles from '../jc.module.scss';
 
 export interface IConteudoEtapaProps {
   etapa: IEtapa;
@@ -79,7 +78,7 @@ const YouTube: React.FC<IConteudoEtapaProps> = ({ etapa, inicioSeg, aoProgresso 
   };
 
   if (!id) {
-    return <p className={styles.aviso}>O endereço deste vídeo não é um link válido do YouTube.</p>;
+    return <p className={styles.avisoConteudo}>O endereço deste vídeo não é um link válido do YouTube.</p>;
   }
   return (
     <div className={styles.video}>
@@ -100,7 +99,7 @@ const VideoBiblioteca: React.FC<IConteudoEtapaProps> = ({ etapa, siteUrl, inicio
   const limitar = useLimitador();
   const url: string = urlSegura(etapa.url, siteUrl);
   if (!url || !mesmoHost(url, siteUrl)) {
-    return <p className={styles.aviso}>O vídeo precisa estar numa biblioteca deste SharePoint.</p>;
+    return <p className={styles.avisoConteudo}>O vídeo precisa estar numa biblioteca deste SharePoint.</p>;
   }
   return (
     <div className={styles.video}>
@@ -138,13 +137,13 @@ const Documento: React.FC<IConteudoEtapaProps> = ({ etapa, siteUrl, aoAbrir }: I
     }
   }, [embutido]);
   if (!url) {
-    return <p className={styles.aviso}>O endereço deste documento não é válido.</p>;
+    return <p className={styles.avisoConteudo}>O endereço deste documento não é válido.</p>;
   }
   return (
     <div className={styles.documento}>
       {embutido && <iframe title={`Documento: ${etapa.titulo}`} src={embutido} />}
-      <a className={styles.abrirLink} href={url} target="_blank" rel="noopener noreferrer" onClick={aoAbrir}>
-        <Icon iconName="OpenInNewWindow" aria-hidden="true" /> Abrir o documento em nova aba
+      <a className="pi-link-btn" href={url} target="_blank" rel="noopener noreferrer" onClick={aoAbrir} style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+        <Icon nome="olho" tamanho={14} /> Abrir o documento em nova aba
       </a>
     </div>
   );
@@ -154,20 +153,18 @@ const Documento: React.FC<IConteudoEtapaProps> = ({ etapa, siteUrl, aoAbrir }: I
 const Link: React.FC<IConteudoEtapaProps> = ({ etapa, siteUrl, aoAbrir }: IConteudoEtapaProps) => {
   const url: string = urlSegura(etapa.url, siteUrl);
   if (!url) {
-    return <p className={styles.aviso}>O endereço deste link não é válido.</p>;
+    return <p className={styles.avisoConteudo}>O endereço deste link não é válido.</p>;
   }
   return (
-    <div className={styles.link}>
-      <Icon iconName="Link" className={styles.linkIcone} aria-hidden="true" />
-      <p className={styles.linkTexto}>Este conteúdo abre em outra página.</p>
-      <PrimaryButton
-        text="Abrir conteúdo"
-        iconProps={{ iconName: 'OpenInNewWindow' }}
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={aoAbrir}
-      />
+    <div className={styles.linkConteudo}>
+      <span className={styles.linkIcone}>
+        <Icon nome="link" tamanho={26} />
+      </span>
+      <h4 style={{ margin: 0, color: 'var(--pi-navy)' }}>{etapa.titulo}</h4>
+      <p className="pi-hint">Este conteúdo fica em outra página. Ao abrir, a etapa pode ser concluída.</p>
+      <a className="pi-btn primary lg" href={url} target="_blank" rel="noopener noreferrer" onClick={aoAbrir}>
+        Abrir conteúdo <Icon nome="direita" tamanho={16} />
+      </a>
     </div>
   );
 };

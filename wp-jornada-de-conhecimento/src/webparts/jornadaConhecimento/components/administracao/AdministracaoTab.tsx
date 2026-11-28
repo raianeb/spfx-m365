@@ -1,50 +1,43 @@
-// Skills aplicadas: spfx-design-base (barra, cards, estados), spfx-acessibilidade-conteudo (status com texto e ícone,
-// não só cor), spfx-configuracao-webpart (grupo de Administradores vem das propriedades), spfx-codigo-performance.
+// Skills aplicadas: spfx-padrao-visual-gti (receita "Administração": indicadores, cartões por área com faixa de cor,
+// situação e ações; criação em painel lateral com passos visíveis), spfx-acessibilidade-conteudo (situação em texto),
+// spfx-configuracao-webpart (grupo de Administradores vem das propriedades).
 import * as React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
-import { Icon } from '@fluentui/react/lib/Icon';
-import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
+import { useCallback, useEffect, useState } from 'react';
 import { ISiteGroupInfo } from '@pnp/sp/site-groups';
 import { IArea, StatusArea } from '../../../../jornada/modelo';
-import { AreaService, IContagemArea, INovaArea } from '../../../../services/AreaService';
-import { IAreaComPapel, IPerfil } from '../../../../services/PerfilService';
+import { IContagemArea, INovaArea } from '../../../../services/AreaService';
+import { IAreaComPapel } from '../../../../services/PerfilService';
 import { mensagemDeErro } from '../../../../services/sp';
-import { IJornadaConhecimentoProps } from '../tipos';
-import Estado from '../comum/Estado';
+import { Badge, Empty, GtiDialog, Icon, Metric, MetricGrid, PageHeader, TomBadge } from '../gti';
+import { IContextoTela } from '../tipos';
+import { Aviso, IconeArea, textoErro } from '../comum/ui';
 import NovaAreaModal from './NovaAreaModal';
 import MembrosModal from './MembrosModal';
-import styles from '../JornadaConhecimento.module.scss';
+import styles from '../jc.module.scss';
 
-export interface IAdministracaoTabProps extends IJornadaConhecimentoProps {
-  perfil: IPerfil;
-  aoAlterar: () => void;
-}
-
-const ROTULO_STATUS: Record<StatusArea, { texto: string; icone: string }> = {
-  Provisionando: { texto: 'Provisionando', icone: 'Sync' },
-  Ativa: { texto: 'Ativa', icone: 'CompletedSolid' },
-  Erro: { texto: 'Erro no provisionamento', icone: 'ErrorBadge' },
-  Arquivada: { texto: 'Arquivada', icone: 'Archive' }
+const SITUACAO: Record<StatusArea, { texto: string; tom: TomBadge }> = {
+  Provisionando: { texto: 'Provisionando', tom: 'warning' },
+  Ativa: { texto: 'Ativa', tom: 'success' },
+  Erro: { texto: 'Erro no provisionamento', tom: 'danger' },
+  Arquivada: { texto: 'Arquivada', tom: 'neutral' }
 };
 
-type Modal = { tipo: 'nova' } | { tipo: 'gestores'; area: IArea } | undefined;
+type Modal = { tipo: 'nova' } | { tipo: 'gestores'; area: IArea } | { tipo: 'arquivar'; area: IArea } | undefined;
 
-const AdministracaoTab: React.FC<IAdministracaoTabProps> = (props: IAdministracaoTabProps) => {
-  const { sp, environment, prefixos, logger, perfil, adminGroupIds, aoAlterar } = props;
-  const servico: AreaService = useMemo(
-    () => new AreaService(sp, environment, prefixos, logger),
-    [sp, environment, prefixos.PROD, prefixos.HML, logger]
-  );
+const AdministracaoTab: React.FC<IContextoTela> = (ctx: IContextoTela) => {
+  const { perfil, servicos, props } = ctx;
+  const servico = servicos.areas;
   const [modal, setModal] = useState<Modal>(undefined);
-  const [aviso, setAviso] = useState<{ tipo: MessageBarType; texto: string } | undefined>(undefined);
+  const [erro, setErro] = useState<string>('');
+  const [sucesso, setSucesso] = useState<string>('');
   const [ocupada, setOcupada] = useState<number | undefined>(undefined);
   const [passo, setPasso] = useState<string>('');
   const [contagens, setContagens] = useState<Map<number, IContagemArea>>(new Map<number, IContagemArea>());
   const [grupoAdmin, setGrupoAdmin] = useState<ISiteGroupInfo | undefined | 'carregando'>('carregando');
+  const [preparando, setPreparando] = useState<boolean>(false);
 
   const areas: IArea[] = perfil.areas.map((item: IAreaComPapel) => item.area);
-  const grupoAdministradoresId: number | undefined = adminGroupIds[0];
+  const grupoAdministradoresId: number | undefined = props.adminGroupIds[0];
 
   useEffect(() => {
     let ativo: boolean = true;
@@ -56,7 +49,7 @@ const AdministracaoTab: React.FC<IAdministracaoTabProps> = (props: IAdministraca
       servico
         .contarAreas(areas)
         .then((resultado: Map<number, IContagemArea>) => ativo && setContagens(resultado))
-        .catch((erro: unknown) => logger.log('warn', 'Administração', mensagemDeErro(erro, 'Contar jornadas e membros')));
+        .catch((falha: unknown) => props.logger.log('warn', 'Administração', mensagemDeErro(falha, 'Contar jornadas e membros')));
     }
     return () => {
       ativo = false;
@@ -64,33 +57,33 @@ const AdministracaoTab: React.FC<IAdministracaoTabProps> = (props: IAdministraca
   }, [servico, perfil]);
 
   const preparar = useCallback(async (): Promise<void> => {
-    setAviso(undefined);
+    setErro('');
+    setPreparando(true);
     try {
       const grupo: ISiteGroupInfo = await servico.prepararSite();
       setGrupoAdmin(grupo);
-      setAviso({
-        tipo: MessageBarType.success,
-        texto: `Grupo "${grupo.Title}" pronto. Agora selecione-o em Propriedades da web part > Acesso > Administradores — ${environment}.`
-      });
-    } catch (erro: unknown) {
-      setAviso({ tipo: MessageBarType.error, texto: erro instanceof Error && !('status' in erro) ? erro.message : mensagemDeErro(erro, 'Preparar o site') });
+      setSucesso(`Grupo "${grupo.Title}" pronto. Agora selecione-o em Propriedades da web part > Acesso > Administradores — ${props.environment}.`);
+    } catch (falha: unknown) {
+      setErro(textoErro(falha, (e: unknown) => mensagemDeErro(e, 'Preparar o site')));
+    } finally {
+      setPreparando(false);
     }
-  }, [servico, environment]);
+  }, [servico, props.environment]);
 
   const criar = useCallback(
     async (nova: INovaArea, progresso: (texto: string) => void): Promise<void> => {
       if (!grupoAdministradoresId) {
-        throw new Error('Grupo de Administradores não configurado.');
+        throw new Error('Grupo de Administradores não configurado nas propriedades da web part.');
       }
       try {
         await servico.criarArea(nova, grupoAdministradoresId, progresso);
       } finally {
-        aoAlterar();
+        ctx.recarregarPerfil();
       }
       setModal(undefined);
-      setAviso({ tipo: MessageBarType.success, texto: `Área "${nova.nome}" criada e ativa.` });
+      ctx.avisar(`Área "${nova.nome}" criada e ativa.`);
     },
-    [servico, grupoAdministradoresId, aoAlterar]
+    [servico, grupoAdministradoresId]
   );
 
   const reprocessar = async (area: IArea): Promise<void> => {
@@ -98,128 +91,204 @@ const AdministracaoTab: React.FC<IAdministracaoTabProps> = (props: IAdministraca
       return;
     }
     setOcupada(area.id);
-    setAviso(undefined);
+    setErro('');
     try {
       await servico.provisionar(area, grupoAdministradoresId, [], setPasso);
-      setAviso({ tipo: MessageBarType.success, texto: `Área "${area.nome}" reprocessada e ativa.` });
-    } catch (erro: unknown) {
-      setAviso({ tipo: MessageBarType.error, texto: erro instanceof Error ? erro.message : 'Falha ao reprocessar.' });
+      ctx.avisar(`Área "${area.nome}" reprocessada e ativa.`);
+    } catch (falha: unknown) {
+      setErro(falha instanceof Error ? falha.message : 'Falha ao reprocessar.');
     } finally {
       setOcupada(undefined);
       setPasso('');
-      aoAlterar();
+      ctx.recarregarPerfil();
     }
   };
 
   const alterarStatus = async (area: IArea, status: StatusArea): Promise<void> => {
     setOcupada(area.id);
-    setAviso(undefined);
+    setErro('');
     try {
       await servico.alterarStatus(area, status);
-      aoAlterar();
-    } catch (erro: unknown) {
-      setAviso({ tipo: MessageBarType.error, texto: mensagemDeErro(erro, 'Alterar o status da área') });
+      ctx.avisar(status === 'Arquivada' ? `"${area.nome}" arquivada. Dados e histórico preservados.` : `"${area.nome}" reativada.`);
+      setModal(undefined);
+      ctx.recarregarPerfil();
+    } catch (falha: unknown) {
+      setErro(mensagemDeErro(falha, 'Alterar a situação da área'));
     } finally {
       setOcupada(undefined);
     }
   };
 
-  // ---- Primeiro uso: grupo de Administradores ainda não configurado nas propriedades.
+  const cabecalho = (acoes?: React.ReactNode): React.ReactElement => (
+    <PageHeader
+      idTitulo={ctx.idTitulo}
+      nivel={2}
+      sobretitulo={`Administração · ${props.environment}`}
+      titulo="Áreas"
+      descricao="Cada área recebe os próprios grupos, listas, biblioteca e permissões, criados pela web part com a sua sessão."
+      acoes={acoes}
+    />
+  );
+  const avisos = (
+    <>
+      {erro && (
+        <Aviso tom="erro" aoFechar={() => setErro('')}>
+          {erro}
+        </Aviso>
+      )}
+      {sucesso && (
+        <Aviso tom="sucesso" aoFechar={() => setSucesso('')}>
+          {sucesso}
+        </Aviso>
+      )}
+    </>
+  );
+
+  // Primeiro uso: grupo de Administradores ainda não configurado nas propriedades.
   if (!perfil.administrador) {
+    const existe: boolean = !!grupoAdmin && grupoAdmin !== 'carregando';
     return (
       <>
-        {aviso && <MessageBar messageBarType={aviso.tipo}>{aviso.texto}</MessageBar>}
-        <Estado
-          titulo="Preparar o site"
-          texto={
-            grupoAdmin && grupoAdmin !== 'carregando'
-              ? `O grupo "${grupoAdmin.Title}" já existe. Selecione-o em Propriedades da web part > Acesso > Administradores — ${environment} e inclua nele quem administra a Jornada de Conhecimento.`
-              : 'Cria o grupo de Administradores deste ambiente, com Controle Total no site, e inclui você nele. Depois, selecione o grupo nas propriedades da web part.'
-          }
-        >
-          {grupoAdmin === undefined && perfil.podePrepararSite && <PrimaryButton text="Preparar o site" onClick={preparar} />}
-        </Estado>
+        {cabecalho()}
+        {avisos}
+        <div className="pi-card">
+          <Empty
+            icone="engrenagem"
+            titulo="Preparar o site"
+            descricao={
+              existe
+                ? `O grupo "${(grupoAdmin as ISiteGroupInfo).Title}" já existe. Selecione-o em Propriedades da web part > Acesso > Administradores — ${props.environment} e inclua nele quem administra a Jornada de Conhecimento.`
+                : 'Cria o grupo de Administradores deste ambiente, com Controle Total no site, e inclui você nele. Depois, selecione o grupo nas propriedades da web part.'
+            }
+            acao={
+              grupoAdmin === undefined && perfil.podePrepararSite ? (
+                <button type="button" className="pi-btn primary" disabled={preparando} onClick={preparar}>
+                  {preparando ? 'Preparando…' : 'Preparar o site'}
+                </button>
+              ) : undefined
+            }
+          />
+        </div>
       </>
     );
   }
 
   if (perfil.situacao === 'semListaCentral') {
     return (
-      <Estado
-        titulo="Lista central não encontrada"
-        texto={`A lista "${perfil.listaAreas}" não existe neste ambiente. Execute o script de provisionamento (provisionamento/INSTRUCOES.md) e recarregue a página.`}
-      />
+      <>
+        {cabecalho()}
+        <div className="pi-card">
+          <Empty
+            icone="alerta"
+            titulo="Lista central não encontrada"
+            descricao={`A lista "${perfil.listaAreas}" não existe neste ambiente. Execute o script de provisionamento (provisionamento/INSTRUCOES.md) e recarregue a página.`}
+          />
+        </div>
+      </>
     );
   }
 
-  const total: number = areas.length;
-  const ativas: number = areas.filter((area: IArea) => area.status === 'Ativa').length;
-  const comErro: number = areas.filter((area: IArea) => area.status === 'Erro').length;
+  const ativas: number = areas.filter((a: IArea) => a.status === 'Ativa').length;
+  const comErro: number = areas.filter((a: IArea) => a.status === 'Erro').length;
+  const jornadas: number = Array.from(contagens.values()).reduce((t: number, c: IContagemArea) => t + (c.jornadas ?? 0), 0);
+  const membros: number = Array.from(contagens.values()).reduce((t: number, c: IContagemArea) => t + (c.membros ?? 0), 0);
 
   return (
     <>
-      {aviso && (
-        <MessageBar messageBarType={aviso.tipo} onDismiss={() => setAviso(undefined)} dismissButtonAriaLabel="Fechar aviso">
-          {aviso.texto}
-        </MessageBar>
+      {cabecalho(
+        <button type="button" className="pi-btn primary" onClick={() => setModal({ tipo: 'nova' })}>
+          <Icon nome="mais" tamanho={16} />
+          Nova área
+        </button>
       )}
-      <div className={styles.barra}>
-        <div>
-          <h3 className={styles.subtitulo}>Áreas</h3>
-          <span className={styles.numeros}>
-            <span>{total} no total</span>
-            <span>{ativas} ativas</span>
-            {comErro > 0 && <span className={styles.statusErro}>{comErro} com erro</span>}
-          </span>
+      {avisos}
+      <MetricGrid>
+        <Metric nome="Áreas ativas" valor={ativas} icone="predio" explicacao={`De ${areas.length} cadastrada(s)`} />
+        <Metric nome="Jornadas cadastradas" valor={jornadas} icone="livro" explicacao="Todas as situações" />
+        <Metric nome="Membros em Usuários" valor={membros.toLocaleString('pt-BR')} icone="pessoas" explicacao="Um grupo do Entra ID conta como um" />
+        <Metric nome="Com erro" valor={comErro} icone="alerta" tom={comErro ? 'danger' : 'normal'} explicacao={comErro ? 'Reprocessar resolve sem duplicar' : 'Nenhuma pendência'} />
+      </MetricGrid>
+      {areas.length === 0 ? (
+        <div className="pi-card">
+          <Empty
+            icone="predio"
+            titulo="Nenhuma área criada"
+            descricao="Crie a primeira área para montar os grupos, as listas e as permissões dela."
+            acao={
+              <button type="button" className="pi-btn primary" onClick={() => setModal({ tipo: 'nova' })}>
+                Nova área
+              </button>
+            }
+          />
         </div>
-        <PrimaryButton iconProps={{ iconName: 'Add' }} text="Nova área" onClick={() => setModal({ tipo: 'nova' })} />
-      </div>
-
-      {total === 0 ? (
-        <Estado titulo="Nenhuma área criada" texto="Crie a primeira área para montar os grupos, as listas e as permissões dela." />
       ) : (
-        <div className={styles.grade}>
+        <div className={styles.areas}>
           {areas.map((area: IArea) => {
-            const status: { texto: string; icone: string } = ROTULO_STATUS[area.status];
+            const situacao = SITUACAO[area.status];
             const contagem: IContagemArea | undefined = contagens.get(area.id);
             const emAndamento: boolean = ocupada === area.id;
             return (
-              <article key={area.id} className={styles.card} style={{ borderTopColor: area.cor }} aria-label={`Área ${area.nome}`}>
-                <div className={styles.cardCabecalho}>
-                  <Icon iconName={area.icone} className={styles.cardIcone} style={{ color: area.cor }} aria-hidden="true" />
-                  <div>
-                    <h4 className={styles.cardNome}>{area.nome}</h4>
-                    <span className={styles.cardSigla}>{area.sigla}</span>
+              <article key={area.id} className={`pi-card ${styles.areaCard}`} aria-label={`Área ${area.nome}`}>
+                <div className={styles.areaFaixa} style={{ background: area.cor }} />
+                <div className={styles.areaCorpo}>
+                  <div className={styles.areaTopo}>
+                    <span className={styles.areaIcone} style={{ background: `${area.cor}1f`, color: area.cor }}>
+                      <IconeArea area={area} />
+                    </span>
+                    <div>
+                      <h3>{area.nome}</h3>
+                      <span className="pi-hint">{area.sigla}</span>
+                    </div>
                   </div>
-                </div>
-                <span className={`${styles.status} ${area.status === 'Erro' ? styles.statusErro : ''}`}>
-                  <Icon iconName={status.icone} aria-hidden="true" /> {status.texto}
-                </span>
-                {area.status === 'Ativa' && (
-                  <span className={styles.numeros}>
-                    <span>{contagem?.jornadas ?? '–'} jornadas</span>
-                    <span>{contagem?.membros ?? '–'} membros em Usuários</span>
-                  </span>
-                )}
-                {area.status === 'Erro' && area.mensagemErro && <p className={styles.erroTexto}>{area.mensagemErro}</p>}
-                {emAndamento && passo && (
-                  <p className={styles.progresso} role="status">
-                    {passo}...
-                  </p>
-                )}
-                <div className={styles.cardAcoes}>
-                  {area.status === 'Ativa' && area.grupoGestoresId && (
-                    <DefaultButton text="Gestores" disabled={emAndamento} onClick={() => setModal({ tipo: 'gestores', area })} />
+                  <div>
+                    <Badge tom={situacao.tom}>{situacao.texto}</Badge>
+                  </div>
+                  {area.status === 'Erro' && area.mensagemErro ? (
+                    <p className="pi-hint" style={{ color: 'var(--pi-danger)' }}>
+                      {area.mensagemErro}
+                    </p>
+                  ) : (
+                    area.status === 'Ativa' && (
+                      <span className={styles.meta}>
+                        <span>
+                          <Icon nome="livro" tamanho={13} />
+                          {contagem?.jornadas ?? '–'} jornada(s)
+                        </span>
+                        <span>
+                          <Icon nome="pessoas" tamanho={13} />
+                          {contagem?.membros ?? '–'} em Usuários
+                        </span>
+                      </span>
+                    )
                   )}
-                  {(area.status === 'Erro' || area.status === 'Provisionando') && (
-                    <DefaultButton text={emAndamento ? 'Reprocessando...' : 'Reprocessar'} disabled={ocupada !== undefined} onClick={() => reprocessar(area)} />
+                  {emAndamento && passo && (
+                    <p className="pi-hint" role="status">
+                      {passo}…
+                    </p>
                   )}
-                  {area.status === 'Ativa' && (
-                    <DefaultButton text="Arquivar" disabled={emAndamento} onClick={() => alterarStatus(area, 'Arquivada')} />
-                  )}
-                  {area.status === 'Arquivada' && (
-                    <DefaultButton text="Reativar" disabled={emAndamento} onClick={() => alterarStatus(area, 'Ativa')} />
-                  )}
+                  <div className="pi-actions">
+                    {(area.status === 'Erro' || area.status === 'Provisionando') && (
+                      <button type="button" className="pi-btn primary" disabled={ocupada !== undefined} onClick={() => reprocessar(area)}>
+                        <Icon nome="atualizar" tamanho={16} />
+                        {emAndamento ? 'Reprocessando…' : 'Reprocessar'}
+                      </button>
+                    )}
+                    {area.status === 'Ativa' && area.grupoGestoresId && (
+                      <button type="button" className="pi-btn" disabled={emAndamento} onClick={() => setModal({ tipo: 'gestores', area })}>
+                        Gestores
+                      </button>
+                    )}
+                    {area.status === 'Ativa' && (
+                      <button type="button" className="pi-btn ghost" disabled={emAndamento} onClick={() => setModal({ tipo: 'arquivar', area })}>
+                        Arquivar
+                      </button>
+                    )}
+                    {area.status === 'Arquivada' && (
+                      <button type="button" className="pi-btn" disabled={emAndamento} onClick={() => alterarStatus(area, 'Ativa')}>
+                        Reativar
+                      </button>
+                    )}
+                  </div>
                 </div>
               </article>
             );
@@ -229,22 +298,48 @@ const AdministracaoTab: React.FC<IAdministracaoTabProps> = (props: IAdministraca
 
       {modal?.tipo === 'nova' && (
         <NovaAreaModal
+          id={`${ctx.idTitulo}-nova`}
           servico={servico}
-          siglasExistentes={areas.map((area: IArea) => area.sigla)}
-          themeStyle={props.themeStyle}
+          siglasExistentes={areas.map((a: IArea) => a.sigla)}
+          ambiente={props.environment}
           aoFechar={() => setModal(undefined)}
           aoCriar={criar}
         />
       )}
       {modal?.tipo === 'gestores' && modal.area.grupoGestoresId && (
         <MembrosModal
+          id={`${ctx.idTitulo}-gestores`}
           servico={servico}
           grupoId={modal.area.grupoGestoresId}
+          sobretitulo={`Administração · ${modal.area.sigla}`}
           titulo={`Gestores — ${modal.area.nome}`}
           descricao="Gestores veem tudo da área, acompanham as pessoas, incluem membros em Apoio e Usuários e aprovam as jornadas."
-          themeStyle={props.themeStyle}
+          aoAvisar={ctx.avisar}
           aoFechar={() => setModal(undefined)}
         />
+      )}
+      {modal?.tipo === 'arquivar' && (
+        <GtiDialog
+          id={`${ctx.idTitulo}-arquivar`}
+          variante="central"
+          titulo={`Arquivar a área "${modal.area.nome}"?`}
+          bloquearFechamento={ocupada !== undefined}
+          aoFechar={() => setModal(undefined)}
+          rodape={
+            <>
+              <button type="button" className="pi-btn" disabled={ocupada !== undefined} onClick={() => setModal(undefined)}>
+                Cancelar
+              </button>
+              <button type="button" className="pi-btn primary" disabled={ocupada !== undefined} onClick={() => alterarStatus(modal.area, 'Arquivada')}>
+                {ocupada !== undefined ? 'Arquivando…' : 'Arquivar'}
+              </button>
+            </>
+          }
+        >
+          <p style={{ fontSize: 13 }}>
+            As jornadas da área saem do catálogo das pessoas. Grupos, listas, matrículas e avaliações continuam guardados, e a área pode ser reativada.
+          </p>
+        </GtiDialog>
       )}
     </>
   );

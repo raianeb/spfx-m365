@@ -1,53 +1,52 @@
-// Skills aplicadas: spfx-design-base (modal padrão, validação por campo), spfx-acessibilidade-conteudo.
+// Skills aplicadas: spfx-padrao-visual-gti (painel lateral de item, escolha de tipo em cartões, validação por campo),
+// spfx-acessibilidade-conteudo (tipo como grupo de opções, erros ligados aos campos).
 import * as React from 'react';
 import { useState } from 'react';
-import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
-import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
-import { TextField } from '@fluentui/react/lib/TextField';
-import ModalShell from '../../../../crud/ModalShell';
-import crud from '../../../../crud/crud.module.scss';
-import { primaryButtonStyles, secondaryButtonStyles, textFieldStyles } from '../../../../crud/modalStyles';
 import RichTextEditor from '../../../../comum/RichTextEditor';
 import { ErrosFormulario, arquivoCombina, regraPadrao, validarEtapa } from '../../../../jornada/estudio';
 import { IEtapa, PERCENTUAL_MINIMO_PADRAO, RegraConclusao, TipoEtapa } from '../../../../jornada/progresso';
 import { IArquivoBiblioteca } from '../../../../services/EstudioService';
-import { NOME_SOLUCAO } from '../tipos';
+import { Field, GtiDialog, Icon } from '../gti';
+import { ICONE_TIPO } from '../comum/ui';
+import styles from '../jc.module.scss';
 
 export interface IEtapaFormProps {
+  id: string;
   etapa: IEtapa;
+  nova: boolean;
   siteUrl: string;
   arquivos: IArquivoBiblioteca[] | undefined;
-  themeStyle?: React.CSSProperties;
+  sufixoBiblioteca: string;
   aoFechar: () => void;
   aoSalvar: (etapa: IEtapa) => void;
 }
 
-const TIPOS: IDropdownOption[] = [
-  { key: 'YouTube', text: 'Vídeo do YouTube' },
-  { key: 'Video', text: 'Vídeo da biblioteca da área' },
-  { key: 'Documento', text: 'Documento' },
-  { key: 'Link', text: 'Link' }
+const TIPOS: { tipo: TipoEtapa; rotulo: string }[] = [
+  { tipo: 'YouTube', rotulo: 'YouTube' },
+  { tipo: 'Video', rotulo: 'Vídeo da área' },
+  { tipo: 'Documento', rotulo: 'Documento' },
+  { tipo: 'Link', rotulo: 'Link' }
 ];
 
-const regrasPara = (tipo: TipoEtapa): IDropdownOption[] => [
-  ...(tipo === 'YouTube' || tipo === 'Video' ? [{ key: 'PercentualAssistido', text: 'Assistir a um percentual do vídeo' }] : []),
-  { key: 'AbrirConteudo', text: 'Abrir o conteúdo' },
-  { key: 'Manual', text: 'Marcar como concluída (manual)' }
+const regrasPara = (tipo: TipoEtapa): { regra: RegraConclusao; rotulo: string }[] => [
+  ...(tipo === 'YouTube' || tipo === 'Video' ? [{ regra: 'PercentualAssistido' as RegraConclusao, rotulo: 'Assistir a um percentual do vídeo' }] : []),
+  { regra: 'AbrirConteudo', rotulo: 'Abrir o conteúdo' },
+  { regra: 'Manual', rotulo: 'Marcar como concluída' }
 ];
 
 const EtapaForm: React.FC<IEtapaFormProps> = (props: IEtapaFormProps) => {
-  const tituloId: string = React.useId();
   const [etapa, setEtapa] = useState<IEtapa>(props.etapa);
   const [erros, setErros] = useState<ErrosFormulario>({});
+  const id: string = props.id;
 
   const alterar = (parcial: Partial<IEtapa>): void => setEtapa((atual: IEtapa) => ({ ...atual, ...parcial }));
 
   const alterarTipo = (tipo: TipoEtapa): void => {
-    const regra: RegraConclusao = regrasPara(tipo).some((opcao) => opcao.key === etapa.regra) ? etapa.regra : regraPadrao(tipo);
+    const regra: RegraConclusao = regrasPara(tipo).some((o) => o.regra === etapa.regra) ? etapa.regra : regraPadrao(tipo);
     alterar({ tipo, regra, percentualMinimo: etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO });
   };
 
-  const salvar = (): void => {
+  const aplicar = (): void => {
     const encontrados: ErrosFormulario = validarEtapa(etapa, props.siteUrl);
     setErros(encontrados);
     if (Object.keys(encontrados).length === 0) {
@@ -55,86 +54,110 @@ const EtapaForm: React.FC<IEtapaFormProps> = (props: IEtapaFormProps) => {
     }
   };
 
-  const arquivos: IArquivoBiblioteca[] = (props.arquivos ?? []).filter((arquivo: IArquivoBiblioteca) => arquivoCombina(arquivo.nome, etapa.tipo));
+  const arquivos: IArquivoBiblioteca[] = (props.arquivos ?? []).filter((a: IArquivoBiblioteca) => arquivoCombina(a.nome, etapa.tipo));
   const usaBiblioteca: boolean = etapa.tipo === 'Video' || etapa.tipo === 'Documento';
 
   return (
-    <ModalShell contextLabel={NOME_SOLUCAO} titleId={tituloId} firstFocusableClass={crud.firstField} onDismiss={props.aoFechar} themeStyle={props.themeStyle}>
-      <h2 id={tituloId} className={crud.modalTitle}>
-        {props.etapa.titulo ? 'Editar etapa' : 'Nova etapa'}
-      </h2>
-      <div className={crud.modalForm}>
-        <div className={crud.fields}>
-          <TextField
-            label="Nome da etapa"
-            required
-            className={crud.firstField}
-            value={etapa.titulo}
-            maxLength={255}
-            onChange={(_e, valor?: string) => alterar({ titulo: valor ?? '' })}
-            errorMessage={erros.titulo}
-            styles={textFieldStyles}
-          />
-          <Dropdown label="Tipo de conteúdo" required options={TIPOS} selectedKey={etapa.tipo} onChange={(_e, opcao) => opcao && alterarTipo(opcao.key as TipoEtapa)} />
-          {usaBiblioteca && (
-            <Dropdown
-              label="Escolher da biblioteca da área"
-              placeholder={props.arquivos === undefined ? 'Carregando arquivos...' : arquivos.length ? 'Selecione um arquivo' : 'Nenhum arquivo deste tipo na biblioteca'}
-              options={arquivos.map((arquivo: IArquivoBiblioteca) => ({ key: arquivo.url, text: arquivo.nome }))}
-              selectedKey={arquivos.some((arquivo) => arquivo.url === etapa.url) ? etapa.url : null}
-              onChange={(_e, opcao) => opcao && alterar({ url: String(opcao.key) })}
-              disabled={!arquivos.length}
-            />
-          )}
-          <TextField
-            label={etapa.tipo === 'YouTube' ? 'Link do YouTube' : 'Endereço do conteúdo'}
-            required
-            value={etapa.url}
-            onChange={(_e, valor?: string) => alterar({ url: valor ?? '' })}
-            description={usaBiblioteca ? 'Escolha um arquivo acima ou cole o endereço de um arquivo deste SharePoint.' : undefined}
-            errorMessage={erros.url}
-            styles={textFieldStyles}
-          />
-          <TextField
-            label="Duração (minutos)"
-            type="number"
-            min={0}
-            value={String(etapa.duracaoMin)}
-            onChange={(_e, valor?: string) => alterar({ duracaoMin: Number(valor || 0) })}
-            errorMessage={erros.duracaoMin}
-            styles={textFieldStyles}
-          />
-          <Dropdown
-            label="Como a etapa é concluída"
-            options={regrasPara(etapa.tipo)}
-            selectedKey={etapa.regra}
-            onChange={(_e, opcao) => opcao && alterar({ regra: opcao.key as RegraConclusao })}
-            errorMessage={erros.regra}
-          />
-          {etapa.regra === 'PercentualAssistido' && (
-            <TextField
-              label="Percentual mínimo assistido"
-              type="number"
-              min={1}
-              max={100}
-              suffix="%"
-              value={String(etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO)}
-              onChange={(_e, valor?: string) => alterar({ percentualMinimo: Number(valor || 0) })}
-              errorMessage={erros.percentualMinimo}
-              styles={textFieldStyles}
-            />
-          )}
-          <RichTextEditor label="Instruções (opcional)" value={etapa.instrucoes} onChange={(html: string) => alterar({ instrucoes: html })} />
-        </div>
-        <footer className={crud.footer}>
-          <span className={crud.helper}>As etapas são gravadas ao salvar a jornada.</span>
-          <div className={crud.footerActions}>
-            <DefaultButton text="Cancelar" onClick={props.aoFechar} styles={secondaryButtonStyles} />
-            <PrimaryButton text="Aplicar" onClick={salvar} styles={primaryButtonStyles} />
+    <GtiDialog
+      id={id}
+      sobretitulo="Estúdio"
+      titulo={props.nova ? 'Nova etapa' : 'Editar etapa'}
+      aoFechar={props.aoFechar}
+      textoRodape="As etapas são gravadas ao salvar a jornada."
+      rodape={
+        <>
+          <button type="button" className="pi-btn" onClick={props.aoFechar}>
+            Cancelar
+          </button>
+          <button type="button" className="pi-btn primary" onClick={aplicar}>
+            Aplicar
+          </button>
+        </>
+      }
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div className="pi-field">
+          <span className="pi-label" id={`${id}-tipo`}>
+            Tipo de conteúdo
+          </span>
+          <div className={styles.tipos} role="radiogroup" aria-labelledby={`${id}-tipo`}>
+            {TIPOS.map((t) => (
+              <button key={t.tipo} type="button" role="radio" aria-checked={etapa.tipo === t.tipo} onClick={() => alterarTipo(t.tipo)}>
+                <Icon nome={ICONE_TIPO[t.tipo]} tamanho={22} />
+                {t.rotulo}
+              </button>
+            ))}
           </div>
-        </footer>
+        </div>
+        <Field id={`${id}-nome`} rotulo="Nome da etapa" obrigatorio erro={erros.titulo}>
+          {(aria) => <input {...aria} autoFocus maxLength={255} value={etapa.titulo} onChange={(e) => alterar({ titulo: e.target.value })} />}
+        </Field>
+        {usaBiblioteca && (
+          <Field
+            id={`${id}-arquivo`}
+            rotulo="Escolher da biblioteca da área"
+            dica={props.arquivos === undefined ? 'Carregando arquivos…' : arquivos.length ? `Biblioteca de conteúdos da área ${props.sufixoBiblioteca}.` : 'Nenhum arquivo deste tipo na biblioteca da área.'}
+          >
+            {(aria) => (
+              <select {...aria} disabled={!arquivos.length} value={arquivos.some((a) => a.url === etapa.url) ? etapa.url : ''} onChange={(e) => e.target.value && alterar({ url: e.target.value })}>
+                <option value="">Selecione um arquivo</option>
+                {arquivos.map((a: IArquivoBiblioteca) => (
+                  <option key={a.url} value={a.url}>
+                    {a.nome}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
+        )}
+        <Field
+          id={`${id}-url`}
+          rotulo={etapa.tipo === 'YouTube' ? 'Link do YouTube' : 'Endereço do conteúdo'}
+          obrigatorio
+          erro={erros.url}
+          dica={
+            etapa.tipo === 'YouTube'
+              ? 'Aceita youtube.com, youtu.be e shorts. O player usa youtube-nocookie.'
+              : usaBiblioteca
+                ? 'Escolha um arquivo acima ou cole o endereço de um arquivo deste SharePoint.'
+                : 'Abre em nova aba.'
+          }
+        >
+          {(aria) => <input {...aria} type="url" placeholder="https://" value={etapa.url} onChange={(e) => alterar({ url: e.target.value })} />}
+        </Field>
+        <div className="pi-form-grid">
+          <Field id={`${id}-dur`} rotulo="Duração (minutos)" erro={erros.duracaoMin}>
+            {(aria) => <input {...aria} type="number" min={0} max={1440} value={String(etapa.duracaoMin)} onChange={(e) => alterar({ duracaoMin: Number(e.target.value || 0) })} />}
+          </Field>
+          <Field id={`${id}-regra`} rotulo="Como a etapa é concluída" erro={erros.regra}>
+            {(aria) => (
+              <select {...aria} value={etapa.regra} onChange={(e) => alterar({ regra: e.target.value as RegraConclusao })}>
+                {regrasPara(etapa.tipo).map((o) => (
+                  <option key={o.regra} value={o.regra}>
+                    {o.rotulo}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
+        </div>
+        {etapa.regra === 'PercentualAssistido' && (
+          <Field id={`${id}-pct`} rotulo="Percentual mínimo assistido (%)" erro={erros.percentualMinimo}>
+            {(aria) => (
+              <input
+                {...aria}
+                type="number"
+                min={1}
+                max={100}
+                value={String(etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO)}
+                onChange={(e) => alterar({ percentualMinimo: Number(e.target.value || 0) })}
+              />
+            )}
+          </Field>
+        )}
+        <RichTextEditor label="Instruções (opcional)" value={etapa.instrucoes} onChange={(html: string) => alterar({ instrucoes: html })} />
       </div>
-    </ModalShell>
+    </GtiDialog>
   );
 };
 
