@@ -4,6 +4,8 @@ import { ISPFXContext, SPFI, SPFx, spfi } from '@pnp/sp';
 import '@pnp/sp/webs';
 import '@pnp/sp/lists';
 import '@pnp/sp/items';
+import '@pnp/sp/files';
+import '@pnp/sp/folders';
 import '@pnp/sp/fields';
 import '@pnp/sp/site-groups/web';
 import '@pnp/sp/site-users/web';

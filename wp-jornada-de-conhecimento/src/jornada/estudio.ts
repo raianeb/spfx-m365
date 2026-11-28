@@ -108,13 +108,26 @@ export const validarJornada = (jornada: Pick<IJornadaEstudio, 'titulo' | 'capa' 
   return erros;
 };
 
-export const validarEtapa = (etapa: Pick<IEtapa, 'titulo' | 'tipo' | 'url' | 'duracaoMin' | 'regra' | 'percentualMinimo'>, siteUrl: string): ErrosFormulario => {
+/** Tamanho máximo do HTML de uma etapa do tipo Conteudo (a coluna aceita até 63.999 caracteres). */
+export const LIMITE_CONTEUDO_ETAPA: number = 60000;
+
+export const validarEtapa = (
+  etapa: Pick<IEtapa, 'titulo' | 'tipo' | 'url' | 'conteudo' | 'duracaoMin' | 'regra' | 'percentualMinimo'>,
+  siteUrl: string,
+  conteudoTemAlgo: (html: string) => boolean = (html: string) => html.trim() !== ''
+): ErrosFormulario => {
   const erros: ErrosFormulario = {};
   if (etapa.titulo.trim() === '') {
     erros.titulo = 'Informe o nome da etapa.';
   }
   const url: string = urlSegura(etapa.url, siteUrl);
-  if (etapa.url.trim() === '') {
+  if (etapa.tipo === 'Conteudo') {
+    if (!conteudoTemAlgo(etapa.conteudo ?? '')) {
+      erros.conteudo = 'Escreva o conteúdo da etapa ou insira ao menos uma imagem.';
+    } else if ((etapa.conteudo ?? '').length > LIMITE_CONTEUDO_ETAPA) {
+      erros.conteudo = 'O conteúdo passou do limite. Divida-o em duas etapas.';
+    }
+  } else if (etapa.url.trim() === '') {
     erros.url = 'Informe o endereço do conteúdo.';
   } else if (etapa.tipo === 'YouTube' && idDoYoutube(etapa.url) === '') {
     erros.url = 'Cole um link do YouTube (youtube.com ou youtu.be).';
@@ -160,6 +173,13 @@ export const EXTENSOES_POR_TIPO: Partial<Record<TipoEtapa, string[]>> = {
   Video: ['mp4', 'webm', 'm4v', 'mov'],
   Documento: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
 };
+
+/** Imagens aceitas para capa e conteúdo. */
+export const EXTENSOES_IMAGEM: string[] = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+export const extensaoDe = (nome: string): string => (nome.lastIndexOf('.') > 0 ? nome.slice(nome.lastIndexOf('.') + 1).toLowerCase() : '');
+
+export const ehImagem = (nome: string): boolean => EXTENSOES_IMAGEM.indexOf(extensaoDe(nome)) !== -1;
 
 export const arquivoCombina = (nome: string, tipo: TipoEtapa): boolean => {
   const extensoes: string[] | undefined = EXTENSOES_POR_TIPO[tipo];

@@ -1,11 +1,16 @@
 // Skills aplicadas: spfx-implementacao-base (regras de negócio puras e testáveis). Escopo, seção 3 ("Regras de negócio").
 // Módulo puro: sem dependência do SharePoint.
 
-export type TipoEtapa = 'YouTube' | 'Video' | 'Documento' | 'Link';
+/**
+ * Tipos de etapa. "Conteudo" é o conteúdo montado no próprio editor (texto, imagens e links); o HTML
+ * sanitizado é gravado na coluna Url da lista de Etapas (texto multilinha simples, sem mudança de esquema).
+ * "Link" não é mais oferecido para etapas novas, mas continua exibido nas etapas existentes.
+ */
+export type TipoEtapa = 'YouTube' | 'Video' | 'Documento' | 'Conteudo' | 'Link';
 export type RegraConclusao = 'Manual' | 'PercentualAssistido' | 'AbrirConteudo';
 export type StatusMatricula = 'EmAndamento' | 'Concluida';
 
-const TIPOS: TipoEtapa[] = ['YouTube', 'Video', 'Documento', 'Link'];
+const TIPOS: TipoEtapa[] = ['YouTube', 'Video', 'Documento', 'Conteudo', 'Link'];
 const REGRAS: RegraConclusao[] = ['Manual', 'PercentualAssistido', 'AbrirConteudo'];
 
 export const PERCENTUAL_MINIMO_PADRAO: number = 90;
@@ -34,6 +39,8 @@ export interface IEtapa {
   ordem: number;
   tipo: TipoEtapa;
   url: string;
+  /** HTML sanitizado da etapa do tipo Conteudo (vazio nos demais tipos). */
+  conteudo?: string;
   duracaoMin: number;
   instrucoes: string;
   regra: RegraConclusao;

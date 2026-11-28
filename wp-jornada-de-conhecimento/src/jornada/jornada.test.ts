@@ -10,7 +10,7 @@ import {
 } from './nomes';
 import { CATALOGO_AREA, xmlDoCampo } from './catalogoArea';
 import { MATRIZ_PERMISSOES, NivelPadrao } from './permissoes';
-import { abasVisiveis, areaDe, corSegura, iconeSeguro, papeisPorPermissao } from './modelo';
+import { abasVisiveis, areaDe, corSegura, iconeSeguro, papeisDaArea, papeisPorPermissao } from './modelo';
 
 // O build do SPFx não inclui os tipos do Node; o Jest roda em CommonJS e oferece require.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,6 +123,18 @@ describe('papéis por permissão efetiva', () => {
     expect(abasVisiveis(false, [papeisPorPermissao(contribuir)])).toEqual(['minhas', 'estudio']);
     expect(abasVisiveis(true, [papeisPorPermissao(design)])).toEqual(['minhas', 'gestao', 'estudio', 'administracao']);
     expect(abasVisiveis(false, [], true)).toEqual(['minhas', 'administracao']);
+  });
+
+  it('Controle Total na lista (dono do site) não vira Gestor sem estar no grupo da área', () => {
+    const controleTotal = { High: 0x7fffffff, Low: 0xffffffff };
+    const nenhum = { gestores: false, apoio: false };
+    expect(papeisDaArea(controleTotal, nenhum, false)).toEqual({ gestor: false, apoio: false, usuario: true });
+    expect(abasVisiveis(false, [papeisDaArea(controleTotal, nenhum, false)])).toEqual(['minhas']);
+    expect(papeisDaArea(controleTotal, { gestores: false, apoio: true }, false)).toEqual({ gestor: false, apoio: true, usuario: true });
+    expect(papeisDaArea(controleTotal, { gestores: true, apoio: false }, false).gestor).toBe(true);
+    expect(papeisDaArea(controleTotal, nenhum, true).gestor).toBe(true);
+    // Sem Controle Total vale a permissão efetiva (grupos do Entra ID dentro dos grupos da área).
+    expect(papeisDaArea(design, nenhum, false).gestor).toBe(true);
   });
 });
 

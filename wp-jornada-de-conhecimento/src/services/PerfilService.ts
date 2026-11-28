@@ -6,7 +6,7 @@ import { IBasePermissions, PermissionKind } from '@pnp/sp/security';
 import { AmbienteLista, IPrefixosListas } from '../core/prefixos';
 import { DiagnosticsLogger } from '../core/diagnostics';
 import { nomeListaAreas, nomeListaDaArea } from '../jornada/nomes';
-import { Aba, CAMPOS_AREA, IArea, IAreaItem, IPapeisArea, abasVisiveis, areaDe, papeisPorPermissao } from '../jornada/modelo';
+import { Aba, CAMPOS_AREA, IArea, IAreaItem, IPapeisArea, abasVisiveis, areaDe, papeisDaArea } from '../jornada/modelo';
 import { naoEncontrado } from './sp';
 
 export interface IAreaComPapel {
@@ -62,9 +62,13 @@ export class PerfilService {
     ]);
     const administrador: boolean =
       this._gruposAdministradores.length > 0 && grupos.some((grupo: { Id: number }) => this._gruposAdministradores.indexOf(grupo.Id) !== -1);
+    // "Preparar o site" só existe enquanto o grupo de Administradores não está configurado na web part:
+    // depois disso, ser dono do site não abre a Administração.
     const podePrepararSite: boolean =
+      this._gruposAdministradores.length === 0 &&
       this._sp.web.hasPermissions(permissoesSite, PermissionKind.ManagePermissions) &&
       this._sp.web.hasPermissions(permissoesSite, PermissionKind.CreateGroups);
+    const meusGrupos: Set<number> = new Set<number>(grupos.map((grupo: { Id: number }) => grupo.Id));
 
     let itens: IAreaItem[];
     try {
@@ -80,7 +84,7 @@ export class PerfilService {
     const areas: IArea[] = itens
       .map(areaDe)
       .filter((area: IArea) => administrador || area.status === 'Ativa');
-    const papeis: IPapeisArea[] = await this._papeis(areas);
+    const papeis: IPapeisArea[] = await this._papeis(areas, meusGrupos, administrador);
     const comPapel: IAreaComPapel[] = areas.map((area: IArea, indice: number) => ({ area, papeis: papeis[indice] }));
 
     this._logger.log(
@@ -100,8 +104,8 @@ export class PerfilService {
     };
   }
 
-  /** Permissão efetiva na lista de Jornadas de cada área ativa, numa única requisição em lote. */
-  private async _papeis(areas: IArea[]): Promise<IPapeisArea[]> {
+  /** Permissão efetiva na lista de Jornadas de cada área ativa, numa única requisição em lote (regra em papeisDaArea). */
+  private async _papeis(areas: IArea[], meusGrupos: Set<number>, administrador: boolean): Promise<IPapeisArea[]> {
     const semPapel: IPapeisArea = { gestor: false, apoio: false, usuario: false };
     const ativas: IArea[] = areas.filter((area: IArea) => area.status === 'Ativa');
     if (ativas.length === 0) {
@@ -118,6 +122,9 @@ export class PerfilService {
         .catch(() => mascaras.set(area.id, undefined));
     });
     await executar();
-    return areas.map((area: IArea) => papeisPorPermissao(mascaras.get(area.id)));
+    const membroDe = (id: number | undefined): boolean => id !== undefined && meusGrupos.has(id);
+    return areas.map((area: IArea) =>
+      papeisDaArea(mascaras.get(area.id), { gestores: membroDe(area.grupoGestoresId), apoio: membroDe(area.grupoApoioId) }, administrador)
+    );
   }
 }

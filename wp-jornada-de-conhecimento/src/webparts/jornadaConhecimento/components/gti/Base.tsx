@@ -136,6 +136,8 @@ export interface IHeroProps {
   acoes?: React.ReactNode;
   /** Conteúdo à direita (anel de progresso, número de destaque). Some em coluna estreita. */
   lateral?: React.ReactNode;
+  /** Frase curta de marca, discreta no canto superior direito (ex.: lema institucional). */
+  lema?: string;
   rotulo: string;
 }
 
@@ -153,6 +155,7 @@ export function Hero(props: IHeroProps): React.ReactElement {
         {props.acoes && <div className="pi-actions">{props.acoes}</div>}
       </div>
       {props.lateral && <div className="pi-hero-aside">{props.lateral}</div>}
+      {props.lema && <p className="pi-hero-lema">{props.lema}</p>}
     </section>
   );
 }

@@ -52,6 +52,13 @@ describe('validação do editor', () => {
     expect(arquivoCombina('Aula.mp4', 'Documento')).toBe(false);
     expect(arquivoCombina('x.pdf', 'Link')).toBe(false);
   });
+
+  it('etapa de texto e imagens exige conteúdo, não endereço', () => {
+    const base = { titulo: 'Leitura', tipo: 'Conteudo' as const, url: '', duracaoMin: 10, regra: 'AbrirConteudo' as const, percentualMinimo: 0 };
+    expect(validarEtapa({ ...base, conteudo: '' }, SITE).conteudo).toBeDefined();
+    expect(validarEtapa({ ...base, conteudo: '<p>Olá</p>' }, SITE)).toEqual({});
+    expect(validarEtapa({ ...base, conteudo: 'x'.repeat(60001) }, SITE).conteudo).toBeDefined();
+  });
 });
 
 describe('gestão da área', () => {

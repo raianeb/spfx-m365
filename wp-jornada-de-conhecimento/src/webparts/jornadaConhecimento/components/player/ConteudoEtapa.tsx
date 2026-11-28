@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import { Icon } from '../gti';
+import { sanitizarConteudo } from '../../../../comum/richText';
 import { IEtapa } from '../../../../jornada/progresso';
 import { ORIGENS_YOUTUBE, idDoYoutube, mesmoHost, urlEmbedDocumento, urlEmbedYoutube, urlSegura } from '../../../../jornada/conteudo';
 import styles from '../jc.module.scss';
@@ -169,6 +170,44 @@ const Link: React.FC<IConteudoEtapaProps> = ({ etapa, siteUrl, aoAbrir }: IConte
   );
 };
 
+/**
+ * Texto e imagens montados no Estúdio. O HTML passa de novo pela allowlist ao exibir. A regra "Abrir o conteúdo"
+ * conta quando a pessoa chega ao fim do texto (marcador observado), ou logo que abre, se o texto cabe na tela.
+ */
+const ConteudoRico: React.FC<IConteudoEtapaProps> = ({ etapa, aoAbrir }: IConteudoEtapaProps) => {
+  const fim = useRef<HTMLDivElement>(null);
+  const html: string = sanitizarConteudo(etapa.conteudo ?? '');
+  useEffect(() => {
+    const alvo: HTMLDivElement | null = fim.current;
+    if (!alvo) {
+      return undefined;
+    }
+    if (typeof IntersectionObserver === 'undefined') {
+      aoAbrir();
+      return undefined;
+    }
+    const observador: IntersectionObserver = new IntersectionObserver((entradas: IntersectionObserverEntry[]) => {
+      if (entradas.some((entrada: IntersectionObserverEntry) => entrada.isIntersecting)) {
+        aoAbrir();
+        observador.disconnect();
+      }
+    });
+    observador.observe(alvo);
+    return () => observador.disconnect();
+  }, [etapa.id]);
+  if (!html) {
+    return <p className={styles.avisoConteudo}>Esta etapa ainda não tem conteúdo.</p>;
+  }
+  return (
+    <article className={styles.leitura} aria-label={etapa.titulo}>
+      <div className={styles.conteudoRico} dangerouslySetInnerHTML={{ __html: html }} />
+      <div ref={fim} className={styles.leituraFim} aria-hidden="true">
+        <Icon nome="checkCirculo" tamanho={16} /> Fim do conteúdo
+      </div>
+    </article>
+  );
+};
+
 const ConteudoEtapa: React.FC<IConteudoEtapaProps> = (props: IConteudoEtapaProps) => {
   switch (props.etapa.tipo) {
     case 'YouTube':
@@ -177,6 +216,8 @@ const ConteudoEtapa: React.FC<IConteudoEtapaProps> = (props: IConteudoEtapaProps
       return <VideoBiblioteca {...props} />;
     case 'Documento':
       return <Documento {...props} />;
+    case 'Conteudo':
+      return <ConteudoRico {...props} />;
     default:
       return <Link {...props} />;
   }
