@@ -1,18 +1,15 @@
-// Skills aplicadas: spfx-design-base (linha do tempo, ação principal clara, estados), spfx-acessibilidade-conteudo
-// (etapa atual anunciada, bloqueio explicado, foco no conteúdo ao trocar de etapa), spfx-codigo-performance
-// (progresso gravado a cada 15 s e ao sair; curtida otimista). Escopo, seções 3 e 6.2.
+// Skills aplicadas: spfx-padrao-visual-gti (receita "Fluxo passo a passo": progresso, linha do tempo recolhível, palco,
+// rodapé de ações, comemoração), spfx-acessibilidade-conteudo (etapa atual anunciada, bloqueio explicado, foco no
+// título ao trocar de etapa, atalho N), spfx-codigo-performance (progresso gravado a cada 15 s e ao sair; curtida
+// otimista). Escopo, seções 3 e 6.2.
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
-import { Icon } from '@fluentui/react/lib/Icon';
-import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
-import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { toSafeHtml } from '../../../../comum/richText';
 import {
   EstadoEtapa,
   IEtapa,
   IMatricula,
-  avaliacaoLiberada,
+  PERCENTUAL_MINIMO_PADRAO,
   concluirEtapa,
   estadosEtapas,
   etapaParaContinuar,
@@ -26,27 +23,13 @@ import {
 } from '../../../../jornada/progresso';
 import { ICurtidas } from '../../../../services/EngajamentoService';
 import { mensagemDeErro } from '../../../../services/sp';
-import { IJornadaVisivel, IServicosJornada } from '../tipos';
-import Estado from '../comum/Estado';
-import { AnelProgresso } from '../comum/Indicadores';
+import { Empty, ErrorBox, GtiDialog, Icon, Loading, ProgressBar, useToast } from '../gti';
+import { IContextoTela, IJornadaVisivel, rotaJornada, rotaPlayer } from '../tipos';
+import { ICONE_TIPO, ROTULO_TIPO, formatarDuracao, textoErro } from '../comum/ui';
+import { encontrarJornada } from '../aprendizado/DetalheJornada';
 import ConteudoEtapa from './ConteudoEtapa';
-import Avaliacoes from './Avaliacoes';
-import styles from './Player.module.scss';
-
-export interface IPlayerProps {
-  item: IJornadaVisivel;
-  servicos: IServicosJornada;
-  usuarioId: number;
-  siteUrl: string;
-  aoVoltar: () => void;
-}
-
-const ICONE_TIPO: Record<IEtapa['tipo'], string> = {
-  YouTube: 'Video',
-  Video: 'MSNVideos',
-  Documento: 'TextDocument',
-  Link: 'Link'
-};
+import { EscolhaNota } from './Avaliacoes';
+import styles from '../jc.module.scss';
 
 const ROTULO_ESTADO: Record<EstadoEtapa, string> = {
   concluida: 'concluída',
@@ -54,25 +37,45 @@ const ROTULO_ESTADO: Record<EstadoEtapa, string> = {
   bloqueada: 'bloqueada até concluir a anterior'
 };
 
-const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
-  const { item, servicos, usuarioId } = props;
+interface IPlayerProps {
+  ctx: IContextoTela;
+  item: IJornadaVisivel;
+}
+
+const PlayerJornada: React.FC<IPlayerProps> = ({ ctx, item }: IPlayerProps) => {
+  const { servicos, roteador, perfil, props } = ctx;
   const { area, jornada } = item;
+  const usuarioId: number = perfil.usuarioId;
+  const etapaPedida: number | undefined = roteador.parametros[2] ? Number(roteador.parametros[2]) : undefined;
+  const { avisar } = useToast();
   const [etapas, setEtapas] = useState<IEtapa[] | undefined>(undefined);
   const [matricula, setMatricula] = useState<IMatricula | undefined>(undefined);
-  const [atualId, setAtualId] = useState<number | undefined>(undefined);
   const [curtidas, setCurtidas] = useState<ICurtidas | undefined>(undefined);
-  const [aba, setAba] = useState<'conteudo' | 'avaliacoes'>('conteudo');
-  const [concluiuAgora, setConcluiuAgora] = useState<boolean>(false);
+  const [linhaTempo, setLinhaTempo] = useState<boolean>(true);
   const [erro, setErro] = useState<string>('');
   const [aviso, setAviso] = useState<string>('');
   const [salvando, setSalvando] = useState<boolean>(false);
-  const tituloConteudo = useRef<HTMLHeadingElement>(null);
-  // Versão mais recente da matrícula para os eventos do player e da página (sem fechar sobre estado antigo).
+  const [comemorar, setComemorar] = useState<boolean>(false);
+  const [nota, setNota] = useState<number>(0);
+  const [comentario, setComentario] = useState<string>('');
+  const titulo = useRef<HTMLHeadingElement>(null);
   const matriculaAtual = useRef<IMatricula | undefined>(undefined);
+  const alterou = useRef<boolean>(false);
+
+  const atualId: number | undefined = useMemo(() => {
+    if (!etapas) {
+      return undefined;
+    }
+    if (etapaPedida && etapas.some((e: IEtapa) => e.id === etapaPedida)) {
+      return etapaPedida;
+    }
+    return etapaParaContinuar(etapas, matricula)?.id;
+  }, [etapas, etapaPedida, matricula?.id]);
 
   const atualizar = useCallback(
     (proxima: IMatricula, gravarAgora: boolean): Promise<void> => {
       matriculaAtual.current = proxima;
+      alterou.current = true;
       setMatricula(proxima);
       if (gravarAgora) {
         return servicos.matriculas.salvar(area, proxima);
@@ -89,20 +92,18 @@ const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
     (async (): Promise<void> => {
       const lidas: IEtapa[] = ordenarEtapas(await servicos.jornadas.etapasDaJornada(area, jornada.id));
       const garantida: IMatricula = await servicos.matriculas.garantir(area, jornada.id, usuarioId, lidas[0]?.id);
-      if (!ativo) {
-        return;
+      if (ativo) {
+        matriculaAtual.current = garantida;
+        setEtapas(lidas);
+        setMatricula(garantida);
       }
-      matriculaAtual.current = garantida;
-      setEtapas(lidas);
-      setMatricula(garantida);
-      setAtualId(etapaParaContinuar(lidas, garantida)?.id);
     })().catch((falha: unknown) => ativo && setErro(mensagemDeErro(falha, 'Abrir a jornada')));
     return () => {
       ativo = false;
     };
   }, [servicos, area, jornada.id, usuarioId]);
 
-  // Ao sair da página, esconder a aba ou fechar o player, grava o que estiver pendente.
+  // Ao sair da página, esconder a aba ou fechar o player, grava o pendente e atualiza o catálogo.
   useEffect(() => {
     const descarregar = (): void => {
       servicos.matriculas.descarregar().catch(() => undefined);
@@ -118,23 +119,33 @@ const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
       document.removeEventListener('visibilitychange', aoMudarVisibilidade);
       window.removeEventListener('pagehide', descarregar);
       descarregar();
+      if (alterou.current) {
+        ctx.recarregarCatalogo();
+      }
     };
   }, [servicos]);
 
-  // Curtidas da etapa atual.
+  // Etapa atual: grava a posição na matrícula, carrega curtidas e leva o foco ao título.
   useEffect(() => {
     let ativo: boolean = true;
     setCurtidas(undefined);
-    if (atualId !== undefined) {
-      servicos.engajamento
-        .curtidas(area, atualId, usuarioId)
-        .then((resultado: ICurtidas) => ativo && setCurtidas(resultado))
-        .catch(() => ativo && setCurtidas({ total: 0 }));
+    setAviso('');
+    if (atualId === undefined) {
+      return undefined;
     }
+    const atual: IMatricula | undefined = matriculaAtual.current;
+    if (atual && atual.etapaAtualId !== atualId) {
+      atualizar({ ...atual, etapaAtualId: atualId, ultimoAcesso: new Date().toISOString() }, false).catch(() => undefined);
+    }
+    servicos.engajamento
+      .curtidas(area, atualId, usuarioId)
+      .then((r: ICurtidas) => ativo && setCurtidas(r))
+      .catch(() => ativo && setCurtidas({ total: 0 }));
+    titulo.current?.focus({ preventScroll: true });
     return () => {
       ativo = false;
     };
-  }, [servicos, area, atualId, usuarioId]);
+  }, [atualId]);
 
   const estados: EstadoEtapa[] = useMemo(
     () => (etapas && matricula ? estadosEtapas(etapas, matricula.progresso, jornada.ordemLivre) : []),
@@ -160,42 +171,60 @@ const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
     }
   }, [atualId, atualizar]);
 
+  const irPara = useCallback(
+    (etapaId: number): void => {
+      servicos.matriculas.descarregar().catch(() => undefined);
+      roteador.navegar(rotaPlayer(item, etapaId));
+    },
+    [servicos, roteador, item]
+  );
+
+  // Atalho N: próxima etapa liberada.
+  const proxima: IEtapa | undefined = etapas && atualId !== undefined ? proximaEtapa(etapas, atualId) : undefined;
+  const indiceAtual: number = etapas ? Math.max(0, etapas.findIndex((e: IEtapa) => e.id === atualId)) : 0;
+  const proximaLiberada: boolean = !!proxima && estados[indiceAtual + 1] !== 'bloqueada';
+  useEffect(() => {
+    const aoTeclar = (e: KeyboardEvent): void => {
+      const alvo: HTMLElement | null = e.target as HTMLElement | null;
+      if (!alvo || /input|textarea|select/i.test(alvo.tagName) || alvo.isContentEditable || e.ctrlKey || e.metaKey || e.altKey) {
+        return;
+      }
+      if (e.key.toLowerCase() === 'n' && proxima && proximaLiberada) {
+        irPara(proxima.id);
+      }
+    };
+    document.addEventListener('keydown', aoTeclar);
+    return () => document.removeEventListener('keydown', aoTeclar);
+  }, [proxima, proximaLiberada, irPara]);
+
   if (erro) {
-    return (
-      <Estado titulo="Não foi possível abrir a jornada" texto={erro} papel="alert">
-        <DefaultButton text="Voltar para Minhas Jornadas" onClick={props.aoVoltar} />
-      </Estado>
-    );
+    return <ErrorBox mensagem={erro} />;
   }
-  if (!etapas || !matricula) {
-    return <Spinner size={SpinnerSize.medium} label="Abrindo a jornada..." />;
-  }
-  if (etapas.length === 0) {
-    return (
-      <Estado titulo={jornada.titulo} texto="Esta jornada ainda não tem etapas.">
-        <DefaultButton text="Voltar para Minhas Jornadas" onClick={props.aoVoltar} />
-      </Estado>
+  if (!etapas || !matricula || atualId === undefined) {
+    return etapas && etapas.length === 0 ? (
+      <div className="pi-card">
+        <Empty icone="camadas" titulo={jornada.titulo} descricao="Esta jornada ainda não tem etapas." />
+      </div>
+    ) : (
+      <Loading texto="Abrindo a jornada…" />
     );
   }
 
-  const indiceAtual: number = Math.max(0, etapas.findIndex((etapa: IEtapa) => etapa.id === atualId));
   const etapa: IEtapa = etapas[indiceAtual];
   const estadoAtual: EstadoEtapa = estados[indiceAtual] ?? 'disponivel';
-  const proxima: IEtapa | undefined = proximaEtapa(etapas, etapa.id);
-  const proximaLiberada: boolean = !!proxima && estados[indiceAtual + 1] !== 'bloqueada';
-  const liberarAvaliacao: boolean = avaliacaoLiberada(etapas, matricula.progresso);
-
-  const selecionar = (id: number): void => {
-    servicos.matriculas.descarregar().catch(() => undefined);
-    setAtualId(id);
-    setAba('conteudo');
-    setAviso('');
-    const atual: IMatricula | undefined = matriculaAtual.current;
-    if (atual) {
-      atualizar({ ...atual, etapaAtualId: id, ultimoAcesso: new Date().toISOString() }, false).catch(() => undefined);
-    }
-    window.setTimeout(() => tituloConteudo.current?.focus(), 0);
-  };
+  const progressoEtapa = matricula.progresso[String(etapa.id)];
+  const percentual: number = matricula.status === 'Concluida' ? 100 : matricula.percentual;
+  const pctEtapa: number = progressoEtapa?.pct ?? 0;
+  const minimo: number = etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO;
+  const instrucoes: string = toSafeHtml(etapa.instrucoes);
+  const regraTexto: string =
+    etapa.regra === 'PercentualAssistido'
+      ? `Assista ${minimo}% para concluir · ${pctEtapa}% assistido`
+      : etapa.regra === 'AbrirConteudo'
+        ? progressoEtapa
+          ? 'Conteúdo aberto'
+          : 'Abra o conteúdo para concluir'
+        : 'Marque quando terminar';
 
   const concluir = async (): Promise<void> => {
     const atual: IMatricula | undefined = matriculaAtual.current;
@@ -205,20 +234,19 @@ const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
     setSalvando(true);
     setAviso('');
     const agora: Date = new Date();
-    const antes: IMatricula = atual;
     const depois: IMatricula = recalcular({ ...atual, progresso: concluirEtapa(atual.progresso, etapa.id, agora) }, etapas, agora);
     try {
       await atualizar(depois, true);
-      if (antes.status !== 'Concluida' && depois.status === 'Concluida') {
-        // Momento de maior resposta: a tela de conclusão já abre a avaliação.
-        setConcluiuAgora(true);
-        setAba('avaliacoes');
+      if (atual.status !== 'Concluida' && depois.status === 'Concluida') {
+        setComemorar(true);
       } else if (proxima && depois.etapaAtualId === proxima.id) {
-        selecionar(proxima.id);
+        avisar('Etapa concluída. Seguindo para a próxima.');
+        irPara(proxima.id);
+      } else {
+        avisar('Etapa concluída.');
       }
     } catch (falha: unknown) {
-      // Não volta ao estado anterior (perderia posições registradas durante a gravação): mantém a conclusão na tela
-      // e agenda nova tentativa com a versão mais recente.
+      // Mantém a conclusão na tela e agenda nova tentativa com a versão mais recente (não perde posições).
       const ultima: IMatricula | undefined = matriculaAtual.current;
       if (ultima) {
         servicos.matriculas.agendar(area, ultima);
@@ -234,7 +262,6 @@ const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
       return;
     }
     const anterior: ICurtidas = curtidas;
-    // Atualização otimista: a curtida aparece na hora para quem clicou.
     setCurtidas(anterior.minhaId ? { total: Math.max(0, anterior.total - 1) } : { total: anterior.total + 1, minhaId: -1 });
     try {
       if (anterior.minhaId) {
@@ -249,86 +276,73 @@ const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
     }
   };
 
-  const instrucoes: string = toSafeHtml(etapa.instrucoes);
-  const progressoEtapa = matricula.progresso[String(etapa.id)];
-  const regraTexto: string =
-    etapa.regra === 'PercentualAssistido'
-      ? `Assista ao menos ${etapa.percentualMinimo || 90}% do vídeo para concluir.`
-      : etapa.regra === 'AbrirConteudo'
-        ? 'Abra o conteúdo para liberar a conclusão.'
-        : '';
+  const enviarAvaliacao = async (): Promise<void> => {
+    setSalvando(true);
+    try {
+      const atual = await servicos.engajamento.avaliacoes(area, jornada.id, usuarioId);
+      await servicos.engajamento.salvarAvaliacao(area, jornada.id, usuarioId, nota, comentario, atual.minha?.id);
+      setComemorar(false);
+      avisar('Avaliação salva. Obrigado!');
+    } catch (falha: unknown) {
+      setAviso(textoErro(falha, (e: unknown) => mensagemDeErro(e, 'Salvar a avaliação')));
+      setComemorar(false);
+    } finally {
+      setSalvando(false);
+    }
+  };
 
   return (
-    <div className={styles.player}>
-      <div className={styles.cabecalho}>
-        <DefaultButton iconProps={{ iconName: 'Back' }} text="Minhas Jornadas" onClick={props.aoVoltar} />
-        <div className={styles.cabecalhoTexto}>
-          <span className={styles.area} style={{ color: area.cor }}>
-            {area.nome}
+    <>
+      <div className={styles.playerTopo}>
+        <a className="pi-btn" href={roteador.hrefDe(rotaJornada(item))} onClick={roteador.aoClicarLink(rotaJornada(item))} aria-label="Voltar para a jornada">
+          <Icon nome="esquerda" tamanho={16} />
+        </a>
+        <button
+          type="button"
+          className="pi-btn"
+          aria-pressed={linhaTempo}
+          aria-label={linhaTempo ? 'Ocultar a lista de etapas' : 'Mostrar a lista de etapas'}
+          onClick={() => setLinhaTempo(!linhaTempo)}
+        >
+          <Icon nome="lateral" tamanho={16} />
+        </button>
+        <div className={styles.playerTitulo}>
+          <span>
+            {area.nome} · Etapa {indiceAtual + 1} de {etapas.length}
           </span>
-          <h3 className={styles.jornadaTitulo}>{jornada.titulo}</h3>
+          <h2>{jornada.titulo}</h2>
         </div>
-        <AnelProgresso percentual={matricula.status === 'Concluida' ? 100 : matricula.percentual} tamanho={52} />
+        <div className={styles.playerProgresso}>
+          <ProgressBar percentual={percentual} rotulo="Progresso na jornada" />
+        </div>
       </div>
 
-      <Pivot
-        selectedKey={aba}
-        onLinkClick={(pivo?: PivotItem) => pivo?.props.itemKey && setAba(pivo.props.itemKey as 'conteudo' | 'avaliacoes')}
-        headersOnly
-        aria-label="Seções da jornada"
-      >
-        <PivotItem itemKey="conteudo" headerText="Conteúdo" />
-        <PivotItem itemKey="avaliacoes" headerText="Avaliações" />
-      </Pivot>
-
-      {aba === 'avaliacoes' ? (
-        <div className={styles.painelAvaliacoes}>
-          {concluiuAgora && (
-            <div className={styles.parabens} role="status">
-              <Icon iconName="Trophy2" className={styles.parabensIcone} aria-hidden="true" />
-              <div>
-                <strong>Jornada concluída!</strong>
-                <p className={styles.meta}>Que tal contar como foi? Sua avaliação ajuda quem cria as jornadas.</p>
-              </div>
-            </div>
-          )}
-          <Avaliacoes
-            servico={servicos.engajamento}
-            area={area}
-            jornadaId={jornada.id}
-            usuarioId={usuarioId}
-            siteUrl={props.siteUrl}
-            liberada={liberarAvaliacao}
-            destaque={concluiuAgora}
-          />
-        </div>
-      ) : (
-        <div className={styles.corpo}>
-          <nav className={styles.linhaTempo} aria-label="Etapas da jornada">
+      <div className={`${styles.player} ${linhaTempo ? '' : styles.playerSemLinha}`}>
+        {linhaTempo && (
+          <nav className={`pi-card ${styles.linhaTempo}`} aria-label="Etapas da jornada">
+            <h2>Etapas</h2>
             <ol>
-              {etapas.map((item: IEtapa, indice: number) => {
-                const estado: EstadoEtapa = estados[indice];
-                const atual: boolean = item.id === etapa.id;
+              {etapas.map((e: IEtapa, i: number) => {
+                const estado: EstadoEtapa = estados[i];
+                const atual: boolean = e.id === etapa.id;
                 return (
-                  <li key={item.id}>
+                  <li key={e.id} className={estado === 'concluida' ? styles.liFeito : undefined}>
                     <button
                       type="button"
-                      className={`${styles.etapa} ${atual ? styles.etapaAtual : ''} ${estado === 'concluida' ? styles.etapaFeita : ''}`}
                       aria-current={atual ? 'step' : undefined}
                       aria-disabled={estado === 'bloqueada'}
-                      aria-label={`Etapa ${indice + 1}: ${item.titulo}, ${ROTULO_ESTADO[estado]}`}
-                      onClick={() => estado !== 'bloqueada' && selecionar(item.id)}
+                      aria-label={`Etapa ${i + 1}: ${e.titulo}, ${ROTULO_ESTADO[estado]}`}
+                      onClick={() => estado !== 'bloqueada' && !atual && irPara(e.id)}
                     >
-                      <Icon
-                        iconName={estado === 'concluida' ? 'CompletedSolid' : estado === 'bloqueada' ? 'Lock' : ICONE_TIPO[item.tipo]}
-                        className={styles.etapaIcone}
-                        aria-hidden="true"
-                      />
-                      <span className={styles.etapaTexto}>
-                        <span>{item.titulo}</span>
-                        <span className={styles.meta}>
-                          {item.duracaoMin ? `${item.duracaoMin} min` : item.tipo}
-                          {novidade(item, matricula) ? ' · Novo' : ''}
+                      <span className={`${styles.ponto} ${estado === 'concluida' ? styles.pontoFeito : ''} ${atual ? styles.pontoAtual : ''}`} aria-hidden="true">
+                        <Icon nome={estado === 'concluida' ? 'check' : estado === 'bloqueada' ? 'cadeado' : ICONE_TIPO[e.tipo]} tamanho={15} />
+                      </span>
+                      <span className={styles.pontoTexto}>
+                        <b>{e.titulo}</b>
+                        <span>
+                          {ROTULO_TIPO[e.tipo]}
+                          {e.duracaoMin ? ` · ${formatarDuracao(e.duracaoMin)}` : ''}
+                          {novidade(e, matricula) ? ' · Novo' : ''}
                         </span>
                       </span>
                     </button>
@@ -337,72 +351,143 @@ const Player: React.FC<IPlayerProps> = (props: IPlayerProps) => {
               })}
             </ol>
           </nav>
+        )}
 
-          <section className={styles.conteudo} aria-labelledby={`etapa-${etapa.id}`}>
-            <h4 id={`etapa-${etapa.id}`} ref={tituloConteudo} tabIndex={-1} className={styles.etapaTitulo}>
+        <section className={`pi-card ${styles.palco}`} aria-labelledby={`${ctx.idTitulo}-etapa`}>
+          <div className={styles.palcoTopo}>
+            <h3 id={`${ctx.idTitulo}-etapa`} ref={titulo} tabIndex={-1}>
               {etapa.titulo}
-            </h4>
-            {estadoAtual === 'bloqueada' ? (
-              <p className={styles.aviso}>Conclua a etapa anterior para liberar esta.</p>
+            </h3>
+            <span className={styles.palcoTipo}>
+              <Icon nome={ICONE_TIPO[etapa.tipo]} tamanho={14} />
+              {ROTULO_TIPO[etapa.tipo]}
+              {etapa.duracaoMin ? ` · ${formatarDuracao(etapa.duracaoMin)}` : ''}
+            </span>
+          </div>
+          {estadoAtual === 'bloqueada' ? (
+            <Empty icone="cadeado" titulo="Etapa bloqueada" descricao="Conclua a etapa anterior para liberar esta." />
+          ) : (
+            <ConteudoEtapa key={etapa.id} etapa={etapa} siteUrl={props.siteUrl} inicioSeg={progressoEtapa?.p ?? 0} aoProgresso={aoProgresso} aoAbrir={aoAbrir} />
+          )}
+          {instrucoes && (
+            <div className={styles.instrucoes}>
+              <b className={styles.rotulo}>Instruções</b>
+              <div dangerouslySetInnerHTML={{ __html: instrucoes }} />
+            </div>
+          )}
+          <div className={styles.palcoRodape}>
+            <button
+              type="button"
+              className={`pi-btn ${styles.curtir}`}
+              aria-pressed={!!curtidas?.minhaId}
+              disabled={!curtidas}
+              aria-label={`${curtidas?.minhaId ? 'Descurtir' : 'Curtir'} esta etapa, ${curtidas?.total ?? 0} curtida(s)`}
+              onClick={alternarCurtida}
+            >
+              <Icon nome="curtir" tamanho={16} />
+              {curtidas?.total ?? '–'}
+            </button>
+            {estadoAtual === 'concluida' ? (
+              <span className="pi-badge success" style={{ fontSize: 11, padding: '6px 10px' }}>
+                Etapa concluída
+              </span>
             ) : (
-              <ConteudoEtapa
-                key={etapa.id}
-                etapa={etapa}
-                siteUrl={props.siteUrl}
-                inicioSeg={progressoEtapa?.p ?? 0}
-                aoProgresso={aoProgresso}
-                aoAbrir={aoAbrir}
-              />
-            )}
-
-            <div className={styles.engajamento}>
-              <DefaultButton
-                iconProps={{ iconName: curtidas?.minhaId ? 'LikeSolid' : 'Like' }}
-                text={`${curtidas?.total ?? '–'}`}
-                ariaLabel={`${curtidas?.minhaId ? 'Descurtir' : 'Curtir'} esta etapa. ${curtidas?.total ?? 0} curtida(s)`}
-                toggle
-                checked={!!curtidas?.minhaId}
-                disabled={!curtidas}
-                onClick={alternarCurtida}
-              />
-              {regraTexto && estadoAtual !== 'concluida' && <span className={styles.meta}>{regraTexto}</span>}
-            </div>
-
-            {instrucoes && <div className={styles.instrucoes} dangerouslySetInnerHTML={{ __html: instrucoes }} />}
-
-            {aviso && (
-              <p className={styles.erro} role="alert">
-                {aviso}
-              </p>
-            )}
-
-            <div className={styles.rodape}>
-              {estadoAtual === 'concluida' ? (
-                <span className={styles.concluidaTexto}>
-                  <Icon iconName="CompletedSolid" aria-hidden="true" /> Etapa concluída
-                </span>
-              ) : (
-                <PrimaryButton
-                  text={salvando ? 'Salvando...' : 'Concluir etapa'}
-                  onClick={concluir}
+              <>
+                <button
+                  type="button"
+                  className="pi-btn primary"
                   disabled={salvando || estadoAtual === 'bloqueada' || !podeConcluir(etapa, matricula.progresso)}
-                />
-              )}
-              {proxima && (
-                <DefaultButton
-                  text="Próxima etapa"
-                  iconProps={{ iconName: 'Forward' }}
-                  onClick={() => selecionar(proxima.id)}
-                  disabled={!proximaLiberada}
-                  title={proximaLiberada ? undefined : 'Conclua esta etapa para liberar a próxima'}
-                />
-              )}
-            </div>
-          </section>
-        </div>
+                  onClick={concluir}
+                >
+                  <Icon nome="check" tamanho={16} />
+                  {salvando ? 'Salvando…' : 'Concluir etapa'}
+                </button>
+                <span className={styles.regra}>
+                  <Icon nome={etapa.regra === 'PercentualAssistido' ? 'video' : etapa.regra === 'AbrirConteudo' ? 'olho' : 'checkCirculo'} tamanho={14} />
+                  {regraTexto}
+                </span>
+              </>
+            )}
+            {proxima && (
+              <button
+                type="button"
+                className="pi-btn"
+                disabled={!proximaLiberada}
+                title={proximaLiberada ? undefined : 'Conclua esta etapa para liberar a próxima'}
+                onClick={() => irPara(proxima.id)}
+              >
+                Próxima <Icon nome="direita" tamanho={16} />
+              </button>
+            )}
+            <span className={styles.atalhos}>
+              <kbd>N</kbd> próxima etapa
+            </span>
+            {aviso && (
+              <span className={styles.erroInline} role="alert">
+                {aviso}
+              </span>
+            )}
+          </div>
+        </section>
+      </div>
+
+      {comemorar && (
+        <GtiDialog
+          id={`${ctx.idTitulo}-fim`}
+          variante="central"
+          titulo="Jornada concluída!"
+          aoFechar={() => setComemorar(false)}
+          bloquearFechamento={salvando}
+          rodape={
+            <>
+              <button type="button" className="pi-btn" disabled={salvando} onClick={() => setComemorar(false)}>
+                Agora não
+              </button>
+              <button type="button" className="pi-btn primary" disabled={salvando || nota === 0} onClick={enviarAvaliacao}>
+                {salvando ? 'Enviando…' : 'Enviar avaliação'}
+              </button>
+            </>
+          }
+        >
+          <div className={styles.comemoracao}>
+            <span className={styles.medalha} aria-hidden="true">
+              <Icon nome="medalha" tamanho={40} />
+            </span>
+            <p className="pi-hint">
+              Você concluiu <b>{jornada.titulo}</b>. Que tal contar como foi? Sua avaliação ajuda quem cria as jornadas.
+            </p>
+          </div>
+          <b style={{ color: 'var(--pi-navy)', fontSize: 13 }}>Como foi esta jornada?</b>
+          <div style={{ marginTop: 8 }}>
+            <EscolhaNota nota={nota} aoEscolher={setNota} desabilitado={salvando} />
+          </div>
+          <div className="pi-field" style={{ marginTop: 12 }}>
+            <label htmlFor={`${ctx.idTitulo}-fim-coment`}>Comentário (opcional)</label>
+            <textarea id={`${ctx.idTitulo}-fim-coment`} maxLength={1000} value={comentario} onChange={(e) => setComentario(e.target.value)} />
+          </div>
+        </GtiDialog>
       )}
-    </div>
+    </>
   );
+};
+
+/** Rota player/<área>/<jornada>[/<etapa>]: encontra a jornada no catálogo do usuário. */
+const Player: React.FC<IContextoTela> = (ctx: IContextoTela) => {
+  if (ctx.catalogo.tipo === 'carregando') {
+    return <Loading texto="Abrindo a jornada…" />;
+  }
+  if (ctx.catalogo.tipo === 'erro') {
+    return <ErrorBox mensagem={ctx.catalogo.mensagem} aoTentarNovamente={ctx.recarregarCatalogo} />;
+  }
+  const item: IJornadaVisivel | undefined = encontrarJornada(ctx);
+  if (!item) {
+    return (
+      <div className="pi-card">
+        <Empty icone="busca" titulo="Jornada não encontrada" descricao="Ela pode ter sido arquivada ou não estar disponível para você." />
+      </div>
+    );
+  }
+  return <PlayerJornada key={`${item.area.id}-${item.jornada.id}`} ctx={ctx} item={item} />;
 };
 
 export default Player;

@@ -1,25 +1,24 @@
-// Skills aplicadas: spfx-design-base, spfx-acessibilidade-conteudo. Escopo, seção 5 ("Moderação"): o Gestor oculta
-// comentários direto, pelo nível Editar na lista Avaliações.
+// Skills aplicadas: spfx-padrao-visual-gti (lista de comentários com ação por item), spfx-acessibilidade-conteudo.
+// Escopo, seção 5 ("Moderação"): o Gestor oculta comentários direto, pelo nível Editar na lista Avaliações.
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { DefaultButton } from '@fluentui/react/lib/Button';
-import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
-import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { IArea } from '../../../../jornada/modelo';
 import { IJornada } from '../../../../jornada/progresso';
 import { IAvaliacao } from '../../../../services/EngajamentoService';
 import { mensagemDeErro } from '../../../../services/sp';
-import { IServicosJornada } from '../tipos';
-import { Estrelas } from '../comum/Indicadores';
-import styles from './Gestao.module.scss';
+import { Badge, Empty, ErrorBox, Loading, Panel } from '../gti';
+import { IContextoTela } from '../tipos';
+import { Estrelas, dataCurta, iniciais } from '../comum/ui';
+import styles from '../jc.module.scss';
 
 export interface IModeracaoProps {
+  ctx: IContextoTela;
   area: IArea;
   jornadas: IJornada[];
-  servicos: IServicosJornada;
 }
 
-const Moderacao: React.FC<IModeracaoProps> = ({ area, jornadas, servicos }: IModeracaoProps) => {
+const Moderacao: React.FC<IModeracaoProps> = ({ ctx, area, jornadas }: IModeracaoProps) => {
+  const { servicos } = ctx;
   const [jornadaId, setJornadaId] = useState<number | undefined>(jornadas[0]?.id);
   const [comentarios, setComentarios] = useState<IAvaliacao[] | undefined>(undefined);
   const [erro, setErro] = useState<string>('');
@@ -31,6 +30,7 @@ const Moderacao: React.FC<IModeracaoProps> = ({ area, jornadas, servicos }: IMod
     }
     let ativo: boolean = true;
     setComentarios(undefined);
+    setErro('');
     servicos.gestao
       .comentarios(area, jornadaId)
       .then((lista: IAvaliacao[]) => ativo && setComentarios(lista))
@@ -45,9 +45,8 @@ const Moderacao: React.FC<IModeracaoProps> = ({ area, jornadas, servicos }: IMod
     setErro('');
     try {
       await servicos.gestao.ocultar(area, avaliacao.id, !avaliacao.oculto);
-      setComentarios((atual: IAvaliacao[] | undefined) =>
-        (atual ?? []).map((item: IAvaliacao) => (item.id === avaliacao.id ? { ...item, oculto: !item.oculto } : item))
-      );
+      setComentarios((atual: IAvaliacao[] | undefined) => (atual ?? []).map((a: IAvaliacao) => (a.id === avaliacao.id ? { ...a, oculto: !a.oculto } : a)));
+      ctx.avisar(avaliacao.oculto ? 'Comentário visível de novo.' : 'Comentário ocultado. Só o autor continua vendo.');
     } catch (falha: unknown) {
       setErro(mensagemDeErro(falha, 'Moderar o comentário'));
     } finally {
@@ -56,47 +55,56 @@ const Moderacao: React.FC<IModeracaoProps> = ({ area, jornadas, servicos }: IMod
   };
 
   if (jornadas.length === 0) {
-    return <p className={styles.ajuda}>Nenhuma jornada publicada nesta área.</p>;
+    return (
+      <div className="pi-card">
+        <Empty icone="email" titulo="Nenhuma jornada publicada" descricao="Os comentários das jornadas da área aparecem aqui para moderação." />
+      </div>
+    );
   }
 
   return (
-    <div className={styles.secao}>
-      <Dropdown
-        label="Jornada"
-        options={jornadas.map((jornada: IJornada): IDropdownOption => ({ key: jornada.id, text: jornada.titulo }))}
-        selectedKey={jornadaId}
-        onChange={(_e, opcao?: IDropdownOption) => opcao && setJornadaId(Number(opcao.key))}
-        styles={{ root: { maxWidth: 420 } }}
-      />
-      {erro && (
-        <p className={styles.erro} role="alert">
-          {erro}
-        </p>
-      )}
-      {comentarios === undefined ? (
-        <Spinner size={SpinnerSize.small} label="Carregando comentários..." />
-      ) : comentarios.length === 0 ? (
-        <p className={styles.ajuda}>Nenhum comentário nesta jornada.</p>
-      ) : (
-        <ul className={styles.listaAprovacoes}>
-          {comentarios.map((avaliacao: IAvaliacao) => (
-            <li key={avaliacao.id} className={styles.cartaoAprovacao}>
-              <div>
-                <strong>{avaliacao.autorNome}</strong> <Estrelas nota={avaliacao.nota} total={1} individual />
-                {avaliacao.oculto && <span className={styles.seloOculto}>Oculto</span>}
-                <p className={styles.comentarioTexto}>{avaliacao.comentario}</p>
-              </div>
-              <DefaultButton
-                text={avaliacao.oculto ? 'Mostrar' : 'Ocultar'}
-                ariaLabel={`${avaliacao.oculto ? 'Mostrar' : 'Ocultar'} comentário de ${avaliacao.autorNome}`}
-                disabled={ocupado !== undefined}
-                onClick={() => alternar(avaliacao)}
-              />
-            </li>
+    <Panel
+      titulo="Comentários"
+      descricao="Oculte comentários inadequados. O autor continua vendo o próprio comentário."
+      acao={
+        <select className="pi-select" aria-label="Jornada" value={jornadaId} onChange={(e) => setJornadaId(Number(e.target.value))}>
+          {jornadas.map((j: IJornada) => (
+            <option key={j.id} value={j.id}>
+              {j.titulo}
+            </option>
           ))}
-        </ul>
+        </select>
+      }
+    >
+      {erro && <ErrorBox mensagem={erro} />}
+      {comentarios === undefined ? (
+        !erro && <Loading texto="Carregando comentários…" />
+      ) : comentarios.length === 0 ? (
+        <p className="pi-hint">Nenhum comentário nesta jornada.</p>
+      ) : (
+        comentarios.map((a: IAvaliacao) => (
+          <div key={a.id} className={styles.comentario} style={a.oculto ? { opacity: 0.65 } : undefined}>
+            <span className="pi-avatar" aria-hidden="true">
+              {iniciais(a.autorNome)}
+            </span>
+            <div style={{ flex: 1 }}>
+              <b style={{ color: 'var(--pi-navy)', fontSize: 12 }}>{a.autorNome}</b> <Estrelas nota={a.nota} total={1} individual />{' '}
+              <span className="pi-hint">{dataCurta(a.data)}</span> {a.oculto && <Badge tom="danger">Oculto</Badge>}
+              <p>{a.comentario}</p>
+            </div>
+            <button
+              type="button"
+              className="pi-btn ghost"
+              disabled={ocupado !== undefined}
+              aria-label={`${a.oculto ? 'Mostrar' : 'Ocultar'} comentário de ${a.autorNome}`}
+              onClick={() => alternar(a)}
+            >
+              {a.oculto ? 'Mostrar' : 'Ocultar'}
+            </button>
+          </div>
+        ))
       )}
-    </div>
+    </Panel>
   );
 };
 

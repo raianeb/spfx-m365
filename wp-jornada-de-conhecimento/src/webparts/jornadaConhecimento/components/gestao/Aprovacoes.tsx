@@ -1,162 +1,185 @@
-// Skills aplicadas: spfx-design-base (fila com ações claras, confirmação com comentário), spfx-acessibilidade-conteudo.
-// Escopo, seção 6.3 ("Aprovações"): jornadas enviadas pelo Apoio, com Publicar e Devolver com comentário.
+// Skills aplicadas: spfx-padrao-visual-gti (fila em cartões com etapas, devolução com comentário em painel lateral),
+// spfx-acessibilidade-conteudo. Escopo, seção 6.3 ("Aprovações"): Publicar e Devolver com comentário.
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
-import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
-import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
-import { TextField } from '@fluentui/react/lib/TextField';
-import ModalShell from '../../../../crud/ModalShell';
-import crud from '../../../../crud/crud.module.scss';
-import { primaryButtonStyles, secondaryButtonStyles } from '../../../../crud/modalStyles';
 import { IArea } from '../../../../jornada/modelo';
 import { IEtapa } from '../../../../jornada/progresso';
 import { IJornadaEstudio, ROTULO_SITUACAO, SituacaoPublicacao, situacaoPublicacao } from '../../../../jornada/estudio';
 import { mensagemDeErro } from '../../../../services/sp';
-import { IServicosJornada, NOME_SOLUCAO } from '../tipos';
-import Estado from '../comum/Estado';
+import { Badge, Empty, ErrorBox, Field, GtiDialog, Icon, Loading, Panel } from '../gti';
+import { IContextoTela } from '../tipos';
+import { ICONE_TIPO, ROTULO_TIPO, dataCurta, formatarDuracao, rotuloRegra, textoErro } from '../comum/ui';
 import PreviaJornada from '../estudio/PreviaJornada';
-import styles from './Gestao.module.scss';
+import styles from '../jc.module.scss';
 
-export interface IAprovacoesProps {
-  area: IArea;
-  servicos: IServicosJornada;
-  siteUrl: string;
-  themeStyle?: React.CSSProperties;
-  aoPublicar: () => void;
-}
-
-const aguardando = (jornada: IJornadaEstudio): boolean => {
+export const aguardando = (jornada: IJornadaEstudio): boolean => {
   const situacao: SituacaoPublicacao = situacaoPublicacao(jornada.status, jornada.moderacao, !!jornada.dataPublicacao);
   return situacao === 'emAprovacao' || situacao === 'alteracoesPendentes';
 };
 
-const Aprovacoes: React.FC<IAprovacoesProps> = ({ area, servicos, siteUrl, themeStyle, aoPublicar }: IAprovacoesProps) => {
-  const [lista, setLista] = useState<IJornadaEstudio[] | undefined>(undefined);
+export interface IAprovacoesProps {
+  ctx: IContextoTela;
+  area: IArea;
+  aoContar: (n: number) => void;
+  aoPublicar: () => void;
+}
+
+const Aprovacoes: React.FC<IAprovacoesProps> = ({ ctx, area, aoContar, aoPublicar }: IAprovacoesProps) => {
+  const { servicos } = ctx;
+  const [lista, setLista] = useState<{ jornada: IJornadaEstudio; etapas: IEtapa[] }[] | undefined>(undefined);
   const [previa, setPrevia] = useState<{ jornada: IJornadaEstudio; etapas: IEtapa[] } | undefined>(undefined);
   const [devolvendo, setDevolvendo] = useState<IJornadaEstudio | undefined>(undefined);
   const [comentario, setComentario] = useState<string>('');
+  const [tentou, setTentou] = useState<boolean>(false);
   const [ocupado, setOcupado] = useState<number | undefined>(undefined);
-  const [aviso, setAviso] = useState<{ tipo: MessageBarType; texto: string } | undefined>(undefined);
+  const [erro, setErro] = useState<string>('');
   const [versao, setVersao] = useState<number>(0);
 
   useEffect(() => {
     let ativo: boolean = true;
-    servicos.estudio
-      .listar(area)
-      .then((todas: IJornadaEstudio[]) => ativo && setLista(todas.filter(aguardando)))
-      .catch((erro: unknown) => ativo && setAviso({ tipo: MessageBarType.error, texto: mensagemDeErro(erro, 'Carregar as aprovações') }));
+    setErro('');
+    (async (): Promise<void> => {
+      const pendentes: IJornadaEstudio[] = (await servicos.estudio.listar(area)).filter(aguardando);
+      const comEtapas = await Promise.all(pendentes.map(async (jornada: IJornadaEstudio) => ({ jornada, etapas: await servicos.jornadas.etapasDaJornada(area, jornada.id) })));
+      if (ativo) {
+        setLista(comEtapas);
+        aoContar(comEtapas.length);
+      }
+    })().catch((falha: unknown) => ativo && setErro(mensagemDeErro(falha, 'Carregar as aprovações')));
     return () => {
       ativo = false;
     };
   }, [servicos, area, versao]);
 
-  const executar = async (jornada: IJornadaEstudio, acao: () => Promise<void>, sucesso: string): Promise<void> => {
+  const executar = async (jornada: IJornadaEstudio, acao: () => Promise<void>, sucesso: string): Promise<boolean> => {
     setOcupado(jornada.id);
-    setAviso(undefined);
+    setErro('');
     try {
       await acao();
-      setAviso({ tipo: MessageBarType.success, texto: sucesso });
+      ctx.avisar(sucesso);
       setVersao((v: number) => v + 1);
       aoPublicar();
-    } catch (erro: unknown) {
-      setAviso({ tipo: MessageBarType.error, texto: erro instanceof Error && !('status' in erro) ? erro.message : mensagemDeErro(erro, 'Atualizar a jornada') });
+      return true;
+    } catch (falha: unknown) {
+      setErro(textoErro(falha, (e: unknown) => mensagemDeErro(e, 'Atualizar a jornada')));
+      return false;
     } finally {
       setOcupado(undefined);
     }
   };
 
   const devolver = async (): Promise<void> => {
-    if (!devolvendo) {
+    setTentou(true);
+    if (!devolvendo || comentario.trim() === '') {
       return;
     }
     const alvo: IJornadaEstudio = devolvendo;
-    setDevolvendo(undefined);
-    await executar(alvo, () => servicos.estudio.devolver(area, alvo.id, comentario), `"${alvo.titulo}" foi devolvida para ajustes.`);
-    setComentario('');
+    if (await executar(alvo, () => servicos.estudio.devolver(area, alvo.id, comentario.trim()), `"${alvo.titulo}" foi devolvida para ajustes.`)) {
+      setDevolvendo(undefined);
+      setComentario('');
+      setTentou(false);
+    }
   };
 
-  if (!lista) {
-    return aviso ? <MessageBar messageBarType={aviso.tipo}>{aviso.texto}</MessageBar> : <Spinner size={SpinnerSize.small} label="Carregando aprovações..." />;
+  if (erro && !lista) {
+    return <ErrorBox mensagem={erro} aoTentarNovamente={() => setVersao((v: number) => v + 1)} />;
   }
-
+  if (!lista) {
+    return <Loading texto="Carregando aprovações…" />;
+  }
   return (
-    <div className={styles.secao}>
-      {aviso && (
-        <MessageBar messageBarType={aviso.tipo} onDismiss={() => setAviso(undefined)} dismissButtonAriaLabel="Fechar aviso">
-          {aviso.texto}
-        </MessageBar>
-      )}
+    <>
+      {erro && <ErrorBox mensagem={erro} />}
       {lista.length === 0 ? (
-        <Estado titulo="Nada aguardando aprovação" texto="Quando a Equipe de apoio enviar uma jornada, ela aparece aqui." />
+        <div className="pi-card">
+          <Empty icone="caixaEntrada" titulo="Nada aguardando aprovação" descricao="Quando a Equipe de apoio enviar uma jornada, ela aparece aqui." />
+        </div>
       ) : (
-        <ul className={styles.listaAprovacoes}>
-          {lista.map((jornada: IJornadaEstudio) => (
-            <li key={jornada.id} className={styles.cartaoAprovacao}>
-              <div>
-                <strong>{jornada.titulo}</strong>
-                <span className={styles.ajuda}>
-                  {ROTULO_SITUACAO[situacaoPublicacao(jornada.status, jornada.moderacao, !!jornada.dataPublicacao)]} · enviada por {jornada.autor}
-                </span>
-              </div>
-              <div className={styles.acoes}>
-                <DefaultButton
-                  text="Pré-visualizar"
-                  onClick={() =>
-                    servicos.jornadas
-                      .etapasDaJornada(area, jornada.id)
-                      .then((etapas: IEtapa[]) => setPrevia({ jornada, etapas }))
-                      .catch((erro: unknown) => setAviso({ tipo: MessageBarType.error, texto: mensagemDeErro(erro, 'Abrir a pré-visualização') }))
-                  }
-                />
-                <DefaultButton text="Devolver" disabled={ocupado !== undefined} onClick={() => setDevolvendo(jornada)} />
-                <PrimaryButton
-                  text={ocupado === jornada.id ? 'Publicando...' : 'Publicar'}
-                  disabled={ocupado !== undefined}
-                  onClick={() => executar(jornada, () => servicos.estudio.publicar(area, jornada), `"${jornada.titulo}" foi publicada.`)}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        lista.map(({ jornada, etapas }) => {
+          const situacao: SituacaoPublicacao = situacaoPublicacao(jornada.status, jornada.moderacao, !!jornada.dataPublicacao);
+          const duracao: number = etapas.reduce((t: number, e: IEtapa) => t + (e.duracaoMin || 0), 0);
+          return (
+            <div key={jornada.id} style={{ marginBottom: 14 }}>
+              <Panel
+                titulo={jornada.titulo}
+                descricao={`Enviada por ${jornada.autor}${jornada.modificadaEm ? ` em ${dataCurta(jornada.modificadaEm)}` : ''} · ${etapas.length} etapa(s) · ${formatarDuracao(duracao)}`}
+                acao={<Badge tom="warning">{ROTULO_SITUACAO[situacao]}</Badge>}
+              >
+                {jornada.descricao && <p style={{ fontSize: 13, marginBottom: 10 }}>{jornada.descricao}</p>}
+                <ol className={styles.etapas}>
+                  {etapas.map((e: IEtapa, i: number) => (
+                    <li key={e.id} className={styles.etapa}>
+                      <span className={styles.numero} aria-hidden="true">
+                        {i + 1}
+                      </span>
+                      <div className={styles.etapaTexto}>
+                        <b>{e.titulo}</b>
+                        <span>
+                          <Icon nome={ICONE_TIPO[e.tipo]} tamanho={13} />
+                          {ROTULO_TIPO[e.tipo]} · {formatarDuracao(e.duracaoMin)} · {rotuloRegra(e)}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <div className="pi-actions" style={{ justifyContent: 'flex-end', marginTop: 14 }}>
+                  <button type="button" className="pi-btn" onClick={() => setPrevia({ jornada, etapas })}>
+                    <Icon nome="olho" tamanho={16} />
+                    Pré-visualizar
+                  </button>
+                  <button type="button" className="pi-btn danger" disabled={ocupado !== undefined} onClick={() => setDevolvendo(jornada)}>
+                    Devolver com comentário
+                  </button>
+                  <button
+                    type="button"
+                    className="pi-btn primary"
+                    disabled={ocupado !== undefined}
+                    onClick={() => executar(jornada, () => servicos.estudio.publicar(area, jornada), `"${jornada.titulo}" foi publicada.`)}
+                  >
+                    <Icon nome="check" tamanho={16} />
+                    {ocupado === jornada.id ? 'Publicando…' : 'Publicar'}
+                  </button>
+                </div>
+              </Panel>
+            </div>
+          );
+        })
       )}
-
       {previa && (
         <PreviaJornada
+          id={`${ctx.idTitulo}-previa`}
           titulo={previa.jornada.titulo}
           descricao={previa.jornada.descricao}
           etapas={previa.etapas}
-          siteUrl={siteUrl}
-          themeStyle={themeStyle}
+          siteUrl={ctx.props.siteUrl}
           aoFechar={() => setPrevia(undefined)}
         />
       )}
       {devolvendo && (
-        <ModalShell contextLabel={NOME_SOLUCAO} titleId="devolver-titulo" onDismiss={() => setDevolvendo(undefined)} themeStyle={themeStyle}>
-          <h2 id="devolver-titulo" className={crud.modalTitle}>
-            Devolver: {devolvendo.titulo}
-          </h2>
-          <div className={crud.modalForm}>
-            <TextField
-              label="O que precisa ser ajustado"
-              required
-              multiline
-              rows={4}
-              maxLength={1000}
-              value={comentario}
-              onChange={(_e, valor?: string) => setComentario(valor ?? '')}
-            />
-            <footer className={crud.footer}>
-              <span className={crud.helper}>O comentário aparece para quem enviou a jornada.</span>
-              <div className={crud.footerActions}>
-                <DefaultButton text="Cancelar" onClick={() => setDevolvendo(undefined)} styles={secondaryButtonStyles} />
-                <PrimaryButton text="Devolver" onClick={devolver} disabled={comentario.trim() === ''} styles={primaryButtonStyles} />
-              </div>
-            </footer>
-          </div>
-        </ModalShell>
+        <GtiDialog
+          id={`${ctx.idTitulo}-devolver`}
+          sobretitulo={`Aprovações · ${area.nome}`}
+          titulo={`Devolver: ${devolvendo.titulo}`}
+          bloquearFechamento={ocupado !== undefined}
+          aoFechar={() => setDevolvendo(undefined)}
+          textoRodape="O comentário aparece para quem enviou a jornada."
+          rodape={
+            <>
+              <button type="button" className="pi-btn" disabled={ocupado !== undefined} onClick={() => setDevolvendo(undefined)}>
+                Cancelar
+              </button>
+              <button type="button" className="pi-btn primary" disabled={ocupado !== undefined} onClick={devolver}>
+                {ocupado !== undefined ? 'Devolvendo…' : 'Devolver'}
+              </button>
+            </>
+          }
+        >
+          <Field id={`${ctx.idTitulo}-dev`} rotulo="O que precisa ser ajustado" obrigatorio erro={tentou && comentario.trim() === '' ? 'Escreva o que precisa ser ajustado.' : undefined}>
+            {(aria) => <textarea {...aria} autoFocus maxLength={1000} value={comentario} placeholder="Seja específico: cite a etapa e o ajuste." onChange={(e) => setComentario(e.target.value)} />}
+          </Field>
+        </GtiDialog>
       )}
-    </div>
+    </>
   );
 };
 

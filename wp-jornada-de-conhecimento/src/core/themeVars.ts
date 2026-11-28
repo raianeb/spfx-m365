@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
+import { tokensDoTema } from '../webparts/jornadaConhecimento/components/gti/tema';
 
 /** Converte o tema do site nas variáveis --cc-* usadas pelos componentes. */
 export const themeToCssVars = (theme: IReadonlyTheme | undefined): React.CSSProperties => {
@@ -26,5 +27,6 @@ export const themeToCssVars = (theme: IReadonlyTheme | undefined): React.CSSProp
   if (palette.neutralLighter) {
     vars['--cc-surface'] = palette.neutralLighter;
   }
-  return vars as unknown as React.CSSProperties;
+  // Tokens do padrão visual GTI (skill spfx-padrao-visual-gti), herdados do tema do site.
+  return { ...(vars as unknown as React.CSSProperties), ...tokensDoTema(theme) };
 };
