@@ -3,7 +3,7 @@
   "solution": {
     "name": "wp-jornada-de-conhecimento-client-side-solution",
     "id": "fefd2ba7-e476-4826-af15-f3d42e6eb134",
-    "version": "1.1.0.0",
+    "version": "1.1.1.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "developer": {
@@ -29,7 +29,7 @@
         "title": "wp-jornada-de-conhecimento Feature",
         "description": "The feature that activates elements of the wp-jornada-de-conhecimento solution.",
         "id": "3700370f-3ebd-4fa0-b51d-74e647e910ae",
-        "version": "1.1.0.0"
+        "version": "1.1.1.0"
       }
     ]
   },
