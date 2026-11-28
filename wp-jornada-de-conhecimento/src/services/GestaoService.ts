@@ -5,7 +5,7 @@ import { IPrincipalInfo, PrincipalType } from '@pnp/sp';
 import { ISiteUserInfo } from '@pnp/sp/site-users';
 import { DiagnosticsLogger } from '../core/diagnostics';
 import { IArea } from '../jornada/modelo';
-import { IJornada } from '../jornada/progresso';
+import { IJornada, IMatricula, liberarTentativas } from '../jornada/progresso';
 import { IMatriculaPessoa, IPessoaArea } from '../jornada/gestao';
 import { CAMPOS_MATRICULA, IMatriculaItem, JornadaService, matriculaDe } from './JornadaService';
 import { IAvaliacao } from './EngajamentoService';
@@ -142,6 +142,23 @@ export class GestaoService {
   public async ocultar(area: IArea, avaliacaoId: number, oculto: boolean): Promise<void> {
     await this._sp.web.lists.getByTitle(this._jornadas.lista(area, 'Avaliacoes')).items.getById(avaliacaoId).update({ Oculto: oculto });
     this._logger.log('info', `Gestão ${area.sigla}`, `Comentário ${oculto ? 'ocultado' : 'reexibido'}`);
+  }
+
+  /**
+   * Libera novas tentativas de quiz para uma pessoa: zera o contador da etapa, mantém a melhor nota.
+   * Grava só a coluna de progresso (não mexe em último acesso). Exige Editar na lista de Matrículas (Gestores).
+   */
+  public async liberarTentativas<T extends IMatricula>(area: IArea, matricula: T, etapaId: number): Promise<T> {
+    if (!matricula.id) {
+      return matricula;
+    }
+    const progresso = liberarTentativas(matricula.progresso, etapaId);
+    await this._sp.web.lists
+      .getByTitle(this._jornadas.lista(area, 'Matriculas'))
+      .items.getById(matricula.id)
+      .update({ ProgressoEtapas: JSON.stringify(progresso) });
+    this._logger.log('info', `Gestão ${area.sigla}`, `Tentativas de quiz liberadas (etapa ${etapaId})`);
+    return { ...matricula, progresso };
   }
 
   /** Lembrete aos atrasados: um e-mail por pessoa (ninguém vê quem mais recebeu), enviado com a conta do Gestor. */

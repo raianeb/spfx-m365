@@ -2,6 +2,7 @@
 // por campo). Escopo, seções 3 (Estúdio) e 5 (aprovação nativa). Módulo puro.
 import { IEtapa, IJornada, RegraConclusao, TipoEtapa } from './progresso';
 import { idDoYoutube, mesmoHost, urlSegura } from './conteudo';
+import { IQuiz, lerQuiz, paraEdicao, validarQuiz } from './quiz';
 
 /** Status próprio da jornada. A visibilidade para os Usuários vem da Aprovação de Conteúdo nativa. */
 export type StatusJornada = 'Rascunho' | 'EmAprovacao' | 'Publicada' | 'Arquivada';
@@ -121,7 +122,15 @@ export const validarEtapa = (
     erros.titulo = 'Informe o nome da etapa.';
   }
   const url: string = urlSegura(etapa.url, siteUrl);
-  if (etapa.tipo === 'Conteudo') {
+  if (etapa.tipo === 'Quiz') {
+    const quiz: IQuiz | undefined = lerQuiz(etapa.conteudo);
+    const problemas: number = quiz ? Object.keys(validarQuiz(paraEdicao(quiz))).length : 1;
+    if (problemas > 0) {
+      erros.conteudo = problemas === 1 ? 'Revise o quiz: há 1 ponto a corrigir.' : `Revise o quiz: há ${problemas} pontos a corrigir.`;
+    } else if ((etapa.conteudo ?? '').length > LIMITE_CONTEUDO_ETAPA) {
+      erros.conteudo = 'O quiz passou do limite de tamanho. Divida as perguntas em duas etapas.';
+    }
+  } else if (etapa.tipo === 'Conteudo') {
     if (!conteudoTemAlgo(etapa.conteudo ?? '')) {
       erros.conteudo = 'Escreva o conteúdo da etapa ou insira ao menos uma imagem.';
     } else if ((etapa.conteudo ?? '').length > LIMITE_CONTEUDO_ETAPA) {
@@ -139,6 +148,9 @@ export const validarEtapa = (
   if (!Number.isFinite(etapa.duracaoMin) || etapa.duracaoMin < 0 || etapa.duracaoMin > 1440) {
     erros.duracaoMin = 'Informe a duração em minutos (0 a 1440).';
   }
+  if ((etapa.regra === 'Aprovacao') !== (etapa.tipo === 'Quiz')) {
+    erros.regra = etapa.tipo === 'Quiz' ? 'O quiz é concluído pela aprovação.' : 'Aprovação só vale para quiz.';
+  }
   if (etapa.regra === 'PercentualAssistido') {
     if (etapa.tipo !== 'YouTube' && etapa.tipo !== 'Video') {
       erros.regra = 'Percentual assistido só vale para vídeos.';
@@ -149,8 +161,9 @@ export const validarEtapa = (
   return erros;
 };
 
-/** Regra sugerida para o tipo: vídeo pede percentual assistido; documento e link, abrir o conteúdo. */
-export const regraPadrao = (tipo: TipoEtapa): RegraConclusao => (tipo === 'YouTube' || tipo === 'Video' ? 'PercentualAssistido' : 'AbrirConteudo');
+/** Regra sugerida para o tipo: vídeo pede percentual assistido; quiz, aprovação; documento e texto, abrir o conteúdo. */
+export const regraPadrao = (tipo: TipoEtapa): RegraConclusao =>
+  tipo === 'Quiz' ? 'Aprovacao' : tipo === 'YouTube' || tipo === 'Video' ? 'PercentualAssistido' : 'AbrirConteudo';
 
 /** Renumera a Ordem de 10 em 10 (deixa espaço para inserções). */
 export const renumerar = <T extends { ordem: number }>(etapas: T[]): T[] =>

@@ -13,11 +13,30 @@ export interface IDetalhePessoaProps {
   celula: ICelula;
   etapas: IEtapa[];
   aoLembrar?: () => void;
+  /** Libera novas tentativas de um quiz (zera o contador). */
+  aoLiberarQuiz?: (etapaId: number) => Promise<void>;
   aoFechar: () => void;
 }
 
-const DetalhePessoa: React.FC<IDetalhePessoaProps> = ({ id, pessoa, jornada, celula, etapas, aoLembrar, aoFechar }: IDetalhePessoaProps) => {
+const DetalhePessoa: React.FC<IDetalhePessoaProps> = ({ id, pessoa, jornada, celula, etapas, aoLembrar, aoLiberarQuiz, aoFechar }: IDetalhePessoaProps) => {
   const progresso = celula.matricula?.progresso ?? {};
+  const [liberando, setLiberando] = React.useState<number | undefined>(undefined);
+  const [mensagem, setMensagem] = React.useState<string>('');
+  const liberar = async (etapaId: number): Promise<void> => {
+    if (!aoLiberarQuiz) {
+      return;
+    }
+    setLiberando(etapaId);
+    setMensagem('');
+    try {
+      await aoLiberarQuiz(etapaId);
+      setMensagem('Novas tentativas liberadas. A pessoa já pode refazer o quiz.');
+    } catch {
+      setMensagem('Não foi possível liberar agora. Tente de novo em instantes.');
+    } finally {
+      setLiberando(undefined);
+    }
+  };
   return (
     <GtiDialog
       id={id}
@@ -52,6 +71,11 @@ const DetalhePessoa: React.FC<IDetalhePessoaProps> = ({ id, pessoa, jornada, cel
           ? `Início ${formatarData(celula.matricula.dataInicio)} · último acesso ${formatarData(celula.matricula.ultimoAcesso)}`
           : 'Ainda não iniciou esta jornada.'}
       </p>
+      {mensagem && (
+        <p className="pi-hint" role="status">
+          {mensagem}
+        </p>
+      )}
       <ol className={styles.etapas}>
         {ordenarEtapas(etapas).map((etapa: IEtapa, i: number) => {
           const item: IProgressoEtapa | undefined = progresso[String(etapa.id)];
@@ -64,6 +88,17 @@ const DetalhePessoa: React.FC<IDetalhePessoaProps> = ({ id, pessoa, jornada, cel
               <div className={styles.etapaTexto}>
                 <b>{etapa.titulo}</b>
                 <span>{feita ? `Concluída em ${formatarData(item?.c)}` : item ? `Em andamento${item.pct ? ` · ${item.pct}% assistido` : ''}` : 'Não iniciada'}</span>
+                {item?.q && (
+                  <span>
+                    Quiz: {item.q.t} {item.q.t === 1 ? 'tentativa' : 'tentativas'} desde a última liberação · melhor nota {item.q.n}%
+                    {item.q.u !== undefined && item.q.u !== item.q.n ? ` · última ${item.q.u}%` : ''}
+                  </span>
+                )}
+                {item?.q && !feita && item.q.t > 0 && aoLiberarQuiz && (
+                  <button type="button" className="pi-link-btn" disabled={liberando !== undefined} onClick={() => liberar(etapa.id)} style={{ alignSelf: 'flex-start' }}>
+                    {liberando === etapa.id ? 'Liberando…' : 'Liberar novas tentativas'}
+                  </button>
+                )}
               </div>
             </li>
           );

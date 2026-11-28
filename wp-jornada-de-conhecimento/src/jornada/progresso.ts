@@ -6,12 +6,13 @@
  * sanitizado é gravado na coluna Url da lista de Etapas (texto multilinha simples, sem mudança de esquema).
  * "Link" não é mais oferecido para etapas novas, mas continua exibido nas etapas existentes.
  */
-export type TipoEtapa = 'YouTube' | 'Video' | 'Documento' | 'Conteudo' | 'Link';
-export type RegraConclusao = 'Manual' | 'PercentualAssistido' | 'AbrirConteudo';
+export type TipoEtapa = 'YouTube' | 'Video' | 'Documento' | 'Conteudo' | 'Quiz' | 'Link';
+/** Aprovacao: etapa de quiz, concluída sozinha quando a pessoa atinge a nota mínima. */
+export type RegraConclusao = 'Manual' | 'PercentualAssistido' | 'AbrirConteudo' | 'Aprovacao';
 export type StatusMatricula = 'EmAndamento' | 'Concluida';
 
-const TIPOS: TipoEtapa[] = ['YouTube', 'Video', 'Documento', 'Conteudo', 'Link'];
-const REGRAS: RegraConclusao[] = ['Manual', 'PercentualAssistido', 'AbrirConteudo'];
+const TIPOS: TipoEtapa[] = ['YouTube', 'Video', 'Documento', 'Conteudo', 'Quiz', 'Link'];
+const REGRAS: RegraConclusao[] = ['Manual', 'PercentualAssistido', 'AbrirConteudo', 'Aprovacao'];
 
 export const PERCENTUAL_MINIMO_PADRAO: number = 90;
 export const LIMITE_COMENTARIO: number = 1000;
@@ -39,7 +40,7 @@ export interface IEtapa {
   ordem: number;
   tipo: TipoEtapa;
   url: string;
-  /** HTML sanitizado da etapa do tipo Conteudo (vazio nos demais tipos). */
+  /** HTML sanitizado (tipo Conteudo) ou JSON do quiz (tipo Quiz); vazio nos demais tipos. */
   conteudo?: string;
   duracaoMin: number;
   instrucoes: string;
@@ -54,6 +55,14 @@ export interface IProgressoEtapa {
   p?: number;
   pct?: number;
   c?: string;
+  /** Quiz: tentativas usadas (t), melhor nota (n), última nota (u). */
+  q?: IProgressoQuiz;
+}
+
+export interface IProgressoQuiz {
+  t: number;
+  n: number;
+  u?: number;
 }
 
 export type MapaProgresso = Record<string, IProgressoEtapa>;
@@ -108,7 +117,16 @@ export const lerProgresso = (json: string | undefined): MapaProgresso => {
       s: item.s,
       ...(numeroValido(item.p) ? { p: Math.floor(item.p) } : {}),
       ...(numeroValido(item.pct) ? { pct: Math.min(100, Math.round(item.pct)) } : {}),
-      ...(typeof item.c === 'string' ? { c: item.c } : {})
+      ...(typeof item.c === 'string' ? { c: item.c } : {}),
+      ...(item.q && numeroValido(item.q.t) && numeroValido(item.q.n)
+        ? {
+            q: {
+              t: Math.floor(item.q.t),
+              n: Math.min(100, Math.round(item.q.n)),
+              ...(numeroValido(item.q.u) ? { u: Math.min(100, Math.round(item.q.u)) } : {})
+            }
+          }
+        : {})
     };
   });
   return mapa;
@@ -136,15 +154,48 @@ export const novidade = (etapa: IEtapa, matricula: IMatricula | undefined): bool
   !!etapa.criadaEm &&
   new Date(etapa.criadaEm).getTime() > new Date(matricula.concluidaEm).getTime();
 
-/** Estado de cada etapa (ordenadas): com ordem obrigatória, a próxima só libera após a anterior. */
+/**
+ * Estado de cada etapa (ordenadas): com ordem obrigatória, a próxima só libera após a anterior.
+ * Quiz é barreira mesmo com ordem livre: sem aprovação, nenhuma etapa depois dele fica disponível.
+ */
 export const estadosEtapas = (etapas: IEtapa[], progresso: MapaProgresso, ordemLivre: boolean): EstadoEtapa[] => {
   let anteriorConcluida: boolean = true;
+  let quizPendente: boolean = false;
   return etapas.map((etapa: IEtapa) => {
     const feita: boolean = concluida(progresso, etapa);
-    const estado: EstadoEtapa = feita ? 'concluida' : ordemLivre || anteriorConcluida ? 'disponivel' : 'bloqueada';
+    const liberada: boolean = !quizPendente && (ordemLivre || anteriorConcluida);
+    const estado: EstadoEtapa = feita ? 'concluida' : liberada ? 'disponivel' : 'bloqueada';
     anteriorConcluida = anteriorConcluida && feita;
+    quizPendente = quizPendente || (etapa.tipo === 'Quiz' && !feita);
     return estado;
   });
+};
+
+/**
+ * Registra uma tentativa de quiz. Aprovado: a etapa é concluída na hora. A melhor nota nunca diminui;
+ * etapa já concluída continua concluída (refazer para praticar não muda nada).
+ */
+export const registrarTentativa = (progresso: MapaProgresso, etapaId: number, nota: number, aprovado: boolean, agora: Date): MapaProgresso => {
+  const chave: string = String(etapaId);
+  const atual: IProgressoEtapa | undefined = progresso[chave];
+  if (atual?.s === 'concluida') {
+    return progresso;
+  }
+  const q: IProgressoQuiz = { t: (atual?.q?.t ?? 0) + 1, n: Math.max(atual?.q?.n ?? 0, nota), u: nota };
+  return {
+    ...progresso,
+    [chave]: aprovado ? { ...atual, s: 'concluida', c: agora.toISOString(), q } : { ...atual, s: 'iniciada', q }
+  };
+};
+
+/** Gestor libera novas tentativas: zera o contador e mantém a melhor nota. */
+export const liberarTentativas = (progresso: MapaProgresso, etapaId: number): MapaProgresso => {
+  const chave: string = String(etapaId);
+  const atual: IProgressoEtapa | undefined = progresso[chave];
+  if (!atual?.q) {
+    return progresso;
+  }
+  return { ...progresso, [chave]: { ...atual, q: { ...atual.q, t: 0 } } };
 };
 
 /** Concluir etapa liberado conforme a regra da etapa. */
@@ -158,6 +209,9 @@ export const podeConcluir = (etapa: IEtapa, progresso: MapaProgresso): boolean =
       return (atual?.pct ?? 0) >= (etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO);
     case 'AbrirConteudo':
       return !!atual;
+    case 'Aprovacao':
+      // Só a aprovação no quiz conclui a etapa (registrarTentativa).
+      return false;
     default:
       return true;
   }

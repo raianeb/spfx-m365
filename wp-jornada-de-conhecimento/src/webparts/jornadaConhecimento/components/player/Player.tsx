@@ -19,8 +19,10 @@ import {
   proximaEtapa,
   recalcular,
   registrarAbertura,
-  registrarPosicao
+  registrarPosicao,
+  registrarTentativa
 } from '../../../../jornada/progresso';
+import { IQuiz, IResultadoQuiz, lerQuiz } from '../../../../jornada/quiz';
 import { ICurtidas } from '../../../../services/EngajamentoService';
 import { mensagemDeErro } from '../../../../services/sp';
 import { Empty, ErrorBox, GtiDialog, Icon, Loading, ProgressBar, useToast } from '../gti';
@@ -28,13 +30,14 @@ import { IContextoTela, IJornadaVisivel, rotaJornada, rotaPlayer } from '../tipo
 import { ICONE_TIPO, ROTULO_TIPO, formatarDuracao, textoErro } from '../comum/ui';
 import { encontrarJornada } from '../aprendizado/DetalheJornada';
 import ConteudoEtapa from './ConteudoEtapa';
+import QuizEtapa from './QuizEtapa';
 import { EscolhaNota } from './Avaliacoes';
 import styles from '../jc.module.scss';
 
 const ROTULO_ESTADO: Record<EstadoEtapa, string> = {
   concluida: 'concluída',
   disponivel: 'disponível',
-  bloqueada: 'bloqueada até concluir a anterior'
+  bloqueada: 'bloqueada até concluir a anterior ou ser aprovado no quiz'
 };
 
 interface IPlayerProps {
@@ -217,8 +220,13 @@ const PlayerJornada: React.FC<IPlayerProps> = ({ ctx, item }: IPlayerProps) => {
   const pctEtapa: number = progressoEtapa?.pct ?? 0;
   const minimo: number = etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO;
   const instrucoes: string = toSafeHtml(etapa.instrucoes);
+  // Quiz anterior ainda sem aprovação: é ele que segura esta etapa.
+  const quizAntes: IEtapa | undefined = etapas.slice(0, indiceAtual).find((e: IEtapa, i: number) => e.tipo === 'Quiz' && estados[i] !== 'concluida');
+  const quiz: IQuiz | undefined = etapa.tipo === 'Quiz' ? lerQuiz(etapa.conteudo) : undefined;
   const regraTexto: string =
-    etapa.regra === 'PercentualAssistido'
+    etapa.tipo === 'Quiz'
+      ? `Atinja ${quiz?.notaMinima ?? 0}% no quiz para liberar as próximas etapas`
+      : etapa.regra === 'PercentualAssistido'
       ? `Assista ${minimo}% para concluir · ${pctEtapa}% assistido`
       : etapa.regra === 'AbrirConteudo'
         ? etapa.tipo === 'Conteudo'
@@ -258,6 +266,30 @@ const PlayerJornada: React.FC<IPlayerProps> = ({ ctx, item }: IPlayerProps) => {
       setAviso(`${mensagemDeErro(falha, 'Salvar a conclusão')} Uma nova tentativa será feita em instantes.`);
     } finally {
       setSalvando(false);
+    }
+  };
+
+  /** Grava a tentativa do quiz; aprovada, conclui a etapa (e a jornada, se era a última). */
+  const registrarQuiz = async (resultado: IResultadoQuiz): Promise<void> => {
+    const atual: IMatricula | undefined = matriculaAtual.current;
+    if (!atual) {
+      return;
+    }
+    const agora: Date = new Date();
+    const progresso = registrarTentativa(atual.progresso, etapa.id, resultado.nota, resultado.aprovado, agora);
+    const depois: IMatricula = recalcular({ ...atual, progresso }, etapas, agora);
+    try {
+      await atualizar(depois, true);
+    } catch (falha: unknown) {
+      const ultima: IMatricula | undefined = matriculaAtual.current;
+      if (ultima) {
+        servicos.matriculas.agendar(area, ultima);
+      }
+      throw falha;
+    } finally {
+      if (atual.status !== 'Concluida' && depois.status === 'Concluida') {
+        setComemorar(true);
+      }
     }
   };
 
@@ -369,7 +401,32 @@ const PlayerJornada: React.FC<IPlayerProps> = ({ ctx, item }: IPlayerProps) => {
             </span>
           </div>
           {estadoAtual === 'bloqueada' ? (
-            <Empty icone="cadeado" titulo="Etapa bloqueada" descricao="Conclua a etapa anterior para liberar esta." />
+            <Empty
+              icone="cadeado"
+              titulo="Etapa bloqueada"
+              descricao={quizAntes ? `Seja aprovado no quiz "${quizAntes.titulo}" para liberar esta etapa.` : 'Conclua a etapa anterior para liberar esta.'}
+              acao={
+                quizAntes ? (
+                  <button type="button" className="pi-btn primary" onClick={() => irPara(quizAntes.id)}>
+                    Ir para o quiz
+                  </button>
+                ) : undefined
+              }
+            />
+          ) : etapa.tipo === 'Quiz' ? (
+            quiz ? (
+              <QuizEtapa
+                key={etapa.id}
+                id={`${ctx.idTitulo}-quiz-${etapa.id}`}
+                quiz={quiz}
+                progresso={progressoEtapa?.q}
+                aprovadaAntes={estadoAtual === 'concluida'}
+                aoEnviar={registrarQuiz}
+                aoContinuar={proxima ? () => irPara(proxima.id) : undefined}
+              />
+            ) : (
+              <p className={styles.avisoConteudo}>Este quiz não pôde ser lido. Avise a gestão da área.</p>
+            )
           ) : (
             <ConteudoEtapa key={etapa.id} etapa={etapa} siteUrl={props.siteUrl} inicioSeg={progressoEtapa?.p ?? 0} aoProgresso={aoProgresso} aoAbrir={aoAbrir} />
           )}
@@ -397,17 +454,22 @@ const PlayerJornada: React.FC<IPlayerProps> = ({ ctx, item }: IPlayerProps) => {
               </span>
             ) : (
               <>
-                <button
-                  type="button"
-                  className="pi-btn primary"
-                  disabled={salvando || estadoAtual === 'bloqueada' || !podeConcluir(etapa, matricula.progresso)}
-                  onClick={concluir}
-                >
-                  <Icon nome="check" tamanho={16} />
-                  {salvando ? 'Salvando…' : 'Concluir etapa'}
-                </button>
+                {etapa.tipo !== 'Quiz' && (
+                  <button
+                    type="button"
+                    className="pi-btn primary"
+                    disabled={salvando || estadoAtual === 'bloqueada' || !podeConcluir(etapa, matricula.progresso)}
+                    onClick={concluir}
+                  >
+                    <Icon nome="check" tamanho={16} />
+                    {salvando ? 'Salvando…' : 'Concluir etapa'}
+                  </button>
+                )}
                 <span className={styles.regra}>
-                  <Icon nome={etapa.regra === 'PercentualAssistido' ? 'video' : etapa.regra === 'AbrirConteudo' ? 'olho' : 'checkCirculo'} tamanho={14} />
+                  <Icon
+                    nome={etapa.tipo === 'Quiz' ? 'quiz' : etapa.regra === 'PercentualAssistido' ? 'video' : etapa.regra === 'AbrirConteudo' ? 'olho' : 'checkCirculo'}
+                    tamanho={14}
+                  />
                   {regraTexto}
                 </span>
               </>

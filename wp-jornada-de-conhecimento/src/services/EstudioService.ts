@@ -127,7 +127,8 @@ const paraEtapaItem = (etapa: IEtapa, jornadaId: number): Record<string, unknown
   Ordem: etapa.ordem,
   Tipo: etapa.tipo,
   // Etapa de conteúdo: o HTML (já sanitizado pelo editor) vai na coluna Url, que é texto multilinha simples.
-  Url: etapa.tipo === 'Conteudo' ? sanitizarConteudo(etapa.conteudo ?? '') : etapa.url.trim(),
+  // Quiz: o JSON (com as marcas das respostas) também vai na coluna Url.
+  Url: etapa.tipo === 'Conteudo' ? sanitizarConteudo(etapa.conteudo ?? '') : etapa.tipo === 'Quiz' ? etapa.conteudo ?? '' : etapa.url.trim(),
   DuracaoMin: etapa.duracaoMin,
   Instrucoes: etapa.instrucoes,
   RegraConclusao: etapa.regra,

@@ -3,7 +3,7 @@
 // Vídeo e documento: navegador das bibliotecas do site (pastas, filtro por tipo, envio do computador).
 // Texto e imagens: conteúdo montado no próprio editor (EditorConteudo).
 import * as React from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import RichTextEditor from '../../../../comum/RichTextEditor';
 import { conteudoTemAlgo } from '../../../../comum/richText';
 import { EXTENSOES_POR_TIPO, ErrosFormulario, regraPadrao, validarEtapa } from '../../../../jornada/estudio';
@@ -11,6 +11,7 @@ import { IArea } from '../../../../jornada/modelo';
 import { IEtapa, PERCENTUAL_MINIMO_PADRAO, RegraConclusao, TipoEtapa } from '../../../../jornada/progresso';
 import { EstudioService, IItemPasta } from '../../../../services/EstudioService';
 import EditorConteudo from './EditorConteudo';
+import EditorQuiz from './EditorQuiz';
 import NavegadorBiblioteca from './NavegadorBiblioteca';
 import { Field, GtiDialog, Icon } from '../gti';
 import { ICONE_TIPO } from '../comum/ui';
@@ -33,13 +34,15 @@ const TIPOS: { tipo: TipoEtapa; rotulo: string }[] = [
   { tipo: 'YouTube', rotulo: 'YouTube' },
   { tipo: 'Video', rotulo: 'Vídeo da biblioteca' },
   { tipo: 'Documento', rotulo: 'Documento' },
-  { tipo: 'Conteudo', rotulo: 'Texto e imagens' }
+  { tipo: 'Conteudo', rotulo: 'Texto e imagens' },
+  { tipo: 'Quiz', rotulo: 'Quiz' }
 ];
 
 /** "Link" saiu das opções; continua aparecendo só para editar etapas antigas desse tipo. */
 const TIPO_LINK_ANTIGO: { tipo: TipoEtapa; rotulo: string } = { tipo: 'Link', rotulo: 'Link (antigo)' };
 
-const regrasPara = (tipo: TipoEtapa): { regra: RegraConclusao; rotulo: string }[] => [
+const regrasPara = (tipo: TipoEtapa): { regra: RegraConclusao; rotulo: string }[] =>
+  tipo === 'Quiz' ? [{ regra: 'Aprovacao', rotulo: 'Atingir a nota mínima do quiz' }] : [
   ...(tipo === 'YouTube' || tipo === 'Video' ? [{ regra: 'PercentualAssistido' as RegraConclusao, rotulo: 'Assistir a um percentual do vídeo' }] : []),
   { regra: 'AbrirConteudo', rotulo: tipo === 'Conteudo' ? 'Ler até o fim do conteúdo' : 'Abrir o conteúdo' },
   { regra: 'Manual', rotulo: 'Marcar como concluída' }
@@ -48,6 +51,8 @@ const regrasPara = (tipo: TipoEtapa): { regra: RegraConclusao; rotulo: string }[
 const EtapaForm: React.FC<IEtapaFormProps> = (props: IEtapaFormProps) => {
   const [etapa, setEtapa] = useState<IEtapa>(props.etapa);
   const [erros, setErros] = useState<ErrosFormulario>({});
+  const [tentouAplicar, setTentouAplicar] = useState<boolean>(false);
+  const rascunhos = useRef<Partial<Record<TipoEtapa, string>>>({});
   const id: string = props.id;
 
   const alterar = (parcial: Partial<IEtapa>): void => {
@@ -64,10 +69,14 @@ const EtapaForm: React.FC<IEtapaFormProps> = (props: IEtapaFormProps) => {
 
   const alterarTipo = (tipo: TipoEtapa): void => {
     const regra: RegraConclusao = regrasPara(tipo).some((o) => o.regra === etapa.regra) ? etapa.regra : regraPadrao(tipo);
-    alterar({ tipo, regra, percentualMinimo: etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO });
+    // Texto e Quiz usam o mesmo campo: cada tipo guarda o próprio rascunho ao alternar.
+    rascunhos.current[etapa.tipo] = etapa.conteudo ?? '';
+    const conteudo: string = rascunhos.current[tipo] ?? (props.etapa.tipo === tipo ? props.etapa.conteudo ?? '' : '');
+    alterar({ tipo, regra, conteudo, percentualMinimo: etapa.percentualMinimo || PERCENTUAL_MINIMO_PADRAO });
   };
 
   const aplicar = (): void => {
+    setTentouAplicar(true);
     const encontrados: ErrosFormulario = validarEtapa(etapa, props.siteUrl, conteudoTemAlgo);
     setErros(encontrados);
     if (Object.keys(encontrados).length === 0) {
@@ -77,6 +86,7 @@ const EtapaForm: React.FC<IEtapaFormProps> = (props: IEtapaFormProps) => {
 
   const usaBiblioteca: boolean = etapa.tipo === 'Video' || etapa.tipo === 'Documento';
   const ehConteudo: boolean = etapa.tipo === 'Conteudo';
+  const ehQuiz: boolean = etapa.tipo === 'Quiz';
   const tipos: { tipo: TipoEtapa; rotulo: string }[] = props.etapa.tipo === 'Link' ? [...TIPOS, TIPO_LINK_ANTIGO] : TIPOS;
 
   return (
@@ -134,7 +144,22 @@ const EtapaForm: React.FC<IEtapaFormProps> = (props: IEtapaFormProps) => {
             />
           </div>
         )}
-        {ehConteudo ? (
+        {ehQuiz ? (
+          <>
+            <EditorQuiz
+              key={`${etapa.id}-quiz`}
+              id={`${id}-quiz`}
+              valor={etapa.conteudo ?? ''}
+              mostrarErros={tentouAplicar}
+              aoAlterar={(json: string) => alterar({ conteudo: json })}
+            />
+            {erros.conteudo && (
+              <span className="pi-field-error" role="alert">
+                {erros.conteudo}
+              </span>
+            )}
+          </>
+        ) : ehConteudo ? (
           <EditorConteudo
             key={`${etapa.id}-conteudo`}
             id={`${id}-conteudo`}

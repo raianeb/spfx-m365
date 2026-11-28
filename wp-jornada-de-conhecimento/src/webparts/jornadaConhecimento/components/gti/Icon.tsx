@@ -61,7 +61,10 @@ const caminhos = {
   citacao: 'M5 11h4v6H4v-5c0-3 1-5 4-6M15 11h4v6h-5v-5c0-3 1-5 4-6',
   divisor: 'M3 12h18M8 7h8M8 17h8',
   limparFormato: 'M6 5h12M12 5l-3 14M4 20l16-16',
-  subir: 'M12 16V4M7 9l5-5 5 5M4 20h16'
+  subir: 'M12 16V4M7 9l5-5 5 5M4 20h16',
+  quiz: 'M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01M4 4h16v16H4z',
+  duplicar: 'M8 8h12v12H8zM4 16V4h12',
+  trofeu: 'M8 4h8v5a4 4 0 0 1-8 0ZM8 6H4.5a3 3 0 0 0 3.5 3.5M16 6h3.5a3 3 0 0 1-3.5 3.5M12 13v4M8 20h8M10 17h4'
 } as const;
 
 export type NomeIcone = keyof typeof caminhos;

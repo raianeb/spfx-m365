@@ -477,6 +477,19 @@ const Gestao: React.FC<IContextoTela> = (ctx: IContextoTela) => {
                   setDetalhe(undefined);
                 }
           }
+          aoLiberarQuiz={
+            detalhe.celula.matricula
+              ? async (etapaId: number) => {
+                  const matricula = detalhe.celula.matricula;
+                  if (!matricula) {
+                    return;
+                  }
+                  const atualizada = await servicos.gestao.liberarTentativas(area, matricula, etapaId);
+                  setDados((atual) => atual && { ...atual, matriculas: atual.matriculas.map((m) => (m.id === atualizada.id ? atualizada : m)) });
+                  setDetalhe({ ...detalhe, celula: { ...detalhe.celula, matricula: atualizada } });
+                }
+              : undefined
+          }
           aoFechar={() => setDetalhe(undefined)}
         />
       )}

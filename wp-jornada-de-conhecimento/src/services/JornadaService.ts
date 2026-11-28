@@ -15,6 +15,7 @@ import {
   lerProgresso,
   lerPublico,
   regraDe,
+  TipoEtapa,
   tipoEtapaDe
 } from '../jornada/progresso';
 
@@ -115,14 +116,17 @@ export const jornadaDe = (item: IJornadaItem, areaId: number): IJornada => ({
   dataPublicacao: item.DataPublicacao
 });
 
+/** Tipos cujo conteúdo (HTML ou JSON do quiz) fica na coluna Url. */
+export const guardaConteudo = (tipo: TipoEtapa): boolean => tipo === 'Conteudo' || tipo === 'Quiz';
+
 export const etapaDe = (item: IEtapaItem): IEtapa => ({
   id: item.Id,
   jornadaId: item.JornadaId ?? 0,
   titulo: item.Title ?? '',
   ordem: item.Ordem ?? 0,
   tipo: tipoEtapaDe(item.Tipo),
-  url: tipoEtapaDe(item.Tipo) === 'Conteudo' ? '' : item.Url ?? '',
-  conteudo: tipoEtapaDe(item.Tipo) === 'Conteudo' ? item.Url ?? '' : undefined,
+  url: guardaConteudo(tipoEtapaDe(item.Tipo)) ? '' : item.Url ?? '',
+  conteudo: guardaConteudo(tipoEtapaDe(item.Tipo)) ? item.Url ?? '' : undefined,
   duracaoMin: item.DuracaoMin ?? 0,
   instrucoes: item.Instrucoes ?? '',
   regra: regraDe(item.RegraConclusao),
