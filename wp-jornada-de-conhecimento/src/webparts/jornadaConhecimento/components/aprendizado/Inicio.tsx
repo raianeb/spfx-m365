@@ -2,7 +2,7 @@
 // spfx-acessibilidade-conteudo (gráfico com rótulo em texto). Escopo, seção 3 (Minhas Jornadas).
 import * as React from 'react';
 import { IEtapa, IMatricula, etapaParaContinuar, minutosConcluidos } from '../../../../jornada/progresso';
-import { Empty, ErrorBox, Hero, Icon, Loading, Metric, MetricGrid, PageHeader, Panel, ProgressRing, SectionTitle } from '../gti';
+import { Empty, ErrorBox, Hero, Icon, Loading, Metric, MetricGrid, Panel, ProgressRing, SectionTitle } from '../gti';
 import { IContextoTela, IJornadaVisivel, rotaPlayer, rotaJornada } from '../tipos';
 import { formatarData, formatarDuracao } from '../comum/ui';
 import { situacaoDe } from './dadosCatalogo';
@@ -41,21 +41,13 @@ export const minutosPorDia = (itens: IJornadaVisivel[], agora: Date): { dia: Dat
 
 const Inicio: React.FC<IContextoTela> = (ctx: IContextoTela) => {
   const { catalogo, roteador, props } = ctx;
+  const LEMA: string = 'Só o conhecimento liberta';
   const primeiroNome: string = props.nomeUsuario.split(' ')[0] || '';
+  // Sem cabeçalho de tela: o banner abre a página. O título fica só para leitor de tela (foco ao trocar de tela).
   const cabecalho = (
-    <PageHeader
-      idTitulo={ctx.idTitulo}
-      nivel={2}
-      sobretitulo="Minha jornada"
-      titulo={primeiroNome ? `Olá, ${primeiroNome}` : 'Olá'}
-      descricao="Seu aprendizado nas áreas de que você participa, em um só lugar."
-      acoes={
-        <a className="pi-btn" href={roteador.hrefDe('catalogo')} onClick={roteador.aoClicarLink('catalogo')}>
-          <Icon nome="grade" tamanho={16} />
-          Explorar catálogo
-        </a>
-      }
-    />
+    <h2 id={ctx.idTitulo} tabIndex={-1} className="pi-sr">
+      Início{primeiroNome ? ` de ${primeiroNome}` : ''}
+    </h2>
   );
 
   if (catalogo.tipo === 'carregando') {
@@ -151,6 +143,7 @@ const Inicio: React.FC<IContextoTela> = (ctx: IContextoTela) => {
             </>
           }
           lateral={<ProgressRing percentual={continuar.percentual} />}
+          lema={LEMA}
         />
       ) : (
         <Hero
@@ -158,6 +151,7 @@ const Inicio: React.FC<IContextoTela> = (ctx: IContextoTela) => {
           sobretitulo="Comece agora"
           titulo="Escolha sua próxima jornada"
           descricao="Vídeos, documentos e links organizados em etapas, no seu ritmo."
+          lema={LEMA}
           acoes={
             <a className={`pi-btn lg ${styles.botaoClaro}`} href={roteador.hrefDe('catalogo')} onClick={roteador.aoClicarLink('catalogo')}>
               Explorar catálogo

@@ -109,7 +109,7 @@
       gap: 18px;
       min-height: 64px;
       padding: 10px 14px 10px 18px;
-      margin-bottom: 26px;
+      margin-bottom: 20px;
       background: color-mix(in srgb, var(--pi-surface) 94%, transparent);
       backdrop-filter: blur(8px);
       border: 1px solid var(--pi-border);
@@ -211,6 +211,11 @@
     .pi-hero .pi-eyebrow { color: #8fb3cd; }
     .pi-hero-body { position: relative; display: flex; flex-direction: column; gap: 14px; }
     .pi-hero-aside { position: relative; }
+    .pi-hero-lema {
+      position: absolute; top: 22px; right: 30px; margin: 0; display: flex; align-items: center; gap: 10px;
+      font-size: 12px; font-style: italic; letter-spacing: 0.4px; color: #cfe0ec;
+    }
+    .pi-hero-lema::before { content: ''; width: 22px; height: 1px; background: #7fd1c7; }
     .pi-hero-deco { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.5; }
 
     // ---------- situação, progresso ----------
@@ -438,6 +443,7 @@
     .pi-wpbar { padding: 8px 10px; margin-bottom: 18px; }
     .pi-page-head h1, .pi-page-head h2.pi-title { font-size: 24px; }
     .pi-hero { grid-template-columns: minmax(0, 1fr); padding: 24px; }
+    .pi-hero-lema { position: relative; top: auto; right: auto; order: -1; margin-bottom: -6px; }
     .pi-hero-aside { display: none; }
     .pi-form-grid { grid-template-columns: minmax(0, 1fr); }
     .pi-field input, .pi-field select, .pi-field textarea { font-size: 16px; }

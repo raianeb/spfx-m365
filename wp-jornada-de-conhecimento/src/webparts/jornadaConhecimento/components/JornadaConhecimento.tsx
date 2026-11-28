@@ -1,6 +1,6 @@
 // Skills aplicadas: spfx-padrao-visual-gti (modo B: navegação interna compacta, sem cabeçalho próprio — o site usa o
 // ex-layout-sharepoint), spfx-configuracao-webpart (ambiente visível, troca de contexto descarta respostas antigas),
-// spfx-implementacao-base (diagnóstico), spfx-codigo-performance (telas de gestão em pacotes sob demanda).
+// spfx-implementacao-base (diagnóstico); a busca fica no Catálogo (o cabeçalho do site já tem a busca geral), spfx-codigo-performance (telas de gestão em pacotes sob demanda).
 import * as React from 'react';
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { prefixosValidos } from '../../../core/prefixos';
@@ -23,18 +23,15 @@ import {
   IEventoLog,
   IGrupoNav,
   IItemNav,
-  IResultadoBusca,
   Loading,
   NoAccess,
-  QuickSearch,
   ToastProvider,
   WpNav,
   useToast,
   useWpRoute
 } from './gti';
-import { EstadoCatalogo, IContextoTela, IJornadaConhecimentoProps, IJornadaVisivel, IServicosJornada, NOME_SOLUCAO, rotaJornada, rotaPlayer } from './tipos';
+import { EstadoCatalogo, IContextoTela, IJornadaConhecimentoProps, IServicosJornada, NOME_SOLUCAO } from './tipos';
 import { chaveNota, montarVisiveis } from './aprendizado/dadosCatalogo';
-import { ICONE_TIPO } from './comum/ui';
 import Inicio from './aprendizado/Inicio';
 import Catalogo from './aprendizado/Catalogo';
 import MeuAprendizado from './aprendizado/MeuAprendizado';
@@ -104,7 +101,6 @@ const Aplicacao: React.FC<IJornadaConhecimentoProps> = (props: IJornadaConhecime
   const [versaoPerfil, setVersaoPerfil] = useState<number>(0);
   const [catalogo, setCatalogo] = useState<EstadoCatalogo>({ tipo: 'carregando' });
   const [versaoCatalogo, setVersaoCatalogo] = useState<number>(0);
-  const [buscaAberta, setBuscaAberta] = useState<boolean>(false);
   const roteador = useWpRoute({ rotaInicial: 'inicio', prefixo: 'jc', sincronizarHash: true });
   const idTitulo: string = `jc-${React.useId().replace(/:/g, '')}-titulo`;
 
@@ -208,41 +204,6 @@ const Aplicacao: React.FC<IJornadaConhecimentoProps> = (props: IJornadaConhecime
   const recarregarCatalogo = useCallback(() => setVersaoCatalogo((v: number) => v + 1), []);
   const recarregarPerfil = useCallback(() => setVersaoPerfil((v: number) => v + 1), []);
 
-  const buscar = useCallback(
-    (texto: string): IResultadoBusca[] => {
-      const q: string = texto.toLowerCase().trim();
-      const telas: IResultadoBusca[] = gruposNav(perfil)
-        .reduce((todos: IItemNav[], g: IGrupoNav) => todos.concat(g.itens), [])
-        .map((i: IItemNav) => ({ chave: `t-${i.rota}`, grupo: 'Telas', titulo: i.rotulo, detalhe: 'Ir para', icone: i.icone, rota: i.rota }));
-      const itens: IJornadaVisivel[] = catalogo.tipo === 'pronto' ? catalogo.itens : [];
-      const jornadas: IResultadoBusca[] = itens.map((i: IJornadaVisivel) => ({
-        chave: `j-${i.area.id}-${i.jornada.id}`,
-        grupo: 'Jornadas',
-        titulo: i.jornada.titulo,
-        detalhe: `${i.area.nome} · ${i.etapas.length} etapa(s) · ${i.percentual}%`,
-        icone: 'livro',
-        rota: rotaJornada(i)
-      }));
-      const etapas: IResultadoBusca[] = q
-        ? itens.reduce(
-            (todos: IResultadoBusca[], i: IJornadaVisivel) =>
-              todos.concat(
-                i.etapas.map((e) => ({
-                  chave: `e-${i.area.id}-${e.id}`,
-                  grupo: 'Etapas',
-                  titulo: e.titulo,
-                  detalhe: i.jornada.titulo,
-                  icone: ICONE_TIPO[e.tipo],
-                  rota: rotaPlayer(i, e.id)
-                }))
-              ),
-            []
-          )
-        : [];
-      return [...telas, ...jornadas, ...etapas].filter((r: IResultadoBusca) => !q || `${r.titulo} ${r.detalhe ?? ''}`.toLowerCase().indexOf(q) !== -1);
-    },
-    [perfil, catalogo]
-  );
 
   if (carga.tipo === 'carregando') {
     return <Loading texto="Carregando seu perfil…" />;
@@ -300,12 +261,9 @@ const Aplicacao: React.FC<IJornadaConhecimentoProps> = (props: IJornadaConhecime
 
   return (
     <>
-      <WpNav ambiente={environment} grupos={gruposNav(p)} roteador={roteador} aoBuscar={() => setBuscaAberta(true)} rotuloNavegacao={`Telas de ${props.title || NOME_SOLUCAO}`} />
+      <WpNav ambiente={environment} grupos={gruposNav(p)} roteador={roteador} rotuloNavegacao={`Telas de ${props.title || NOME_SOLUCAO}`} />
       <Suspense fallback={<Loading />}>{conteudo}</Suspense>
       <DiagnosticoInstancia props={props} />
-      {buscaAberta && (
-        <QuickSearch id={`${idTitulo}-busca`} buscar={buscar} dica="Buscar jornadas, etapas e telas" aoEscolher={roteador.navegar} aoFechar={() => setBuscaAberta(false)} />
-      )}
     </>
   );
 };

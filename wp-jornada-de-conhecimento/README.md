@@ -7,7 +7,7 @@ Web part **Jornada de Conhecimento** da Equipe M365: jornadas de treinamento por
 - Provisionamento: `provisionamento/INSTRUCOES.md`
 - Roteiro de teste ponta a ponta: `docs/roteiro-teste.md`
 - Protótipo aprovado da interface: `prototipo/index.html`
-- Pacote pronto para o Catálogo de Aplicativos: `pacote/wp-jornada-de-conhecimento.sppkg` (versão 1.1.0.0)
+- Pacote pronto para o Catálogo de Aplicativos: `pacote/wp-jornada-de-conhecimento.sppkg` (versão 1.1.1.0)
 
 ## Interface (versão 1.1)
 
